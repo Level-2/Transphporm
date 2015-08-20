@@ -18,22 +18,11 @@ class Template {
 		$this->hooks[] = [$xpath, $hook];
 	}
 
-	private function replace(\DomNode $node, $replacement) {
-		if (is_array($replacement) || $replacement instanceof \DomNodeList) {
-			foreach ($replacement as $replace) $node->parentNode->insertBefore($replace->cloneNode(true), $node);
-			$node->parentNode->removeChild($node);
-		}
-		else $node->parentNode->replaceChild($replacement, $node);
-	}
-
 	private function processHook($query, $hook, $filter = '') {
 		foreach ($this->xpath->query($query . $filter) as $element) $hook->run($element);
 	}
 
 	public function output() {
-		//Process empty tags e.g. <tpl:foo.bar /> first, these variables might need to be replaced inside tags with child nodes
-		foreach ($this->hooks as list($query, $hook)) $this->processHook($query, $hook, ' and not(node())');
-
 		//Now process tags with child nodes, which will have had any variables already replaced
 		foreach ($this->hooks as list($query, $hook)) $this->processHook($query, $hook);
 
