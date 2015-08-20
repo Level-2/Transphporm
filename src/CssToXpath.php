@@ -17,10 +17,10 @@ class CssToXpath {
 				return '/' . $string;
 			},
 			'#' => function($string) {
-				return '[@id=\'' . $string . '\']';
+				return '//*[@id=\'' . $string . '\']';
 			},
-			'#' => function($string) {
-				return '[contains(concat(\' \', normalize-space(@class), \' \'), \' ' . $string . ' \')]';
+			'.' => function($string) {
+				return '//*[contains(concat(\' \', normalize-space(@class), \' \'), \' ' . $string . ' \')]';
 			}
 		];
 	}
@@ -59,6 +59,7 @@ class CssToXpath {
 			if ($selector->string == '') continue;
 			if (isset($this->translators[trim($selector->type)])) $xpath .= $this->translators[trim($selector->type)]($selector->string);
 		}
+
 		return $xpath;
 	}
 
