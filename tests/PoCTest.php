@@ -18,6 +18,7 @@ class PoCTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('<ul><li>tom</li></ul>' ,$template->output()); 
 	}
 
+
 	public function testContentObject() {
 		$template = '<template name="">
 				<ul><li>TEST1</li></ul>
@@ -167,6 +168,7 @@ class PoCTest extends PHPUnit_Framework_TestCase {
 
 
 		$template = new \CDS\Builder($template, $css, $data);
+
 
 		$this->assertEquals($this->stripTabs('<ul>
 			<li>

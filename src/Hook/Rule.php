@@ -18,10 +18,6 @@ class Rule implements \CDS\Hook {
 		return $element;
 	}
 
-	private function bind($val, $element) {
-		$this->dataStorage[$element] = $this->data;
-	}
-
 	public function content($val, $element) {
 		$value = $this->parseFunction($val, $element);
 		if ($element instanceof \DomElement) {
@@ -71,7 +67,6 @@ class Rule implements \CDS\Hook {
 	}
 
 	private function parseFunction($function, $element) {
-
 		$open = strpos($function, '(');
 		$close = strpos($function, ')', $open);
 		
@@ -84,8 +79,7 @@ class Rule implements \CDS\Hook {
 	private function data($val, $element) {
 		$data = $this->getData($element);
 		$value = $this->traverse($val, $data);
-		return $value;
-			
+		return $value;			
 	}
 
 	private function traverse($name, $data) {

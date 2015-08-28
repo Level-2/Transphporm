@@ -22,3 +22,4 @@ class Builder {
 		return $this->template->output();
 	}
 }
+

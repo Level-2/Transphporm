@@ -1,0 +1,21 @@
+{
+    "name": "tombzombie/CDS",
+    "version": "1.0",
+    "description": "A new approach at templating",
+    "license": "BSD-2-Clause",
+    "homepage": "https://github.com/TomBZombie/CDS",
+    "keywords": ["template system"],
+    "minimum-stability": "dev",
+    "authors": [
+    	{
+    		"name": "Tom Butler",
+    		"email": "tom@r.je"
+    	}
+    ],
+    "require": {
+        "php": ">=5.4.0"
+    },
+    "autoload": {
+    	"classmap": ["src/"]
+    }
+}
