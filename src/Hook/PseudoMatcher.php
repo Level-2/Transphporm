@@ -37,15 +37,12 @@ class PseudoMatcher {
 	}
 
 	private function nth($pseudo, $element) {
-		if (strpos($pseudo, 'nth-child') === 0) {		
-
+		if (strpos($pseudo, 'nth-child') === 0) {	
 			$criteria = $this->getBetween($pseudo, '(', ')');
 			$num = $this->getBetween($element->getNodePath(), '[', ']');
-			if (is_numeric($criteria)) {				
-				if ($num == $criteria) return true;
-				else return false;
-			}
-			else if (is_callable([$this, $criteria])) return $this->$criteria($num);
+			
+			if (is_callable([$this, $criteria])) return $this->$criteria($num);
+			else return $num == $criteria;
 			
 		}
 		return true;
