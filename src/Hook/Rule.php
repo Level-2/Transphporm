@@ -47,6 +47,14 @@ class Rule implements \CDS\Hook {
 		return str_replace('\\' . $marker, $marker, $string);
 	}
 
+	private function parseFunction($function) {
+		$open = strpos($function, '(');
+		$close = strpos($function, ')', $open);
+		$name = substr($function, 0, $open);
+		$params = substr($function, $open+1, $close-$open-1);
+		return ['name' => $name, 'params' => $params, 'endPoint' => $close];
+	}
+
 	private function parseValue($function, $element) {
 		$result = [];
 
@@ -55,14 +63,12 @@ class Rule implements \CDS\Hook {
 			$result[] = $this->extractQuotedString($function[0], $function);
 		}
 		else {
-			$open = strpos($function, '(');
-			$close = strpos($function, ')', $open);
-			$finalPos = $close;
-			$name = substr($function, 0, $open);
-			$params = substr($function, $open+1, $close-$open-1);
+			$func = $this->parseFunction($function);
+			$finalPos = $func['endPoint'];			
+			$name = $func['name'];
 
 			if (is_callable([$this->dataFunction, $name])) {
-				$data = $this->dataFunction->$name($params, $element);	
+				$data = $this->dataFunction->$name($func['params'], $element);	
 				if (is_array($data)) $result += $data;
 				else $result[] = $data;
 			} 
