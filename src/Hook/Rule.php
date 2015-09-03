@@ -32,7 +32,6 @@ class Rule implements \CDS\Hook {
 
 	public function getRules() {
 		return $this->rules;
-
 	}
 
 	public function registerProperty($name, $closure) {
@@ -42,7 +41,7 @@ class Rule implements \CDS\Hook {
 	public function getProperties() {
 		return $this->properties;
 	}
-	
+
 	private function findMatchingPos($string, $char, $start = 0, $escape = '\\') {
 		$pos = $start+1;
 
@@ -70,8 +69,7 @@ class Rule implements \CDS\Hook {
 
 	private function parseValue($function, $element) {
 		$result = [];
-
-		if (in_array($function[0], ['\\', '"'])) {
+		if (in_array($function[0], ['\'', '"'])) {
 			$finalPos = $this->findMatchingPos($function, $function[0]);
 			$result[] = $this->extractQuotedString($function[0], $function);
 		}
@@ -86,7 +84,6 @@ class Rule implements \CDS\Hook {
 				else $result[] = $data;
 			} 
 			else $result[] = trim($function);
-
 		}
 		$remaining = trim(substr($function, $finalPos+1));
 		return $this->parseNextValue($remaining, $result, $element);
