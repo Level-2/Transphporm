@@ -51,7 +51,7 @@ class PseudoMatcher {
 		return true;
 	}
 
-	private function getBetween($string, $start, $end, $offset = 0, $escape = '\\') {
+	private function getBetween($string, $start, $end) {
 		$open = strpos($string, $start);
 		if ($open === false) return false;
 		$close = strpos($string, $end, $open);
