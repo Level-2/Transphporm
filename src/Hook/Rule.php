@@ -3,7 +3,8 @@ namespace CDS\Hook;
 /** Hooks into the template system, gets assigned as `ul li` or similar and `run()` is called with any elements that match */
 class Rule implements \CDS\Hook {
 	private $rules;
-	private $dataStorage;
+	private $dataFunction;
+	private $pseudoMatcher;
 
 	public function __construct(array $rules, PseudoMatcher $pseudoMatcher, DataFunction $dataFunction) {
 		$this->rules = $rules;
