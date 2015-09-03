@@ -13,10 +13,30 @@ class Rule implements \CDS\Hook {
 	}
 
 	public function run(\DomElement $element) {
+		if (!$this->matchesPseudo($element)) return;
+
 		foreach ($this->rule->rules as $name => $value) {
 			if ($this->$name($value, $element) === false) break;
-		}
-		return $element;
+		}		
+	}
+
+	private function matchesPseudo($element) {
+		$pos = strpos($this->pseudo, '[');
+		if ($pos === false) return true;
+			
+		$end = strpos($this->pseudo, ']', $pos);
+
+		$name = substr($this->pseudo, 0, $pos);
+		$criteria = substr($this->pseudo, $pos+1, $end-$pos-1);
+		list ($field, $value) = explode('=', $criteria);
+
+		$value = trim($value, '"');
+
+		$lookupValue = $this->dataFunction->$name($field, $element);
+		
+
+		if ($lookupValue == $value) return true;
+		else return false;
 	}
 
 	public function content($val, $element) {
@@ -24,8 +44,7 @@ class Rule implements \CDS\Hook {
 		if ($element instanceof \DomElement) {
 			if ($this->pseudo === 'before') $element->firstChild->nodeValue = implode('', $value) . $element->firstChild->nodeValue;
 			else if ($this->pseudo === 'after')  $element->firstChild->nodeValue .= implode('', $value);
-			else $element->firstChild->nodeValue = implode('', $value);
-			
+			else $element->firstChild->nodeValue = implode('', $value);			
 		}
 	}
 
@@ -37,7 +56,6 @@ class Rule implements \CDS\Hook {
 			if ($string[$end-1] === $escape) $pos = $end+1;
 			else return $end;
 		}
-
 	}
 
 	private function parseValue($function, $element) {

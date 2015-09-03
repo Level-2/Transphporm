@@ -358,6 +358,61 @@ class PoCTest extends PHPUnit_Framework_TestCase {
 
 		$this->assertEquals($this->stripTabs('<div>TestAFTER</div>'), $this->stripTabs($template->output()));
 	}
+
+
+	public function testIterationPseudo() {
+		$data = new stdclass;
+		$data->list = [];
+
+		$one = new stdclass;		
+		$one->name = 'One';
+		$one->id = '1';
+		$data->list[] = $one;
+
+		$two = new stdclass;		
+		$two->name = 'Two';
+		$two->id = '2';
+		$data->list[] = $two;
+
+		$three = new stdclass;
+		$three->name = 'Three';
+		$three->id = '3';
+		$data->list[] = $three;
+
+
+		$template = '<template>
+				<ul>
+					<li>
+						<h2>header</h2>
+						<span>TEST1</span>
+					</li>
+				</ul>
+		</template>';
+
+		$css = 'ul li {repeat: data(list);}
+		ul li h2 {content: iteration(id)}
+		ul li span {content: iteration(name); }
+		ul li span:iteration[id="2"] {display: none;}
+		';
+
+
+		$template = new \CDS\Builder($template, $css, $data);
+
+
+		$this->assertEquals($this->stripTabs('<ul>
+			<li>
+				<h2>1</h2>
+				<span>One</span>
+			</li><li>
+				<h2>2</h2>
+				
+			</li><li>
+				<h2>3</h2>
+				<span>Three</span>
+			</li>			
+		</ul>'), $this->stripTabs($template->output()));
+
+	}
 }
 
 
