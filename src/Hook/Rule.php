@@ -74,7 +74,6 @@ class Rule implements \CDS\Hook {
 
 	public function repeat($val, $element) {		
 		$data = $this->parseValue($val, $element);
-		//$this->dataStorage[$element] = $data;
 
 		foreach ($data as $iteration) {
 			$clone = $element->cloneNode(true);
