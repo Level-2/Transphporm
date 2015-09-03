@@ -44,7 +44,6 @@ class Rule implements \CDS\Hook {
 		$function = trim($function);
 
 		$result = [];
-		$finalPos = 0;
 
 		if ($function[0] == '\'' || $function[0] == '"') {
 			$finalPos = $this->findMatchingPos($function, $function[0]);
