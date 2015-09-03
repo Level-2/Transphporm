@@ -2,7 +2,6 @@
 namespace CDS\Hook;
 class Rule implements \CDS\Hook {
 	private $rule;
-
 	private $dataStorage;
 
 	public function __construct($rule, $pseudo, $data, $objectStorage) {
@@ -21,29 +20,33 @@ class Rule implements \CDS\Hook {
 	}
 
 	private function matchesPseudo($element) {
-		$pos = strpos($this->pseudo, '[');
-		if ($pos === false) return true;
-			
-		$end = strpos($this->pseudo, ']', $pos);
+		$matches = true;
 
-		$name = substr($this->pseudo, 0, $pos);
-		$criteria = substr($this->pseudo, $pos+1, $end-$pos-1);
-		list ($field, $value) = explode('=', $criteria);
+		foreach ($this->pseudo as $pseudo) {
+			$pos = strpos($pseudo, '[');
+			if ($pos === false) continue;
+				
+			$end = strpos($pseudo, ']', $pos);
 
-		$value = trim($value, '"');
+			$name = substr($pseudo, 0, $pos);
+			$criteria = substr($pseudo, $pos+1, $end-$pos-1);
+			list ($field, $value) = explode('=', $criteria);
 
-		$lookupValue = $this->dataFunction->$name($field, $element);
+			$value = trim($value, '"');
+
+			$lookupValue = $this->dataFunction->$name($field, $element);
+
+			if ($lookupValue != $value) $matches = false;
+		}
 		
-
-		if ($lookupValue == $value) return true;
-		else return false;
+		return $matches;
 	}
 
 	public function content($val, $element) {
 		$value = $this->parseValue($val, $element);
 		if ($element instanceof \DomElement) {
-			if ($this->pseudo === 'before') $element->firstChild->nodeValue = implode('', $value) . $element->firstChild->nodeValue;
-			else if ($this->pseudo === 'after')  $element->firstChild->nodeValue .= implode('', $value);
+			if (in_array('before', $this->pseudo)) $element->firstChild->nodeValue = implode('', $value) . $element->firstChild->nodeValue;
+			else if (in_array('after', $this->pseudo)) $element->firstChild->nodeValue .= implode('', $value);
 			else $element->firstChild->nodeValue = implode('', $value);			
 		}
 	}
@@ -122,5 +125,3 @@ class Rule implements \CDS\Hook {
 	}
 
 }
-
-

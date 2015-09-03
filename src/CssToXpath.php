@@ -73,6 +73,7 @@ class CssToXpath {
 
 	public function getPseudo() {
 		$parts = explode(':', $this->css);
-		return isset($parts[1]) ? $parts[1] : '';
+		array_shift($parts);
+		return $parts;
 	}
 }
