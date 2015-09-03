@@ -95,7 +95,9 @@ class Rule implements \CDS\Hook {
 		return false;
 	}
 
-
+	public function display($val, $element) {
+		if (strtolower($val) === 'none') $element->parentNode->removeChild($element);
+	}
 
 }
 

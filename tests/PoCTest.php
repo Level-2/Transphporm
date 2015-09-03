@@ -316,6 +316,24 @@ class PoCTest extends PHPUnit_Framework_TestCase {
 			<textarea name="foo">REPLACED</textarea>			
 		</div>'), $this->stripTabs($template->output()));
 	}
+
+
+	public function testDisplayNone() {
+		$template = '<template>
+		<div>
+			<a name="foo">a link</a>
+			<textarea name="foo">foo</textarea>			
+		</div>
+		</template>';
+
+		$cds = 'textarea[name="foo"] {display: none;}';
+
+		$template = new \CDS\Builder($template, $cds, []);
+		$this->assertEquals($this->stripTabs('		<div>
+			<a name="foo">a link</a>
+			
+		</div>'), $this->stripTabs($template->output()));
+	}
 }
 
 
