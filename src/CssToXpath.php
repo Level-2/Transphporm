@@ -29,7 +29,7 @@ class CssToXpath {
 			'[' => function($string) {
 				return '[@' . $string . ']';
 			},
-			']' => function($string) {
+			']' => function() {
 				return '';
 			}
 		];
