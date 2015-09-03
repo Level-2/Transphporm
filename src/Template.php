@@ -1,5 +1,6 @@
 <?php
 namespace CDS;
+/** Loads an XML string into a DomDocument and allows searching for specific elements using xpath based hooks */
 class Template {
 	private $hooks = [];
 	private $document;

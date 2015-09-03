@@ -1,78 +1,30 @@
 <?php
 namespace CDS\Hook;
+/** Hooks into the template system, gets assigned as `ul li` or similar and `run()` is called with any elements that match */
 class Rule implements \CDS\Hook {
-	private $rule;
+	private $rules;
 	private $dataStorage;
 
-	public function __construct($rule, $pseudo, $data, $objectStorage) {
-		$this->rule = $rule;
-		$this->dataStorage = $objectStorage;
-		$this->dataFunction = new DataFunction($objectStorage, $data);
-		$this->pseudo = $pseudo;
+	public function __construct(array $rules, PseudoMatcher $pseudoMatcher, DataFunction $dataFunction) {
+		$this->rules = $rules;
+		$this->dataFunction = $dataFunction;
+		$this->pseudoMatcher = $pseudoMatcher;
 	}
 
-	public function run(\DomElement $element) {
-		if (!$this->matchesPseudo($element)) return;
+	public function run(\DomElement $element) {	
+		//Don't run if there's a pseudo element like nth-child() and this element doesn't match it
+		if (!$this->pseudoMatcher->matches($element)) return;
 
-		foreach ($this->rule->rules as $name => $value) {
+		foreach ($this->rules as $name => $value) {
 			if ($this->$name($value, $element) === false) break;
 		}		
-	}
-
-	private function matchesPseudo($element) {
-		$matches = true;
-
-		foreach ($this->pseudo as $pseudo) {			
-			$matches = $matches && $this->pseudoAttribute($pseudo, $element) && $this->pseudoNth($pseudo, $element);			
-		}
-		
-		return $matches;
-	}
-
-	private function pseudoAttribute($pseudo, $element) {
-		$pos = strpos($pseudo, '[');
-		if ($pos === false) return true;
-		$end = strpos($pseudo, ']', $pos);
-
-		$name = substr($pseudo, 0, $pos);
-		$criteria = substr($pseudo, $pos+1, $end-$pos-1);
-		list ($field, $value) = explode('=', $criteria);
-
-		$value = trim($value, '"');
-
-		$lookupValue = $this->dataFunction->$name($field, $element);
-
-		if ($lookupValue != $value) return false;
-		else return true;
-	}
-
-	private function pseudoNth($pseudo, $element) {
-		if (strpos($pseudo, 'nth-child') === 0) {		
-
-			$criteria = $this->getBetween($pseudo, '(', ')');
-			$num = $this->getBetween($element->getNodePath(), '[', ']');
-			if (is_numeric($criteria)) {				
-				if ($num == $criteria) return true;
-				else return false;
-			}
-			else if ($criteria == 'odd') return $num % 2 === 1;
-			else if ($criteria === 'even') return $num % 2 === 0;
-		}
-		return true;
-	}
-
-	private function getBetween($string, $start, $end, $offset = 0, $escape = '\\') {
-		$open = strpos($string, $start);
-		if ($open === false) return false;
-		$close = $this->findMatchingPos($string, $end, $offset, $escape);
-		return substr($string, $open+1, $close-$open-1);
 	}
 
 	public function content($val, $element) {
 		$value = $this->parseValue($val, $element);
 		if ($element instanceof \DomElement) {
-			if (in_array('before', $this->pseudo)) $element->firstChild->nodeValue = implode('', $value) . $element->firstChild->nodeValue;
-			else if (in_array('after', $this->pseudo)) $element->firstChild->nodeValue .= implode('', $value);
+			if (in_array('before', $this->pseudoMatcher->getPseudo())) $element->firstChild->nodeValue = implode('', $value) . $element->firstChild->nodeValue;
+			else if (in_array('after', $this->pseudoMatcher->getPseudo())) $element->firstChild->nodeValue .= implode('', $value);
 			else $element->firstChild->nodeValue = implode('', $value);			
 		}
 	}
@@ -126,18 +78,17 @@ class Rule implements \CDS\Hook {
 
 		foreach ($data as $iteration) {
 			$clone = $element->cloneNode(true);
-			$this->dataStorage[$clone] = $iteration;
+			$this->dataFunction->bind($clone, $iteration);
 			$element->parentNode->insertBefore($clone, $element);
 
 			//Re-run the hook on the new element, but use the iterated data
-			$newRule = clone $this->rule;
+			$newRules = $this->rules;
 
 			//Don't run repeat on the clones element or it will loop forever
-			unset($newRule->rules['repeat']);
+			unset($newRules['repeat']);
 
-			$hook = new Rule($newRule, $this->pseudo, $iteration, $this->dataStorage);
+			$hook = new Rule($newRules, $this->pseudoMatcher, $this->dataFunction);
 			$hook->run($clone);
-
 		}
 
 		//Remove the original element so only the ones that have been looped over will show
@@ -149,5 +100,4 @@ class Rule implements \CDS\Hook {
 	public function display($val, $element) {
 		if (strtolower($val) === 'none') $element->parentNode->removeChild($element);
 	}
-
 }

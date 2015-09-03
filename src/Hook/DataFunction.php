@@ -1,13 +1,20 @@
 <?php
 namespace CDS\Hook;
+/* Handles data() and iteration() functions in the CDS */
 class DataFunction {
 	private $dataStorage;
 	private $data;
 
-	public function __construct($objectStorage, $data) {
+	public function __construct(\SplObjectStorage $objectStorage, $data) {
 		$this->dataStorage = $objectStorage;
 		$this->data = $data;
 	}
+
+	/** Binds data to an element */
+	public function bind(\DomElement $element, $data) {
+		$this->dataStorage[$element] = $data;
+	}
+
 
 	public function iteration($val, $element) {
 		$data = $this->getData($element);
@@ -15,7 +22,8 @@ class DataFunction {
 		return $value;
 	}
 
-	public function getData($element) {
+	/** Returns the data that has been bound to $element, or, if no data is bound to $element climb the DOM tree to find the data bound to a parent node*/
+	private function getData(\DomElement $element) {
 		while ($element) {
 			if (isset($this->dataStorage[$element])) return $this->dataStorage[$element];
 			$element = $element->parentNode;
@@ -39,4 +47,6 @@ class DataFunction {
 
 		return $obj;
 	}
+
+
 }
