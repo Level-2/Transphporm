@@ -40,16 +40,20 @@ class Rule implements \CDS\Hook {
 		}
 	}
 
+	private function extractQuotedString($marker, $str) {
+		$finalPos = $this->findMatchingPos($str, $marker);
+		$string = substr($str, 1, $finalPos-1);
+		//Now remove escape characters
+		return str_replace('\\' . $marker, $marker, $string);
+	}
+
 	private function parseValue($function, $element) {
 		$function = trim($function);
-
 		$result = [];
 
 		if (in_array($function[0], ['\\', '"'])) {
 			$finalPos = $this->findMatchingPos($function, $function[0]);
-			$string = substr($function, 1, $finalPos-1);
-			//Now remove escape characters
-			$result[] = str_replace('\\' . $function[0], $function[0], $string);
+			$result[] = $this->extractQuotedString($function[0], $function);
 		}
 		else {
 			$open = strpos($function, '(');
@@ -66,7 +70,6 @@ class Rule implements \CDS\Hook {
 		}
 
 		$remaining = trim(substr($function, $finalPos+1));
-
 		return $this->parseNextValue($remaining, $result, $element);
 	}
 
