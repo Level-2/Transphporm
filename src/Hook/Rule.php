@@ -22,7 +22,7 @@ class Rule implements \CDS\Hook {
 	}
 
 	public function content($val, $element) {
-		$value = $this->parseValue($val, $element);
+		$value = $this->parseValue(trim($val), $element);
 		if ($element instanceof \DomElement) {
 			if (in_array('before', $this->pseudoMatcher->getPseudo())) $element->firstChild->nodeValue = implode('', $value) . $element->firstChild->nodeValue;
 			else if (in_array('after', $this->pseudoMatcher->getPseudo())) $element->firstChild->nodeValue .= implode('', $value);
@@ -48,7 +48,6 @@ class Rule implements \CDS\Hook {
 	}
 
 	private function parseValue($function, $element) {
-		$function = trim($function);
 		$result = [];
 
 		if (in_array($function[0], ['\\', '"'])) {
@@ -68,7 +67,6 @@ class Rule implements \CDS\Hook {
 				else $result[] = $data;
 			} 
 		}
-
 		$remaining = trim(substr($function, $finalPos+1));
 		return $this->parseNextValue($remaining, $result, $element);
 	}
@@ -79,7 +77,7 @@ class Rule implements \CDS\Hook {
 	}
 
 	public function repeat($val, $element) {		
-		$data = $this->parseValue($val, $element);
+		$data = $this->parseValue(trim($val), $element);
 
 		foreach ($data as $iteration) {
 			$clone = $element->cloneNode(true);
