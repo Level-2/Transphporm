@@ -6,32 +6,15 @@ class CssToXpath {
 	private $css;
 
 	public function __construct($css) {
-		//Translation functions for css -> xpath conversion
-		//Can't have functions with these names so make them closures.
 		$this->css = str_replace([' >', '> '],['>', '>'], trim($css));
 		$this->translators = [
-			' ' => function($string) {
-				return '//' . $string;
-			},
-			'' => function($string) {
-				return '/' . $string;
-			},
-
-			'>' => function($string) {
-				return '/' . $string;
-			},
-			'#' => function($string) {
-				return '[@id=\'' . $string . '\']';
-			},
-			'.' => function($string) {
-				return '[contains(concat(\' \', normalize-space(@class), \' \'), \' ' . $string . ' \')]';
-			}, 
-			'[' => function($string) {
-				return '[@' . $string . ']';
-			},
-			']' => function() {
-				return '';
-			}
+			' ' => function($string) { 	return '//' . $string;	},
+			'' => function($string) { return '/' . $string;	},
+			'>' => function($string) { return '/' . $string; },
+			'#' => function($string) { return '[@id=\'' . $string . '\']'; },
+			'.' => function($string) { return '[contains(concat(\' \', normalize-space(@class), \' \'), \' ' . $string . ' \')]'; }, 
+			'[' => function($string) { return '[@' . $string . ']';	},
+			']' => function() {	return ''; }
 		];
 	}
 
