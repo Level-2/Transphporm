@@ -261,6 +261,61 @@ class PoCTest extends PHPUnit_Framework_TestCase {
 			<span class="bar">test</span>
 		</div>'), $this->stripTabs($template->output()));
 	}
+
+
+	public function testAttributeSelector() {
+		$template = '<template>
+		<div>
+			<textarea name="foo">foo</textarea>
+			<textarea>bar</textarea>
+		</div>
+		</template>';
+
+		$cds = '[name="foo"] {content: "REPLACED";}';
+
+		$template = new \CDS\Builder($template, $cds, []);
+		$this->assertEquals($this->stripTabs('<div>
+			<textarea name="foo">REPLACED</textarea>
+			<textarea>bar</textarea>
+		</div>'), $this->stripTabs($template->output()));
+	}
+
+
+	//check that it's not due to the order of the HTML
+	public function testAttributeSelectorB() {
+		$template = '<template>
+		<div>
+			<textarea>bar</textarea>
+			<textarea name="foo">foo</textarea>			
+		</div>
+		</template>';
+
+		$cds = '[name="foo"] {content: "REPLACED";}';
+
+		$template = new \CDS\Builder($template, $cds, []);
+		$this->assertEquals($this->stripTabs('<div>
+			<textarea>bar</textarea>
+			<textarea name="foo">REPLACED</textarea>
+		</div>'), $this->stripTabs($template->output()));
+	}
+
+
+	public function testAttributeSelectorC() {
+		$template = '<template>
+		<div>
+			<a name="foo">a link</a>
+			<textarea name="foo">foo</textarea>			
+		</div>
+		</template>';
+
+		$cds = 'textarea[name="foo"] {content: "REPLACED";}';
+
+		$template = new \CDS\Builder($template, $cds, []);
+		$this->assertEquals($this->stripTabs('		<div>
+			<a name="foo">a link</a>
+			<textarea name="foo">REPLACED</textarea>			
+		</div>'), $this->stripTabs($template->output()));
+	}
 }
 
 

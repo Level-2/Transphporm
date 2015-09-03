@@ -1,7 +1,7 @@
 <?php
 namespace CDS;
 class CssToXpath {
-	private $specialChars = [' ', '.', '>', '~', '#', ':'];
+	private $specialChars = [' ', '.', '>', '~', '#', ':', '[', ']'];
 	private $translators = [];
 	private $css;
 
@@ -25,6 +25,12 @@ class CssToXpath {
 			},
 			'.' => function($string) {
 				return '[contains(concat(\' \', normalize-space(@class), \' \'), \' ' . $string . ' \')]';
+			}, 
+			'[' => function($string) {
+				return '[@' . $string . ']';
+			},
+			']' => function($string) {
+				return '';
 			}
 		];
 	}
