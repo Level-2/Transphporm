@@ -45,10 +45,18 @@ class PseudoMatcher {
 				if ($num == $criteria) return true;
 				else return false;
 			}
-			else if ($criteria == 'odd') return $num % 2 === 1;
-			else if ($criteria === 'even') return $num % 2 === 0;
+			else if (is_callable([$this, $criteria])) return $this->$criteria($num);
+			
 		}
 		return true;
+	}
+
+	private function odd($num) {
+		return $num % 2 === 1;
+	}
+
+	private function even($num) {
+		return $num % 2 === 0;
 	}
 
 	private function getBetween($string, $start, $end) {

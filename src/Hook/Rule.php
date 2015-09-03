@@ -45,7 +45,7 @@ class Rule implements \CDS\Hook {
 
 		$result = [];
 
-		if ($function[0] == '\'' || $function[0] == '"') {
+		if (in_array($function[0], ['\\', '"'])) {
 			$finalPos = $this->findMatchingPos($function, $function[0]);
 			$string = substr($function, 1, $finalPos-1);
 			//Now remove escape characters
@@ -66,11 +66,14 @@ class Rule implements \CDS\Hook {
 		}
 
 		$remaining = trim(substr($function, $finalPos+1));
-		if (strlen($remaining) > 0 && $remaining[0] == ',') $result = array_merge($result, $this->parseValue(trim(substr($remaining, 1)), $element));
 
-		return $result;
+		return $this->parseNextValue($remaining, $result, $element);
 	}
 
+	private function parseNextValue($remaining, $result, $element) {
+		if (strlen($remaining) > 0 && $remaining[0] == ',') $result = array_merge($result, $this->parseValue(trim(substr($remaining, 1)), $element));
+		return $result;
+	}
 
 	public function repeat($val, $element) {		
 		$data = $this->parseValue($val, $element);
