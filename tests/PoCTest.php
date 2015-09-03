@@ -217,6 +217,50 @@ class PoCTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('<h1>AB</h1>', $template->output());
 	}
 
+
+	public function testMatchClassAndTag() {
+		$template = '<template><h1>Test 1</h1><h1 class="test">Heading</h1><h1>Test 2</h1></template>';
+
+		$cds = 'h1.test {content: "REPLACED";}';
+
+		$template = new \CDS\Builder($template, $cds, []);
+
+		$this->assertEquals('<h1>Test 1</h1><h1 class="test">REPLACED</h1><h1>Test 2</h1>', $template->output());
+	}
+
+	public function testMatchClassChild() {
+		$template = '<template>
+		<div>
+			<span class="foo">test</span>
+			<span class="bar">test</span>
+		</div>
+		</template>';
+
+		$cds = 'div .foo {content: "REPLACED";}';
+
+		$template = new \CDS\Builder($template, $cds, []);
+		$this->assertEquals($this->stripTabs('<div>
+			<span class="foo">REPLACED</span>
+			<span class="bar">test</span>
+		</div>'), $this->stripTabs($template->output()));
+	}
+
+	public function testChildNodeMatcher() {
+		$template = '<template>
+		<div>
+			<span class="foo">test</span>
+			<span class="bar">test</span>
+		</div>
+		</template>';
+
+		$cds = 'div > .foo {content: "REPLACED";}';
+
+		$template = new \CDS\Builder($template, $cds, []);
+		$this->assertEquals($this->stripTabs('<div>
+			<span class="foo">REPLACED</span>
+			<span class="bar">test</span>
+		</div>'), $this->stripTabs($template->output()));
+	}
 }
 
 

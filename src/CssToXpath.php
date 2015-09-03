@@ -8,19 +8,23 @@ class CssToXpath {
 	public function __construct($css) {
 		//Translation functions for css -> xpath conversion
 		//Can't have functions with these names so make them closures.
-		$this->css = $css;
+		$this->css = str_replace([' >', '> '],['>', '>'], trim($css));
 		$this->translators = [
-			'' => function($string) {
+			' ' => function($string) {
 				return '//' . $string;
 			},
+			'' => function($string) {
+				return '/' . $string;
+			},
+
 			'>' => function($string) {
 				return '/' . $string;
 			},
 			'#' => function($string) {
-				return '//*[@id=\'' . $string . '\']';
+				return '[@id=\'' . $string . '\']';
 			},
 			'.' => function($string) {
-				return '//*[contains(concat(\' \', normalize-space(@class), \' \'), \' ' . $string . ' \')]';
+				return '[contains(concat(\' \', normalize-space(@class), \' \'), \' ' . $string . ' \')]';
 			}
 		];
 	}
@@ -51,15 +55,13 @@ class CssToXpath {
 
 	public function getXpath() {
 		$css = explode(':', $this->css)[0];
-
 		$selectors = $this->split($css);
-
-		$xpath = '';
+		$xpath = '/';
 		foreach ($selectors as $selector) {
-			if ($selector->string == '') continue;
-			if (isset($this->translators[trim($selector->type)])) $xpath .= $this->translators[trim($selector->type)]($selector->string);
+			if (isset($this->translators[$selector->type])) $xpath .= $this->translators[$selector->type]($selector->string);
 		}
 
+		$xpath = str_replace('/[', '/*[', $xpath);
 		return $xpath;
 	}
 
