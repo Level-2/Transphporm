@@ -4,6 +4,7 @@ namespace CDS;
 class Template {
 	private $hooks = [];
 	private $document;
+	private $xpath;
 
 	public function __construct($doc) {
 		if ($doc instanceof \DomDocument) $this->document = $doc;
