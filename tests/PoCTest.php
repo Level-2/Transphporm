@@ -2,7 +2,7 @@
 class PoCTest extends PHPUnit_Framework_TestCase {
 
 	public function testContentSimple() {
-		$template = '<template name="">
+		$template = '<template>
 				<ul><li>TEST1</li></ul>
 		</template>';
 
@@ -20,7 +20,7 @@ class PoCTest extends PHPUnit_Framework_TestCase {
 
 
 	public function testContentObject() {
-		$template = '<template name="">
+		$template = '<template>
 				<ul><li>TEST1</li></ul>
 		</template>';
 
@@ -39,7 +39,7 @@ class PoCTest extends PHPUnit_Framework_TestCase {
 
 
 	public function testRepeatBasic() {
-		$template = '<template name="">
+		$template = '<template>
 				<ul><li>TEST1</li></ul>
 		</template>';
 
@@ -58,7 +58,7 @@ class PoCTest extends PHPUnit_Framework_TestCase {
 
 
 	public function testRepeatObject() {
-		$template = '<template name="">
+		$template = '<template>
 				<ul><li>TEST1</li></ul>
 		</template>';
 
@@ -92,7 +92,7 @@ class PoCTest extends PHPUnit_Framework_TestCase {
 	}
 
 	public function testRepeatObjectChildNode() {
-		$template = '<template name="">
+		$template = '<template>
 				<ul>
 					<li>
 						<span>TEST1</span>
@@ -153,7 +153,7 @@ class PoCTest extends PHPUnit_Framework_TestCase {
 		$data->list[] = $three;
 
 
-		$template = '<template name="">
+		$template = '<template>
 				<ul>
 					<li>
 						<h2>header</h2>
@@ -184,6 +184,39 @@ class PoCTest extends PHPUnit_Framework_TestCase {
 		</ul>'), $this->stripTabs($template->output()));
 
 	}
+
+
+	public function testQuotedContent() {
+		$template = '<template><h1>Heading</h1></template>';
+
+		$cds = 'h1 {content: "TEST";}';
+
+		$template = new \CDS\Builder($template, $cds, []);
+
+		$this->assertEquals('<h1>TEST</h1>', $template->output());
+	}
+
+
+	public function testQuotedContentWithEscape() {
+		$template = '<template><h1>Heading</h1></template>';
+
+		$cds = 'h1 {content: "TEST\"TEST";}';
+
+		$template = new \CDS\Builder($template, $cds, []);
+
+		$this->assertEquals('<h1>TEST"TEST</h1>', $template->output());
+	}
+
+	public function testMultipleContentValues() {
+		$template = '<template><h1>Heading</h1></template>';
+
+		$cds = 'h1 {content: "A", "B";}';
+
+		$template = new \CDS\Builder($template, $cds, []);
+
+		$this->assertEquals('<h1>AB</h1>', $template->output());
+	}
+
 }
 
 

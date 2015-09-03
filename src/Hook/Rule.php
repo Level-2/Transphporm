@@ -2,13 +2,13 @@
 namespace CDS\Hook;
 class Rule implements \CDS\Hook {
 	private $rule;
-	private $data;
+
 	private $dataStorage;
 
 	public function __construct($rule, $data, $objectStorage) {
 		$this->rule = $rule;
-		$this->data = $data;
 		$this->dataStorage = $objectStorage;
+		$this->dataFunction = new DataFunction($objectStorage, $data);
 	}
 
 	public function run(\DomElement $element) {
@@ -19,14 +19,58 @@ class Rule implements \CDS\Hook {
 	}
 
 	public function content($val, $element) {
-		$value = $this->parseFunction($val, $element);
+		$value = $this->parseValue($val, $element);
 		if ($element instanceof \DomElement) {
-			$element->firstChild->nodeValue = $value;
+			$element->firstChild->nodeValue = implode('', $value);
 		}
 	}
 
+	private function findMatchingPos($string, $char, $start = 0, $escape = '\\') {
+		$pos = $start+1;
+
+		while (true) {
+			$end = strpos($string, $char, $pos);
+			if ($string[$end-1] === $escape) $pos = $end+1;
+			else return $end;
+		}
+
+	}
+
+	private function parseValue($function, $element) {
+		$function = trim($function);
+
+		$result = [];
+		$finalPos = 0;
+
+		if ($function[0] == '\'' || $function[0] == '"') {
+			$finalPos = $this->findMatchingPos($function, $function[0]);
+			$string = substr($function, 1, $finalPos-1);
+			//Now remove escape characters
+			$result[] = str_replace('\\' . $function[0], $function[0], $string);
+		}
+		else {
+			$open = strpos($function, '(');
+			$close = strpos($function, ')', $open);
+			$finalPos = $close;
+			$name = substr($function, 0, $open);
+			$params = substr($function, $open+1, $close-$open-1);
+
+			if (is_callable([$this->dataFunction, $name])) {
+				$data = $this->dataFunction->$name($params, $element);	
+				if (is_array($data)) $result += $data;
+				else $result[] = $data;
+			} 
+		}
+
+		$remaining = trim(substr($function, $finalPos+1));
+		if (strlen($remaining) > 0 && $remaining[0] == ',') $result = array_merge($result, $this->parseValue(trim(substr($remaining, 1)), $element));
+
+		return $result;
+	}
+
+
 	public function repeat($val, $element) {		
-		$data = $this->parseFunction($val, $element);
+		$data = $this->parseValue($val, $element);
 		//$this->dataStorage[$element] = $data;
 
 		foreach ($data as $iteration) {
@@ -52,46 +96,7 @@ class Rule implements \CDS\Hook {
 	}
 
 
-	public function iteration($val, $element) {
-		$data = $this->getData($element);
-		$value = $this->traverse($val, $data);
-		return $value;
-	}
 
-	public function getData($element) {
-		while ($element) {
-			if (isset($this->dataStorage[$element])) return $this->dataStorage[$element];
-			$element = $element->parentNode;
-		}
-		return $this->data;
-	}
-
-	private function parseFunction($function, $element) {
-		$open = strpos($function, '(');
-		$close = strpos($function, ')', $open);
-		
-		$name = substr($function, 0, $open);
-		$params = substr($function, $open+1, $close-$open-1);
-
-		return $this->$name($params, $element);
-	}
-
-	private function data($val, $element) {
-		$data = $this->getData($element);
-		$value = $this->traverse($val, $data);
-		return $value;			
-	}
-
-	private function traverse($name, $data) {
-		$parts = explode('.', $name);
-		$obj = $data;
-		foreach ($parts as $part) {
-			if ($part == '') continue;
-			$obj = $obj->$part;
-		}
-
-		return $obj;
-	}
 }
 
 
