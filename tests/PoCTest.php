@@ -538,6 +538,31 @@ class PoCTest extends PHPUnit_Framework_TestCase {
 			</ul>'), $this->stripTabs($template->output()));
 
 	}
+
+
+
+	public function testNthChildEven2() {
+		$template = '<template>
+			<ul>
+				<li>One</li>
+				<li>Two</li>
+				<li>Three</li>
+				<li>Four</li>
+			</ul>
+		</template>';
+
+		$cds = 'ul li:nth-child(even) {content: "REPLACED"}';
+
+		$template = new \CDS\Builder($template, $cds, []);
+
+		$this->assertEquals($this->stripTabs('<ul>
+				<li>One</li>
+				<li>REPLACED</li>
+				<li>Three</li>
+				<li>REPLACED</li>
+			</ul>'), $this->stripTabs($template->output()));
+
+	}
 }
 
 

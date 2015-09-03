@@ -5,6 +5,8 @@ class Rule implements \CDS\Hook {
 	private $rules;
 	private $dataFunction;
 	private $pseudoMatcher;
+	private $functions = [];
+	private $properties = [];
 
 	public function __construct(array $rules, PseudoMatcher $pseudoMatcher, DataFunction $dataFunction) {
 		$this->rules = $rules;
@@ -17,19 +19,30 @@ class Rule implements \CDS\Hook {
 		if (!$this->pseudoMatcher->matches($element)) return;
 
 		foreach ($this->rules as $name => $value) {
-			if ($this->$name($value, $element) === false) break;
-		}		
-	}
-
-	public function content($val, $element) {
-		$value = $this->parseValue(trim($val), $element);
-		if ($element instanceof \DomElement) {
-			if (in_array('before', $this->pseudoMatcher->getPseudo())) $element->firstChild->nodeValue = implode('', $value) . $element->firstChild->nodeValue;
-			else if (in_array('after', $this->pseudoMatcher->getPseudo())) $element->firstChild->nodeValue .= implode('', $value);
-			else $element->firstChild->nodeValue = implode('', $value);			
+			if (isset($this->properties[$name])) {
+				$result = call_user_func($this->properties[$name], $this->parseValue(trim($value), $element), $element, $this);
+				if ($result === false) break;
+			}
 		}
 	}
 
+	public function getPseudoMatcher() {
+		return $this->pseudoMatcher;
+	}
+
+	public function getRules() {
+		return $this->rules;
+
+	}
+
+	public function registerProperty($name, $closure) {
+		$this->properties[$name] = $closure;
+	}
+
+	public function getProperties() {
+		return $this->properties;
+	}
+	
 	private function findMatchingPos($string, $char, $start = 0, $escape = '\\') {
 		$pos = $start+1;
 
@@ -72,6 +85,8 @@ class Rule implements \CDS\Hook {
 				if (is_array($data)) $result += $data;
 				else $result[] = $data;
 			} 
+			else $result[] = trim($function);
+
 		}
 		$remaining = trim(substr($function, $finalPos+1));
 		return $this->parseNextValue($remaining, $result, $element);
@@ -82,31 +97,4 @@ class Rule implements \CDS\Hook {
 		return $result;
 	}
 
-	public function repeat($val, $element) {		
-		$data = $this->parseValue(trim($val), $element);
-
-		foreach ($data as $iteration) {
-			$clone = $element->cloneNode(true);
-			$this->dataFunction->bind($clone, $iteration);
-			$element->parentNode->insertBefore($clone, $element);
-
-			//Re-run the hook on the new element, but use the iterated data
-			$newRules = $this->rules;
-
-			//Don't run repeat on the clones element or it will loop forever
-			unset($newRules['repeat']);
-
-			$hook = new Rule($newRules, $this->pseudoMatcher, $this->dataFunction);
-			$hook->run($clone);
-		}
-
-		//Remove the original element so only the ones that have been looped over will show
-		$element->parentNode->removeChild($element);
-
-		return false;
-	}
-
-	public function display($val, $element) {
-		if (strtolower($val) === 'none') $element->parentNode->removeChild($element);
-	}
 }
