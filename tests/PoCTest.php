@@ -331,8 +331,32 @@ class PoCTest extends PHPUnit_Framework_TestCase {
 		$template = new \CDS\Builder($template, $cds, []);
 		$this->assertEquals($this->stripTabs('		<div>
 			<a name="foo">a link</a>
-			
+
 		</div>'), $this->stripTabs($template->output()));
+	}
+
+	public function testBefore() {
+		$template =  '<template>
+		<div>Test</div>
+		</template>';
+
+		$cds = 'div:before {content: "BEFORE";}';
+
+		$template = new \CDS\Builder($template, $cds, []);
+
+		$this->assertEquals($this->stripTabs('<div>BEFORETest</div>'), $this->stripTabs($template->output()));
+	}
+
+	public function testAfter() {
+		$template =  '<template>
+		<div>Test</div>
+		</template>';
+
+		$cds = 'div:after {content: "AFTER";}';
+
+		$template = new \CDS\Builder($template, $cds, []);
+
+		$this->assertEquals($this->stripTabs('<div>TestAFTER</div>'), $this->stripTabs($template->output()));
 	}
 }
 

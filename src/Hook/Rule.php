@@ -5,10 +5,11 @@ class Rule implements \CDS\Hook {
 
 	private $dataStorage;
 
-	public function __construct($rule, $data, $objectStorage) {
+	public function __construct($rule, $pseudo, $data, $objectStorage) {
 		$this->rule = $rule;
 		$this->dataStorage = $objectStorage;
 		$this->dataFunction = new DataFunction($objectStorage, $data);
+		$this->pseudo = $pseudo;
 	}
 
 	public function run(\DomElement $element) {
@@ -21,7 +22,10 @@ class Rule implements \CDS\Hook {
 	public function content($val, $element) {
 		$value = $this->parseValue($val, $element);
 		if ($element instanceof \DomElement) {
-			$element->firstChild->nodeValue = implode('', $value);
+			if ($this->pseudo === 'before') $element->firstChild->nodeValue = implode('', $value) . $element->firstChild->nodeValue;
+			else if ($this->pseudo === 'after')  $element->firstChild->nodeValue .= implode('', $value);
+			else $element->firstChild->nodeValue = implode('', $value);
+			
 		}
 	}
 
@@ -84,7 +88,7 @@ class Rule implements \CDS\Hook {
 			//Don't run repeat on the clones element or it will loop forever
 			unset($newRule->rules['repeat']);
 
-			$hook = new Rule($newRule, $iteration, $this->dataStorage);
+			$hook = new Rule($newRule, $this->pseudo, $iteration, $this->dataStorage);
 			$hook->run($clone);
 
 		}

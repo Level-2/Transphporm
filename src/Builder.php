@@ -16,7 +16,7 @@ class Builder {
 	public function output() {
 		$rules = $this->cds->parse();
 		foreach ($rules as $rule) {
-			$this->template->addHook($rule->query, new Hook\Rule($rule, $this->data, $this->dataStorage));	
+			$this->template->addHook($rule->query, new Hook\Rule($rule, $rule->pseudo, $this->data, $this->dataStorage));	
 		}
 		
 		return $this->template->output();
