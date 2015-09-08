@@ -1,9 +1,9 @@
 {
-    "name": "tombzombie/cds",
+    "name": "level-2/transphporm",
     "version": "1.0",
     "description": "A new approach at templating",
     "license": "BSD-2-Clause",
-    "homepage": "https://github.com/TomBZombie/CDS",
+    "homepage": "https://github.com/Level-2/Transphporm",
     "keywords": ["template system"],
     "minimum-stability": "dev",
     "authors": [

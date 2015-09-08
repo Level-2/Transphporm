@@ -547,10 +547,14 @@ class TransphpormTest extends PHPUnit_Framework_TestCase {
 		$cds = 'div {content: attr(class); }';
 
 		$template = new \Transphporm\Builder($template, $cds, []);
-		
+
 		$this->assertEquals('<div class="fromattribute">fromattribute</div>', $template->output());
 	}
 
+
+	public function testWriteAttribute() {
+		
+	}
 }
 
 
