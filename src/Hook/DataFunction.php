@@ -44,7 +44,10 @@ class DataFunction {
 			if ($part == '') continue;
 			$obj = $obj->$part;
 		}
-
 		return $obj;
+	}
+
+	public function attr($val, $element) {
+		return $element->getAttribute(trim($val));
 	}
 }
