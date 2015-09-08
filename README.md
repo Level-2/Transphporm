@@ -49,6 +49,13 @@ This is equivalent to `<h1 style="font-weight:bold">Title</h1>`, it mixes two ve
 
 ## Transphporm is different
 
+### Project Goals
+
+1. To completely separate the markup from the processing logic (No if statements or loops in the template!)
+2. To follow CSS concepts and grammar as closely as possible. This makes it incredibly easy to learn for anyone who already understands CSS.
+3. To be a lightweight library (Currently it's less than 500 lines and a total cyclomatic complexity (a count of if statements, functions and loops) of less than 100 for the entire project)
+
+
 With Transphporm, the designer just supplies some raw XML that contains some dummy data. (Designers much prefer lorem ipsum to seeing `{{description}}` in their designs!)
 
 ```php
