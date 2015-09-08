@@ -1,5 +1,5 @@
 <?php
-namespace CDS\Hook;
+namespace Transphporm\Hook;
 /** Determines whether $element matches the pseudo rule such as nth-child() or [attribute="value"] */
 class PseudoMatcher {
 	private $pseudo;

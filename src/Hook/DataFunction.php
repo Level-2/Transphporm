@@ -1,5 +1,5 @@
 <?php
-namespace CDS\Hook;
+namespace Transphporm\Hook;
 /* Handles data() and iteration() functions in the CDS */
 class DataFunction {
 	private $dataStorage;
@@ -47,6 +47,4 @@ class DataFunction {
 
 		return $obj;
 	}
-
-
 }

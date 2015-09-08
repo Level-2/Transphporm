@@ -1,5 +1,5 @@
 <?php
-namespace CDS;
+namespace Transphporm;
 class CssToXpath {
 	private $specialChars = [' ', '.', '>', '~', '#', ':', '[', ']'];
 	private $translators = [];

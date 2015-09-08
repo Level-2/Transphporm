@@ -1,5 +1,5 @@
 <?php
-namespace CDS;
+namespace Transphporm;
 /** Loads an XML string into a DomDocument and allows searching for specific elements using xpath based hooks */
 class Template {
 	private $hooks = [];
@@ -20,12 +20,12 @@ class Template {
 		$this->hooks[] = [$xpath, $hook];
 	}
 
-	private function processHook($query, $hook, $filter = '') {
-		foreach ($this->xpath->query($query . $filter) as $element) $hook->run($element);
+	private function processHook($query, $hook) {
+		foreach ($this->xpath->query($query) as $element) $hook->run($element);
 	}
 
 	public function output() {
-		//Now process tags with child nodes, which will have had any variables already replaced
+		//Process all hooks
 		foreach ($this->hooks as list($query, $hook)) $this->processHook($query, $hook);
 
 		//Generate the document by taking only the childnodes of the template, ignoring the <template> and </template> tags

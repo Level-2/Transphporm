@@ -1,7 +1,7 @@
 <?php
-namespace CDS\Hook;
+namespace Transphporm\Hook;
 /** Hooks into the template system, gets assigned as `ul li` or similar and `run()` is called with any elements that match */
-class Rule implements \CDS\Hook {
+class Rule implements \Transphporm\Hook {
 	private $rules;
 	private $dataFunction;
 	private $pseudoMatcher;
@@ -19,10 +19,8 @@ class Rule implements \CDS\Hook {
 		if (!$this->pseudoMatcher->matches($element)) return;
 
 		foreach ($this->rules as $name => $value) {
-			if (isset($this->properties[$name])) {
-				$result = call_user_func($this->properties[$name], $this->parseValue(trim($value), $element), $element, $this);
-				if ($result === false) break;
-			}
+			$result = $this->callProperty($name, $element, $this->parseValue(trim($value), $element));
+			if ($result === false) break;
 		}
 	}
 
@@ -40,6 +38,15 @@ class Rule implements \CDS\Hook {
 
 	public function getProperties() {
 		return $this->properties;
+	}
+
+	private function callProperty($name, $element, $value) {
+		if (isset($this->properties[$name])) {
+			$result = call_user_func($this->properties[$name], $value, $element, $this);
+		}
+		else throw new \InvalidArgumentException('There is no Transphporm Property: ' . $name);
+
+		return $result;
 	}
 
 	private function findMatchingPos($string, $char, $start = 0, $escape = '\\') {

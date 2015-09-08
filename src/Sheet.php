@@ -1,5 +1,5 @@
 <?php
-namespace CDS;
+namespace Transphporm;
 /** Parses a .cds file into individual rules, each rule has a query e,g, `ul li` and a set of rules e.g. `display: none; data: iteration(id);` */
 class Sheet {
 	private $cds;

@@ -1,5 +1,5 @@
 <?php
-namespace CDS;
+namespace Transphporm;
 /** Builds a CDS instance from the 3 constituent parts. XML template string, CDS string and data */
 class Builder {
 	private $template;
@@ -30,7 +30,6 @@ class Builder {
 	public function registerProperty($name, $closure) {
 		$this->registeredProperties[$name] = $closure;
 	}
-
 
 	private function registerBaseProperties() {
 		$basicProperties = new Hook\BasicProperties($this->data);

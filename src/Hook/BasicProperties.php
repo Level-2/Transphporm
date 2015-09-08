@@ -1,5 +1,5 @@
 <?php
-namespace CDS\Hook;
+namespace Transphporm\Hook;
 class BasicProperties {
 	private $data;
 

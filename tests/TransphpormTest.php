@@ -1,5 +1,5 @@
 <?php
-class PoCTest extends PHPUnit_Framework_TestCase {
+class TransphpormTest extends PHPUnit_Framework_TestCase {
 
 	public function testContentSimple() {
 		$template = '<template>
@@ -13,7 +13,7 @@ class PoCTest extends PHPUnit_Framework_TestCase {
 		$data->user = 'tom';
 
 		
-		$template = new \CDS\Builder($template, $css, $data);
+		$template = new \Transphporm\Builder($template, $css, $data);
 		
 		$this->assertEquals('<ul><li>tom</li></ul>' ,$template->output()); 
 	}
@@ -32,7 +32,7 @@ class PoCTest extends PHPUnit_Framework_TestCase {
 		$data->user->name = 'tom';
 
 		
-		$template = new \CDS\Builder($template, $css, $data);
+		$template = new \Transphporm\Builder($template, $css, $data);
 		
 		$this->assertEquals('<ul><li>tom</li></ul>' ,$template->output()); 
 	}
@@ -51,7 +51,7 @@ class PoCTest extends PHPUnit_Framework_TestCase {
 		$data->list = ['One', 'Two', 'Three'];
 
 		
-		$template = new \CDS\Builder($template, $css, $data);
+		$template = new \Transphporm\Builder($template, $css, $data);
 		
 		$this->assertEquals('<ul><li>One</li><li>Two</li><li>Three</li></ul>' ,$template->output()); 
 	}
@@ -82,7 +82,7 @@ class PoCTest extends PHPUnit_Framework_TestCase {
 		$three->id = 'Three';
 		$data->list[] = $three;
 		
-		$template = new \CDS\Builder($template, $css, $data);
+		$template = new \Transphporm\Builder($template, $css, $data);
 		
 		$this->assertEquals('<ul><li>One</li><li>Two</li><li>Three</li></ul>' ,$template->output()); 
 	}
@@ -120,7 +120,7 @@ class PoCTest extends PHPUnit_Framework_TestCase {
 		$three->id = 'Three';
 		$data->list[] = $three;
 		
-		$template = new \CDS\Builder($template, $css, $data);
+		$template = new \Transphporm\Builder($template, $css, $data);
 		
 		$this->assertEquals($this->stripTabs('<ul>
 			<li>
@@ -167,7 +167,7 @@ class PoCTest extends PHPUnit_Framework_TestCase {
 		ul li span {content: iteration(name); }';
 
 
-		$template = new \CDS\Builder($template, $css, $data);
+		$template = new \Transphporm\Builder($template, $css, $data);
 
 
 		$this->assertEquals($this->stripTabs('<ul>
@@ -191,7 +191,7 @@ class PoCTest extends PHPUnit_Framework_TestCase {
 
 		$cds = 'h1 {content: "TEST";}';
 
-		$template = new \CDS\Builder($template, $cds, []);
+		$template = new \Transphporm\Builder($template, $cds, []);
 
 		$this->assertEquals('<h1>TEST</h1>', $template->output());
 	}
@@ -202,7 +202,7 @@ class PoCTest extends PHPUnit_Framework_TestCase {
 
 		$cds = 'h1 {content: "TEST\"TEST";}';
 
-		$template = new \CDS\Builder($template, $cds, []);
+		$template = new \Transphporm\Builder($template, $cds, []);
 
 		$this->assertEquals('<h1>TEST"TEST</h1>', $template->output());
 	}
@@ -212,7 +212,7 @@ class PoCTest extends PHPUnit_Framework_TestCase {
 
 		$cds = 'h1 {content: "A", "B";}';
 
-		$template = new \CDS\Builder($template, $cds, []);
+		$template = new \Transphporm\Builder($template, $cds, []);
 
 		$this->assertEquals('<h1>AB</h1>', $template->output());
 	}
@@ -223,7 +223,7 @@ class PoCTest extends PHPUnit_Framework_TestCase {
 
 		$cds = 'h1.test {content: "REPLACED";}';
 
-		$template = new \CDS\Builder($template, $cds, []);
+		$template = new \Transphporm\Builder($template, $cds, []);
 
 		$this->assertEquals('<h1>Test 1</h1><h1 class="test">REPLACED</h1><h1>Test 2</h1>', $template->output());
 	}
@@ -238,7 +238,7 @@ class PoCTest extends PHPUnit_Framework_TestCase {
 
 		$cds = 'div .foo {content: "REPLACED";}';
 
-		$template = new \CDS\Builder($template, $cds, []);
+		$template = new \Transphporm\Builder($template, $cds, []);
 		$this->assertEquals($this->stripTabs('<div>
 			<span class="foo">REPLACED</span>
 			<span class="bar">test</span>
@@ -255,7 +255,7 @@ class PoCTest extends PHPUnit_Framework_TestCase {
 
 		$cds = 'div > .foo {content: "REPLACED";}';
 
-		$template = new \CDS\Builder($template, $cds, []);
+		$template = new \Transphporm\Builder($template, $cds, []);
 		$this->assertEquals($this->stripTabs('<div>
 			<span class="foo">REPLACED</span>
 			<span class="bar">test</span>
@@ -273,7 +273,7 @@ class PoCTest extends PHPUnit_Framework_TestCase {
 
 		$cds = '[name="foo"] {content: "REPLACED";}';
 
-		$template = new \CDS\Builder($template, $cds, []);
+		$template = new \Transphporm\Builder($template, $cds, []);
 		$this->assertEquals($this->stripTabs('<div>
 			<textarea name="foo">REPLACED</textarea>
 			<textarea>bar</textarea>
@@ -292,7 +292,7 @@ class PoCTest extends PHPUnit_Framework_TestCase {
 
 		$cds = '[name="foo"] {content: "REPLACED";}';
 
-		$template = new \CDS\Builder($template, $cds, []);
+		$template = new \Transphporm\Builder($template, $cds, []);
 		$this->assertEquals($this->stripTabs('<div>
 			<textarea>bar</textarea>
 			<textarea name="foo">REPLACED</textarea>
@@ -310,7 +310,7 @@ class PoCTest extends PHPUnit_Framework_TestCase {
 
 		$cds = 'textarea[name="foo"] {content: "REPLACED";}';
 
-		$template = new \CDS\Builder($template, $cds, []);
+		$template = new \Transphporm\Builder($template, $cds, []);
 		$this->assertEquals($this->stripTabs('		<div>
 			<a name="foo">a link</a>
 			<textarea name="foo">REPLACED</textarea>			
@@ -328,7 +328,7 @@ class PoCTest extends PHPUnit_Framework_TestCase {
 
 		$cds = 'textarea[name="foo"] {display: none;}';
 
-		$template = new \CDS\Builder($template, $cds, []);
+		$template = new \Transphporm\Builder($template, $cds, []);
 		$this->assertEquals($this->stripTabs('		<div>
 			<a name="foo">a link</a>
 
@@ -342,7 +342,7 @@ class PoCTest extends PHPUnit_Framework_TestCase {
 
 		$cds = 'div:before {content: "BEFORE";}';
 
-		$template = new \CDS\Builder($template, $cds, []);
+		$template = new \Transphporm\Builder($template, $cds, []);
 
 		$this->assertEquals($this->stripTabs('<div>BEFORETest</div>'), $this->stripTabs($template->output()));
 	}
@@ -354,7 +354,7 @@ class PoCTest extends PHPUnit_Framework_TestCase {
 
 		$cds = 'div:after {content: "AFTER";}';
 
-		$template = new \CDS\Builder($template, $cds, []);
+		$template = new \Transphporm\Builder($template, $cds, []);
 
 		$this->assertEquals($this->stripTabs('<div>TestAFTER</div>'), $this->stripTabs($template->output()));
 	}
@@ -396,7 +396,7 @@ class PoCTest extends PHPUnit_Framework_TestCase {
 		';
 
 
-		$template = new \CDS\Builder($template, $css, $data);
+		$template = new \Transphporm\Builder($template, $css, $data);
 
 
 		$this->assertEquals($this->stripTabs('<ul>
@@ -451,7 +451,7 @@ class PoCTest extends PHPUnit_Framework_TestCase {
 		';
 
 
-		$template = new \CDS\Builder($template, $css, $data);
+		$template = new \Transphporm\Builder($template, $css, $data);
 
 
 		$this->assertEquals($this->stripTabs('<ul>
@@ -481,7 +481,7 @@ class PoCTest extends PHPUnit_Framework_TestCase {
 
 		$cds = 'ul li:nth-child(2) {content: "REPLACED"}';
 
-		$template = new \CDS\Builder($template, $cds, []);
+		$template = new \Transphporm\Builder($template, $cds, []);
 
 		$this->assertEquals($this->stripTabs('<ul>
 				<li>One</li>
@@ -505,7 +505,7 @@ class PoCTest extends PHPUnit_Framework_TestCase {
 
 		$cds = 'ul li:nth-child(odd) {content: "REPLACED"}';
 
-		$template = new \CDS\Builder($template, $cds, []);
+		$template = new \Transphporm\Builder($template, $cds, []);
 
 		$this->assertEquals($this->stripTabs('<ul>
 				<li>REPLACED</li>
@@ -528,7 +528,7 @@ class PoCTest extends PHPUnit_Framework_TestCase {
 
 		$cds = 'ul li:nth-child(even) {content: "REPLACED"}';
 
-		$template = new \CDS\Builder($template, $cds, []);
+		$template = new \Transphporm\Builder($template, $cds, []);
 
 		$this->assertEquals($this->stripTabs('<ul>
 				<li>One</li>
@@ -539,30 +539,10 @@ class PoCTest extends PHPUnit_Framework_TestCase {
 
 	}
 
-
-
-	public function testNthChildEven2() {
-		$template = '<template>
-			<ul>
-				<li>One</li>
-				<li>Two</li>
-				<li>Three</li>
-				<li>Four</li>
-			</ul>
-		</template>';
-
-		$cds = 'ul li:nth-child(even) {content: "REPLACED"}';
-
-		$template = new \CDS\Builder($template, $cds, []);
-
-		$this->assertEquals($this->stripTabs('<ul>
-				<li>One</li>
-				<li>REPLACED</li>
-				<li>Three</li>
-				<li>REPLACED</li>
-			</ul>'), $this->stripTabs($template->output()));
+	public function testWriteAttribute() {
 
 	}
+
 }
 
 
