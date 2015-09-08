@@ -48,6 +48,17 @@ class PseudoMatcher {
 		return true;
 	}
 
+	public function attr() {
+		foreach ($this->pseudo as $pseudo) {
+			if (strpos($pseudo, 'attr') === 0) {
+				$criteria = trim($this->getBetween($pseudo, '(', ')'));
+				return $criteria;
+			}
+		}
+
+		return false;
+	}
+
 	private function odd($num) {
 		return $num % 2 === 1;
 	}

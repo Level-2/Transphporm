@@ -8,7 +8,8 @@ class BasicProperties {
 	}
 
 	public function content($value, $element, $rule) {
-		if (in_array('before', $rule->getPseudoMatcher()->getPseudo())) $element->firstChild->nodeValue = implode('', $value) . $element->firstChild->nodeValue;
+		if ($attr = $rule->getPseudoMatcher()->attr()) $element->setAttribute($attr, implode('', $value));
+		else if (in_array('before', $rule->getPseudoMatcher()->getPseudo())) $element->firstChild->nodeValue = implode('', $value) . $element->firstChild->nodeValue;
 		else if (in_array('after', $rule->getPseudoMatcher()->getPseudo())) $element->firstChild->nodeValue .= implode('', $value);
 		else $element->firstChild->nodeValue = implode('', $value);	
 	}
