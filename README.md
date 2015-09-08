@@ -65,7 +65,7 @@ With Transphporm, the designer just supplies some raw XML that contains some dum
 
 ```
 
-It's pure HTML without any processing instructions. Transphorm then takes the XML and renders it with some data.
+It's pure HTML without any processing instructions. Transphporm then takes the XML and renders it with some data.
 
 But where are the processing instructions? Transphporm follows CSS's lead and all this processing logic is stored externally in "Transformation Style Sheets", a completely separate file that contains entirely reusable processing instructions.
 
@@ -130,7 +130,7 @@ Output:
 <h1>My Title!</h1>
 ```
 
-Most of the time, you will need to work with much more complex data structures. Transphorm allows for reading data from within data structures using the inbuilt data function:
+Most of the time, you will need to work with much more complex data structures. Transphporm allows for reading data from within data structures using the inbuilt data function:
 
 
 ```php
@@ -214,7 +214,7 @@ $users[] = $user;
 
 ```
 
-Using Transphorm, the user list can be generated like this:
+Using Transphporm, the user list can be generated like this:
 
 
 ```php
@@ -238,7 +238,7 @@ echo $template->output();
 ```
 
 
-`repeat` tells Transphorm to repeat the selected element for each of the supplied array. 
+`repeat` tells Transphporm to repeat the selected element for each of the supplied array. 
 
 `data(users)` reads `$data['users']` as supplied in PHP.
 
@@ -348,7 +348,7 @@ N.b. this is very useful with the iteration value pseudo element
 
 # CSS Selectors
 
-Transphorm supports the following CSS selectors:
+Transphporm supports the following CSS selectors:
 
 ### `.classname`
 
