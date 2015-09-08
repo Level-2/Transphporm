@@ -42,7 +42,7 @@ class DataFunction {
 		$obj = $data;
 		foreach ($parts as $part) {
 			if ($part == '') continue;
-			$obj = $obj->$part;
+			$obj = is_array($obj) ? $obj[$part] : $obj->$part;
 		}
 		return $obj;
 	}

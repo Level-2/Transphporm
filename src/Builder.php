@@ -7,8 +7,8 @@ class Builder {
 	private $data;
 	private $registeredProperties = [];
 
-	public function __construct($template, $cds, $data) {
-		$this->template = new Template($template);
+	public function __construct($template, $cds, $data = []) {
+		$this->template = new Template('<template>' . $template . '</template>');
 		$this->cds = new Sheet($cds);
 		$this->data = new Hook\DataFunction(new \SplObjectStorage(), $data);
 		$this->registerBaseProperties();

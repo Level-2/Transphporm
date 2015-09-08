@@ -2,9 +2,9 @@
 class TransphpormTest extends PHPUnit_Framework_TestCase {
 
 	public function testContentSimple() {
-		$template = '<template>
+		$template = '
 				<ul><li>TEST1</li></ul>
-		</template>';
+		';
 
 		$css = 'ul li {content: data(user);}';
 
@@ -20,9 +20,9 @@ class TransphpormTest extends PHPUnit_Framework_TestCase {
 
 
 	public function testContentObject() {
-		$template = '<template>
+		$template = '
 				<ul><li>TEST1</li></ul>
-		</template>';
+		';
 
 		$css = 'ul li {content: data(user.name);}';
 
@@ -39,9 +39,9 @@ class TransphpormTest extends PHPUnit_Framework_TestCase {
 
 
 	public function testRepeatBasic() {
-		$template = '<template>
+		$template = '
 				<ul><li>TEST1</li></ul>
-		</template>';
+		';
 
 		//When using repeat to repeat some data, set the content to the data for the iteration
 		$css = 'ul li {repeat: data(list); content: iteration()}';
@@ -58,9 +58,9 @@ class TransphpormTest extends PHPUnit_Framework_TestCase {
 
 
 	public function testRepeatObject() {
-		$template = '<template>
+		$template = '
 				<ul><li>TEST1</li></ul>
-		</template>';
+		';
 
 
 		//This time read a specific value from the data of the current iteration
@@ -92,13 +92,13 @@ class TransphpormTest extends PHPUnit_Framework_TestCase {
 	}
 
 	public function testRepeatObjectChildNode() {
-		$template = '<template>
+		$template = '
 				<ul>
 					<li>
 						<span>TEST1</span>
 					</li>
 				</ul>
-		</template>';
+		';
 
 		//Rather than setting the value to the 
 		$css = 'ul li {repeat: data(list);}
@@ -153,14 +153,14 @@ class TransphpormTest extends PHPUnit_Framework_TestCase {
 		$data->list[] = $three;
 
 
-		$template = '<template>
+		$template = '
 				<ul>
 					<li>
 						<h2>header</h2>
 						<span>TEST1</span>
 					</li>
 				</ul>
-		</template>';
+		';
 
 		$css = 'ul li {repeat: data(list);}
 		ul li h2 {content: iteration(id)}
@@ -187,7 +187,7 @@ class TransphpormTest extends PHPUnit_Framework_TestCase {
 
 
 	public function testQuotedContent() {
-		$template = '<template><h1>Heading</h1></template>';
+		$template = '<h1>Heading</h1>';
 
 		$cds = 'h1 {content: "TEST";}';
 
@@ -198,7 +198,7 @@ class TransphpormTest extends PHPUnit_Framework_TestCase {
 
 
 	public function testQuotedContentWithEscape() {
-		$template = '<template><h1>Heading</h1></template>';
+		$template = '<h1>Heading</h1>';
 
 		$cds = 'h1 {content: "TEST\"TEST";}';
 
@@ -208,7 +208,7 @@ class TransphpormTest extends PHPUnit_Framework_TestCase {
 	}
 
 	public function testMultipleContentValues() {
-		$template = '<template><h1>Heading</h1></template>';
+		$template = '<h1>Heading</h1>';
 
 		$cds = 'h1 {content: "A", "B";}';
 
@@ -219,7 +219,7 @@ class TransphpormTest extends PHPUnit_Framework_TestCase {
 
 
 	public function testMatchClassAndTag() {
-		$template = '<template><h1>Test 1</h1><h1 class="test">Heading</h1><h1>Test 2</h1></template>';
+		$template = '<h1>Test 1</h1><h1 class="test">Heading</h1><h1>Test 2</h1>';
 
 		$cds = 'h1.test {content: "REPLACED";}';
 
@@ -229,12 +229,12 @@ class TransphpormTest extends PHPUnit_Framework_TestCase {
 	}
 
 	public function testMatchClassChild() {
-		$template = '<template>
+		$template = '
 		<div>
 			<span class="foo">test</span>
 			<span class="bar">test</span>
 		</div>
-		</template>';
+		';
 
 		$cds = 'div .foo {content: "REPLACED";}';
 
@@ -246,12 +246,12 @@ class TransphpormTest extends PHPUnit_Framework_TestCase {
 	}
 
 	public function testChildNodeMatcher() {
-		$template = '<template>
+		$template = '
 		<div>
 			<span class="foo">test</span>
 			<span class="bar">test</span>
 		</div>
-		</template>';
+		';
 
 		$cds = 'div > .foo {content: "REPLACED";}';
 
@@ -264,12 +264,12 @@ class TransphpormTest extends PHPUnit_Framework_TestCase {
 
 
 	public function testAttributeSelector() {
-		$template = '<template>
+		$template = '
 		<div>
 			<textarea name="foo">foo</textarea>
 			<textarea>bar</textarea>
 		</div>
-		</template>';
+		';
 
 		$cds = '[name="foo"] {content: "REPLACED";}';
 
@@ -283,12 +283,12 @@ class TransphpormTest extends PHPUnit_Framework_TestCase {
 
 	//check that it's not due to the order of the HTML
 	public function testAttributeSelectorB() {
-		$template = '<template>
+		$template = '
 		<div>
 			<textarea>bar</textarea>
 			<textarea name="foo">foo</textarea>			
 		</div>
-		</template>';
+		';
 
 		$cds = '[name="foo"] {content: "REPLACED";}';
 
@@ -301,12 +301,12 @@ class TransphpormTest extends PHPUnit_Framework_TestCase {
 
 
 	public function testAttributeSelectorC() {
-		$template = '<template>
+		$template = '
 		<div>
 			<a name="foo">a link</a>
 			<textarea name="foo">foo</textarea>			
 		</div>
-		</template>';
+		';
 
 		$cds = 'textarea[name="foo"] {content: "REPLACED";}';
 
@@ -319,12 +319,12 @@ class TransphpormTest extends PHPUnit_Framework_TestCase {
 
 
 	public function testDisplayNone() {
-		$template = '<template>
+		$template = '
 		<div>
 			<a name="foo">a link</a>
 			<textarea name="foo">foo</textarea>			
 		</div>
-		</template>';
+		';
 
 		$cds = 'textarea[name="foo"] {display: none;}';
 
@@ -336,9 +336,9 @@ class TransphpormTest extends PHPUnit_Framework_TestCase {
 	}
 
 	public function testBefore() {
-		$template =  '<template>
+		$template =  '
 		<div>Test</div>
-		</template>';
+		';
 
 		$cds = 'div:before {content: "BEFORE";}';
 
@@ -348,9 +348,9 @@ class TransphpormTest extends PHPUnit_Framework_TestCase {
 	}
 
 	public function testAfter() {
-		$template =  '<template>
+		$template =  '
 		<div>Test</div>
-		</template>';
+		';
 
 		$cds = 'div:after {content: "AFTER";}';
 
@@ -380,14 +380,14 @@ class TransphpormTest extends PHPUnit_Framework_TestCase {
 		$data->list[] = $three;
 
 
-		$template = '<template>
+		$template = '
 				<ul>
 					<li>
 						<h2>header</h2>
 						<span>TEST1</span>
 					</li>
 				</ul>
-		</template>';
+		';
 
 		$css = 'ul li {repeat: data(list);}
 		ul li h2 {content: iteration(id)}
@@ -435,14 +435,14 @@ class TransphpormTest extends PHPUnit_Framework_TestCase {
 		$data->list[] = $three;
 
 
-		$template = '<template>
+		$template = '
 				<ul>
 					<li>
 						<h2>header</h2>
 						<span>TEST1</span>
 					</li>
 				</ul>
-		</template>';
+		';
 
 		$css = 'ul li {repeat: data(list);}
 		ul li h2 {content: iteration(id)}
@@ -470,14 +470,14 @@ class TransphpormTest extends PHPUnit_Framework_TestCase {
 	}
 
 	public function testNthChild() {
-		$template = '<template>
+		$template = '
 			<ul>
 				<li>One</li>
 				<li>Two</li>
 				<li>Three</li>
 				<li>Four</li>
 			</ul>
-		</template>';
+		';
 
 		$cds = 'ul li:nth-child(2) {content: "REPLACED"}';
 
@@ -494,14 +494,14 @@ class TransphpormTest extends PHPUnit_Framework_TestCase {
 	}
 
 	public function testNthChildOdd() {
-		$template = '<template>
+		$template = '
 			<ul>
 				<li>One</li>
 				<li>Two</li>
 				<li>Three</li>
 				<li>Four</li>
 			</ul>
-		</template>';
+		';
 
 		$cds = 'ul li:nth-child(odd) {content: "REPLACED"}';
 
@@ -517,14 +517,14 @@ class TransphpormTest extends PHPUnit_Framework_TestCase {
 	}
 
 	public function testNthChildEven() {
-		$template = '<template>
+		$template = '
 			<ul>
 				<li>One</li>
 				<li>Two</li>
 				<li>Three</li>
 				<li>Four</li>
 			</ul>
-		</template>';
+		';
 
 		$cds = 'ul li:nth-child(even) {content: "REPLACED"}';
 
@@ -540,9 +540,9 @@ class TransphpormTest extends PHPUnit_Framework_TestCase {
 	}
 
 	public function testReadAttribute() {
-		$template = '<template>
+		$template = '
 			<div class="fromattribute">Test</div>
-		</template>';
+		';
 
 		$cds = 'div {content: attr(class); }';
 
@@ -553,9 +553,9 @@ class TransphpormTest extends PHPUnit_Framework_TestCase {
 
 
 	public function testWriteAttribute() {
-		$template = '<template>
+		$template = '
 			<div>Test</div>
-		</template>';
+		';
 
 		$cds = 'div:attr(class) {content: "classname"; }';
 
