@@ -242,7 +242,7 @@ echo $template->output();
 
 `data(users)` reads `$data['users']` as supplied in PHP.
 
-`iteration()` points at the value for the current iteration. So this code outputs:
+`iteration(name)` points at the value for the current iteration and reads the `name` property. This code outputs:
 
 
 ```php
