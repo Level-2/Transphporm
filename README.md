@@ -225,7 +225,7 @@ $xml = '<ul>
 
 
 $tss = '
-	ul li {repeat: data(users); content: iteration();}
+	ul li {repeat: data(users); content: iteration(name);}
 ';
 
 $data = ['users' => $users];
