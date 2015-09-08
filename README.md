@@ -953,3 +953,10 @@ $template = new \Transphporm\Builder($xml, $tss);
 echo $template->output();
 ```
 
+Output:
+
+
+```php
+<h1 class="foo">foo</h1>
+
+```
