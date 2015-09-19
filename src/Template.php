@@ -17,7 +17,7 @@ class Template {
 		$this->hooks[] = [$xpath, $hook];
 	}
 
-	private function processHooks($query, $hook) {
+	private function processHooks() {
 		foreach ($this->hooks as list($query, $hook)) {
 			foreach ($this->xpath->query($query) as $element) $hook->run($element);
 		}
