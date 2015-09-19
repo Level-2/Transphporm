@@ -20,7 +20,13 @@ class Template {
 	private function processHooks($query, $hook) {
 		foreach ($this->hooks as list($query, $hook)) {
 			foreach ($this->xpath->query($query) as $element) $hook->run($element);
-		}		
+		}
+	}
+
+	private function printDocument(\DocumentElement $doc) {
+		$output = '';
+		foreach ($doc->documentElement->childNodes as $node) $output .= $doc->saveXML($node, LIBXML_NOEMPTYTAG);
+		return $output;
 	}
 
 	public function output($document = false) {
@@ -35,7 +41,7 @@ class Template {
 		$output = ($this->document->doctype) ? $this->document->saveXml($this->document->doctype) . "\n" : '';
 
 		if ($this->document->documentElement->tagName !== 'template') $output .= $this->document->saveXml($this->document->documentElement, LIBXML_NOEMPTYTAG);
-		else foreach ($this->document->documentElement->childNodes as $node) $output .= $this->document->saveXML($node, LIBXML_NOEMPTYTAG);
+		else $output = $this->printDocument($this->document);
 
 		//repair empty tags. Browsers break on <script /> and <div /> so can't avoid LIBXML_NOEMPTYTAG but they also break on <base></base> so repair them
 		$output = str_replace(['></img>', '></br>', '></meta>', '></base>', '></link>', '></hr>', '></input>'], ' />', $output);
