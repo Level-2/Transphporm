@@ -58,11 +58,6 @@ class DataFunction {
 
 		$doc = $newTemplate->output([], true);
 		
-		$owner = $element->ownerDocument;
-		$parent = $element->parentNode;
-		//$parent->removeChild($element);
-
-
 		$newNode = $element->ownerDocument->importNode($doc->documentElement, true);
 
 		if ($newNode->tagName == 'template') {
