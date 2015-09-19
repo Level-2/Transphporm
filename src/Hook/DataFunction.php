@@ -50,4 +50,24 @@ class DataFunction {
 	public function attr($val, $element) {
 		return $element->getAttribute(trim($val));
 	}
+
+	public function template($val, $element) {
+		$parts = explode(',', trim($val, '"'));
+
+		$newTemplate = new \Transphporm\Builder($parts[0]);
+
+		$doc = $newTemplate->output([], true);
+		
+		$owner = $element->ownerDocument;
+		$parent = $element->parentNode;
+		//$parent->removeChild($element);
+
+
+		$newNode = $element->ownerDocument->importNode($doc->documentElement, true);
+
+		if ($newNode->tagName == 'template') {
+			foreach ($newNode->childNodes as $node) $element->appendChild($node->cloneNode(true));
+		}		
+		else $element->appendChild($newNode);
+	}
 }
