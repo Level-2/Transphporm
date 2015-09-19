@@ -23,7 +23,7 @@ class Template {
 		}
 	}
 
-	private function printDocument(\DocumentElement $doc) {
+	private function printDocument(\DomDocument $doc) {
 		$output = '';
 		foreach ($doc->documentElement->childNodes as $node) $output .= $doc->saveXML($node, LIBXML_NOEMPTYTAG);
 		return $output;
