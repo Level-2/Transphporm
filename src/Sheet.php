@@ -14,6 +14,7 @@ class Sheet {
 		$pos = 0;
 
 		while ($next = strpos($css, '{', $pos)) {
+			if (strpos($css, '/*') < $next) $pos = strpos($css, '*/', $pos+1);
 			$rule = new \stdclass;
 			$selector = trim(substr($css, $pos, $next-$pos));
 			$x = new CssToXpath($selector);
