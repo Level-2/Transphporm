@@ -10,25 +10,24 @@ class Builder {
 	const FILE = 1;
 	const STRING = 2;
 
-	public function __construct($template, $tss = '', $mode = self::FILE) {
-		if (self::FILE & $mode) {
+	public function __construct($template, $tss = '') {
+		if (trim($template)[0] !== '<') {
 			$this->template = file_get_contents($template);
 			if ($tss) $this->tss = file_get_contents($tss);
 		}
 		else {
 			$this->template =  $template;
 			$this->tss = $tss;
-		} 
-	
-		$this->mode = $mode;
-		
+		}	
 	}
 
 	public function output($data = null, $document = false) {
 		$data = new Hook\DataFunction(new \SplObjectStorage(), $data);
 		$this->registerBaseProperties($data);
 
-		if (self::STRING & $this->mode)  $template = new Template('<template>' . $this->template . '</template>');
+
+		//To be a valid XML document it must have a root element, automatically wrap it in <template> to ensure it does
+		if (strpos('<template', $this->template) === false) $template = new Template('<template>' . $this->template . '</template>');
 		else $template = new Template($this->template);
 
 		$tss = new Sheet($this->tss);

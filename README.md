@@ -90,7 +90,7 @@ $xml = '<h1>Original Title</h1>';
 
 $tss = 'h1 {content: "Replaced Title"; }';
 
-$template = new \Transphporm\Builder($xml, $tss, \Transphporm\Builder::STRING);
+$template = new \Transphporm\Builder($xml, $tss);
 
 echo $template->output();
 
@@ -103,13 +103,12 @@ The output will be:
 <h1>Replaced Title</h1>
 ```
 
-The third parameter `\Transphporm\Builder::STRING`, indicates that the `$xml` and `$tss` variables are XML and TSS strings, alternatively (and by default) `Transphporm\Builder` takes file names. For example:
+The arguments for Transphporm\Builder can either be xml and tss strings, or file names to load.
 
 ```php
-$template = new \Transphporm\Builder('template.xml', 'stylesheet.tss', \Transphporm\Builder::FILE);
-
-//\Transphporm\Builder::FILE is the default value, so this is equivalent and tidier:
+//Load files instead of strings, the base path is the current working directory (getcwd())
 $template = new \Transphporm\Builder('template.xml', 'stylesheet.tss');
+
 
 ```
 
@@ -126,7 +125,7 @@ $data = 'My Title!'
 $tss = 'h1 {content: data(); }';
 
 
-$template = new \Transphporm\Builder($xml, $tss, \Transphporm\Builder::STRING)
+$template = new \Transphporm\Builder($xml, $tss)
 
 echo $template->output($data);
 
@@ -159,7 +158,7 @@ $tss = '
 	p {content: data(description);}
 ';
 
-$template = new \Transphporm\Builder($xml, $tss, \Transphporm\Builder::STRING);
+$template = new \Transphporm\Builder($xml, $tss);
 
 echo $template->output($data);
 
@@ -188,7 +187,7 @@ $data = 'My Title!'
 $tss = 'h1 {content: "Title: ", data(); }';
 
 
-$template = new \Transphporm\Builder($xml, $tss, \Transphporm\Builder::STRING);
+$template = new \Transphporm\Builder($xml, $tss);
 
 echo $template->output($data);
 
@@ -240,7 +239,7 @@ $tss = '
 $data = ['users' => $users];
 
 
-$template = new \Transphporm\Builder($xml, $tss, \Transphporm\Builder::STRING);
+$template = new \Transphporm\Builder($xml, $tss);
 
 echo $template->output($data);
 
@@ -282,7 +281,7 @@ $tss = '
 $data = ['users' => $users];
 
 
-$template = new \Transphporm\Builder($xml, $tss, \Transphporm\Builder::STRING);
+$template = new \Transphporm\Builder($xml, $tss);
 
 echo $template->output($data);
 
@@ -330,7 +329,7 @@ $tss = '
 $data = ['users' => $users];
 
 
-$template = new \Transphporm\Builder($xml, $tss, \Transphporm\Builder::STRING)
+$template = new \Transphporm\Builder($xml, $tss)
 
 echo $template->output($data);
 
@@ -375,7 +374,7 @@ $tss = '
 .middle {content: "Middle paragraph"; }
 ';
 
-$template = new \Transphporm\Builder($xml, $tss, \Transphporm\Builder::STRING);
+$template = new \Transphporm\Builder($xml, $tss);
 
 echo $template->output();
 
@@ -411,7 +410,7 @@ $tss = '
 p.middle {content: "Middle paragraph"; }
 ';
 
-$template = new \Transphporm\Builder($xml, $tss, \Transphporm\Builder::STRING);
+$template = new \Transphporm\Builder($xml, $tss);
 
 echo $template->output();
 
@@ -456,7 +455,7 @@ $tss = '
 li > span {content: "REPLACED";}
 ';
 
-$template = new \Transphporm\Builder($xml, $tss, \Transphporm\Builder::STRING);
+$template = new \Transphporm\Builder($xml, $tss);
 
 echo $template->output();
 
@@ -495,7 +494,7 @@ $tss = '
 #middle {content: "Middle paragraph"; }
 ';
 
-$template = new \Transphporm\Builder($xml, $tss, \Transphporm\Builder::STRING)
+$template = new \Transphporm\Builder($xml, $tss)
 
 echo $template->output();
 
@@ -535,7 +534,7 @@ $tss = '
 textarea[name="Two"] {content: "TEST"; }
 ';
 
-$template = new \Transphporm\Builder($xml, $tss, \Transphporm\Builder::STRING);
+$template = new \Transphporm\Builder($xml, $tss);
 
 echo $template->output();
 
@@ -578,7 +577,7 @@ $tss = '
 textarea[name] {content: "TEST"; }
 ';
 
-$template = new \Transphporm\Builder($xml, $tss, \Transphporm\Builder::STRING);
+$template = new \Transphporm\Builder($xml, $tss);
 
 echo $template->output();
 
@@ -642,7 +641,7 @@ $tss = '
 	h1:before {content: "BEFORE ";}
 ';
 
-$template = new \Transphporm\Builder($xml, $tss, \Transphporm\Builder::STRING);
+$template = new \Transphporm\Builder($xml, $tss);
 
 echo $template->output($data);
 
@@ -674,7 +673,7 @@ $tss = '
 	h1:after {content: " AFTER";}
 ';
 
-$template = new \Transphporm\Builder($xml, $tss, \Transphporm\Builder::STRING)
+$template = new \Transphporm\Builder($xml, $tss)
 
 echo $template->output($data);
 
@@ -708,7 +707,7 @@ $xml = '
 
 $tss = 'ul li:nth-child(2) {content: "REPLACED"}';
 
-$template = new \Transphporm\Builder($template, $tss, \Transphporm\Builder::STRING);
+$template = new \Transphporm\Builder($template, $tss);
 
 echo $template->output();
 ```
@@ -742,7 +741,7 @@ $xml = '
 
 $tss = 'ul li:nth-child(even) {content: "REPLACED"}';
 
-$template = new \Transphporm\Builder($template, $tss, \Transphporm\Builder::STRING);
+$template = new \Transphporm\Builder($template, $tss);
 echo $template->output();
 ```
 
@@ -774,7 +773,7 @@ $xml = '
 
 $tss = 'ul li:nth-child(even) {content: "REPLACED"}';
 
-$template = new \Transphporm\Builder($template, $tss, \Transphporm\Builder::STRING);
+$template = new \Transphporm\Builder($template, $tss);
 echo $template->output();
 ```
 
@@ -850,7 +849,7 @@ $tss = '
 $data = ['users' => $users];
 
 
-$template = new \Transphporm\Builder($xml, $tss, \Transphporm\Builder::STRING);
+$template = new \Transphporm\Builder($xml, $tss);
 
 echo $template->output($data);
 
@@ -921,7 +920,7 @@ $tss = '
 $data = ['users' => $users];
 
 
-$template = new \Transphporm\Builder($xml, $tss, \Transphporm\Builder::STRING);
+$template = new \Transphporm\Builder($xml, $tss);
 
 echo $template->output($data);
 
@@ -962,7 +961,7 @@ $xml = '
 
 $tss = 'h1 {content: attr(class);}';
 
-$template = new \Transphporm\Builder($xml, $tss, \Transphporm\Builder::STRING);
+$template = new \Transphporm\Builder($xml, $tss);
 
 echo $template->output();
 ```
