@@ -28,12 +28,20 @@ class PseudoMatcher {
 		$criteria = substr($pseudo, $pos+1, $end-$pos-1);
 		list ($field, $value) = explode('=', $criteria);
 
+		$operator = '';
+		if ($field[strlen($field)-1] == '!') {
+			$operator = 'not';
+			$field = trim($field, '!');
+		}
 		$value = trim($value, '"');
 
 		$lookupValue = $this->dataFunction->$name($field, $element);
 
-		if ($lookupValue != $value) return false;
-		else return true;
+		$matched = true;
+		if ($lookupValue != $value) $matched = false;
+		if ($operator == 'not') $matched = !$matched;
+		return $matched;
+		
 	}
 
 	private function nth($pseudo, $element) {
