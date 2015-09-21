@@ -4,6 +4,7 @@ class CssToXpath {
 	private $specialChars = [' ', '.', '>', '~', '#', ':', '[', ']'];
 	private $translators = [];
 	private $css;
+	private $depth;
 
 	public function __construct($css) {
 		$this->css = str_replace([' >', '> '],['>', '>'], trim($css));
@@ -45,6 +46,7 @@ class CssToXpath {
 	public function getXpath() {
 		$css = explode(':', $this->css)[0];
 		$selectors = $this->split($css);
+		$this->depth = count($selectors);
 		$xpath = '/';
 		foreach ($selectors as $selector) {
 			if (isset($this->translators[$selector->type])) $xpath .= $this->translators[$selector->type]($selector->string);
@@ -54,6 +56,10 @@ class CssToXpath {
 		return $xpath;
 	}
 
+	public function getDepth() {
+		return $this->depth;
+	}
+	
 	public function getPseudo() {
 		$parts = explode(':', $this->css);
 		array_shift($parts);
