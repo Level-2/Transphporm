@@ -54,7 +54,7 @@ class Sheet {
 		$pos = 0;
 		while (($pos = strpos($str, '/*', $pos)) !== false) {
 			$end = strpos($str, '*/', $pos);
-			$str = substr_replace($str, '', $pos, $end-$pos);
+			$str = substr_replace($str, '', $pos, $end-$pos+2);
 		}
 
 		$rules = explode(';', $str);
