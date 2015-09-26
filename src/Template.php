@@ -9,7 +9,6 @@ class Template {
 	public function __construct($doc) {
 		$this->document = new \DomDocument;
 		$this->document->loadXML($doc);
-	
 		$this->xpath = new \DomXPath($this->document);
 	}
 	

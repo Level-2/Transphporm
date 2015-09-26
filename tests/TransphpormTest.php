@@ -14,7 +14,7 @@ class TransphpormTest extends PHPUnit_Framework_TestCase {
 		$data->user = 'tom';
 
 		
-		$template = new Builder($template, $css, Builder::STRING);
+		$template = new Builder($template, $css);
 		
 		$this->assertEquals('<ul><li>tom</li></ul>' ,$template->output($data)); 
 	}
@@ -33,7 +33,7 @@ class TransphpormTest extends PHPUnit_Framework_TestCase {
 		$data->user->name = 'tom';
 
 		
-		$template = new \Transphporm\Builder($template, $css, Builder::STRING);
+		$template = new \Transphporm\Builder($template, $css);
 		
 		$this->assertEquals('<ul><li>tom</li></ul>' ,$template->output($data)); 
 	}
@@ -52,7 +52,7 @@ class TransphpormTest extends PHPUnit_Framework_TestCase {
 		$data->list = ['One', 'Two', 'Three'];
 
 		
-		$template = new \Transphporm\Builder($template, $css, Builder::STRING);
+		$template = new \Transphporm\Builder($template, $css);
 		
 		$this->assertEquals('<ul><li>One</li><li>Two</li><li>Three</li></ul>' ,$template->output($data)); 
 	}
@@ -83,7 +83,7 @@ class TransphpormTest extends PHPUnit_Framework_TestCase {
 		$three->id = 'Three';
 		$data->list[] = $three;
 		
-		$template = new \Transphporm\Builder($template, $css, Builder::STRING);
+		$template = new \Transphporm\Builder($template, $css);
 		
 		$this->assertEquals('<ul><li>One</li><li>Two</li><li>Three</li></ul>' ,$template->output($data)); 
 	}
@@ -121,7 +121,7 @@ class TransphpormTest extends PHPUnit_Framework_TestCase {
 		$three->id = 'Three';
 		$data->list[] = $three;
 		
-		$template = new \Transphporm\Builder($template, $css, Builder::STRING);
+		$template = new \Transphporm\Builder($template, $css);
 		
 		$this->assertEquals($this->stripTabs('<ul>
 			<li>
@@ -168,7 +168,7 @@ class TransphpormTest extends PHPUnit_Framework_TestCase {
 		ul li span {content: iteration(name); }';
 
 
-		$template = new \Transphporm\Builder($template, $css, Builder::STRING);
+		$template = new \Transphporm\Builder($template, $css);
 
 
 		$this->assertEquals($this->stripTabs('<ul>
@@ -192,7 +192,7 @@ class TransphpormTest extends PHPUnit_Framework_TestCase {
 
 		$tss = 'h1 {content: "TEST";}';
 
-		$template = new \Transphporm\Builder($template, $tss, Builder::STRING);
+		$template = new \Transphporm\Builder($template, $tss);
 
 		$this->assertEquals('<h1>TEST</h1>', $template->output());
 	}
@@ -203,7 +203,7 @@ class TransphpormTest extends PHPUnit_Framework_TestCase {
 
 		$tss = 'h1 {content: "TEST\"TEST";}';
 
-		$template = new \Transphporm\Builder($template, $tss, Builder::STRING);
+		$template = new \Transphporm\Builder($template, $tss);
 
 		$this->assertEquals('<h1>TEST"TEST</h1>', $template->output());
 	}
@@ -213,7 +213,7 @@ class TransphpormTest extends PHPUnit_Framework_TestCase {
 
 		$tss = 'h1 {content: "A", "B";}';
 
-		$template = new \Transphporm\Builder($template, $tss, Builder::STRING);
+		$template = new \Transphporm\Builder($template, $tss);
 
 		$this->assertEquals('<h1>AB</h1>', $template->output());
 	}
@@ -224,7 +224,7 @@ class TransphpormTest extends PHPUnit_Framework_TestCase {
 
 		$tss = 'h1.test {content: "REPLACED";}';
 
-		$template = new \Transphporm\Builder($template, $tss, Builder::STRING);
+		$template = new \Transphporm\Builder($template, $tss);
 
 		$this->assertEquals('<h1>Test 1</h1><h1 class="test">REPLACED</h1><h1>Test 2</h1>', $template->output());
 	}
@@ -239,7 +239,7 @@ class TransphpormTest extends PHPUnit_Framework_TestCase {
 
 		$tss = 'div .foo {content: "REPLACED";}';
 
-		$template = new \Transphporm\Builder($template, $tss, Builder::STRING);
+		$template = new \Transphporm\Builder($template, $tss);
 		$this->assertEquals($this->stripTabs('<div>
 			<span class="foo">REPLACED</span>
 			<span class="bar">test</span>
@@ -256,7 +256,7 @@ class TransphpormTest extends PHPUnit_Framework_TestCase {
 
 		$tss = 'div > .foo {content: "REPLACED";}';
 
-		$template = new \Transphporm\Builder($template, $tss, Builder::STRING);
+		$template = new \Transphporm\Builder($template, $tss);
 		$this->assertEquals($this->stripTabs('<div>
 			<span class="foo">REPLACED</span>
 			<span class="bar">test</span>
@@ -274,7 +274,7 @@ class TransphpormTest extends PHPUnit_Framework_TestCase {
 
 		$tss = '[name="foo"] {content: "REPLACED";}';
 
-		$template = new \Transphporm\Builder($template, $tss, Builder::STRING);
+		$template = new \Transphporm\Builder($template, $tss);
 		$this->assertEquals($this->stripTabs('<div>
 			<textarea name="foo">REPLACED</textarea>
 			<textarea>bar</textarea>
@@ -293,7 +293,7 @@ class TransphpormTest extends PHPUnit_Framework_TestCase {
 
 		$tss = '[name="foo"] {content: "REPLACED";}';
 
-		$template = new \Transphporm\Builder($template, $tss, Builder::STRING);
+		$template = new \Transphporm\Builder($template, $tss);
 		$this->assertEquals($this->stripTabs('<div>
 			<textarea>bar</textarea>
 			<textarea name="foo">REPLACED</textarea>
@@ -311,7 +311,7 @@ class TransphpormTest extends PHPUnit_Framework_TestCase {
 
 		$tss = 'textarea[name="foo"] {content: "REPLACED";}';
 
-		$template = new \Transphporm\Builder($template, $tss, Builder::STRING);
+		$template = new \Transphporm\Builder($template, $tss);
 		$this->assertEquals($this->stripTabs('		<div>
 			<a name="foo">a link</a>
 			<textarea name="foo">REPLACED</textarea>			
@@ -329,7 +329,7 @@ class TransphpormTest extends PHPUnit_Framework_TestCase {
 
 		$tss = 'textarea[name="foo"] {display: none;}';
 
-		$template = new \Transphporm\Builder($template, $tss, Builder::STRING);
+		$template = new \Transphporm\Builder($template, $tss);
 		$this->assertEquals($this->stripTabs('		<div>
 			<a name="foo">a link</a>
 
@@ -343,7 +343,7 @@ class TransphpormTest extends PHPUnit_Framework_TestCase {
 
 		$tss = 'div:before {content: "BEFORE";}';
 
-		$template = new \Transphporm\Builder($template, $tss, Builder::STRING);
+		$template = new \Transphporm\Builder($template, $tss);
 
 		$this->assertEquals($this->stripTabs('<div>BEFORETest</div>'), $this->stripTabs($template->output()));
 	}
@@ -355,7 +355,7 @@ class TransphpormTest extends PHPUnit_Framework_TestCase {
 
 		$tss = 'div:after {content: "AFTER";}';
 
-		$template = new \Transphporm\Builder($template, $tss, Builder::STRING);
+		$template = new \Transphporm\Builder($template, $tss);
 
 		$this->assertEquals($this->stripTabs('<div>TestAFTER</div>'), $this->stripTabs($template->output()));
 	}
@@ -397,7 +397,7 @@ class TransphpormTest extends PHPUnit_Framework_TestCase {
 		';
 
 
-		$template = new \Transphporm\Builder($template, $css, Builder::STRING);
+		$template = new \Transphporm\Builder($template, $css);
 
 
 		$this->assertEquals($this->stripTabs('<ul>
@@ -452,7 +452,7 @@ class TransphpormTest extends PHPUnit_Framework_TestCase {
 		';
 
 
-		$template = new \Transphporm\Builder($template, $css, Builder::STRING);
+		$template = new \Transphporm\Builder($template, $css);
 
 
 		$this->assertEquals($this->stripTabs('<ul>
@@ -482,7 +482,7 @@ class TransphpormTest extends PHPUnit_Framework_TestCase {
 
 		$tss = 'ul li:nth-child(2) {content: "REPLACED"}';
 
-		$template = new \Transphporm\Builder($template, $tss, Builder::STRING);
+		$template = new \Transphporm\Builder($template, $tss);
 
 		$this->assertEquals($this->stripTabs('<ul>
 				<li>One</li>
@@ -506,7 +506,7 @@ class TransphpormTest extends PHPUnit_Framework_TestCase {
 
 		$tss = 'ul li:nth-child(odd) {content: "REPLACED"}';
 
-		$template = new \Transphporm\Builder($template, $tss, Builder::STRING);
+		$template = new \Transphporm\Builder($template, $tss);
 
 		$this->assertEquals($this->stripTabs('<ul>
 				<li>REPLACED</li>
@@ -529,7 +529,7 @@ class TransphpormTest extends PHPUnit_Framework_TestCase {
 
 		$tss = 'ul li:nth-child(even) {content: "REPLACED"}';
 
-		$template = new \Transphporm\Builder($template, $tss, Builder::STRING);
+		$template = new \Transphporm\Builder($template, $tss);
 
 		$this->assertEquals($this->stripTabs('<ul>
 				<li>One</li>
@@ -547,7 +547,7 @@ class TransphpormTest extends PHPUnit_Framework_TestCase {
 
 		$tss = 'div {content: attr(class); }';
 
-		$template = new \Transphporm\Builder($template, $tss, Builder::STRING);
+		$template = new \Transphporm\Builder($template, $tss);
 
 		$this->assertEquals('<div class="fromattribute">fromattribute</div>', $template->output());
 	}
@@ -560,7 +560,7 @@ class TransphpormTest extends PHPUnit_Framework_TestCase {
 
 		$tss = 'div:attr(class) {content: "classname"; }';
 
-		$template = new \Transphporm\Builder($template, $tss, Builder::STRING);
+		$template = new \Transphporm\Builder($template, $tss);
 
 		$this->assertEquals('<div class="classname">Test</div>', $template->output());
 	}

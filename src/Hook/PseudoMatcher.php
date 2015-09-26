@@ -35,7 +35,7 @@ class PseudoMatcher {
 		}
 		$value = trim($value, '"');
 
-		$lookupValue = $this->dataFunction->$name($field, $element);
+		$lookupValue = $this->dataFunction->$name([$field], $element);
 
 		$matched = true;
 		if ($lookupValue != $value) $matched = false;

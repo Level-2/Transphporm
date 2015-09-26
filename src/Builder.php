@@ -5,15 +5,13 @@ class Builder {
 	private $template;
 	private $tss;
 	private $registeredProperties = [];
-	private $mode;
-
-	const FILE = 1;
-	const STRING = 2;
+	private $isFile = false;
 
 	public function __construct($template, $tss = '') {
 		if (trim($template)[0] !== '<') {
 			$this->template = file_get_contents($template);
 			if ($tss) $this->tss = file_get_contents($tss);
+			$this->isFile = true;
 		}
 		else {
 			$this->template =  $template;
@@ -25,9 +23,9 @@ class Builder {
 		$data = new Hook\DataFunction(new \SplObjectStorage(), $data);
 		$this->registerBaseProperties($data);
 
-
 		//To be a valid XML document it must have a root element, automatically wrap it in <template> to ensure it does
-		if (strpos('<template', $this->template) === false) $template = new Template('<template>' . $this->template . '</template>');
+		//If it's a file, don't assume template partials and don't wrap in <template>
+		if (!$this->isFile) $template = new Template('<template>' . $this->template . '</template>');
 		else $template = new Template($this->template);
 
 		$tss = new Sheet($this->tss);

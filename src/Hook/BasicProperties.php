@@ -11,7 +11,23 @@ class BasicProperties {
 		if ($attr = $rule->getPseudoMatcher()->attr()) $element->setAttribute($attr, implode('', $value));
 		else if (in_array('before', $rule->getPseudoMatcher()->getPseudo())) $element->firstChild->nodeValue = implode('', $value) . $element->firstChild->nodeValue;
 		else if (in_array('after', $rule->getPseudoMatcher()->getPseudo())) $element->firstChild->nodeValue .= implode('', $value);
-		else $element->firstChild->nodeValue = implode('', $value);	
+		else {
+			//Remove the current contents
+			$this->removeAllChildren($element);
+			//Now make a text node
+			$this->appendContent($element, $value);
+		}
+	}
+
+	private function appendContent($element, $content) {
+		if ($content[0] instanceof \DomNode) {
+			foreach ($content as $node) $element->appendChild($node);
+		}
+		else $element->appendChild($element->ownerDocument->createTextNode(implode('', $content)));		
+	}
+
+	private function removeAllChildren($element) {
+		while ($element->hasChildNodes()) $element->removeChild($element->firstChild);
 	}
 
 	public function repeat($value, $element, $rule) {

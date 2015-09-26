@@ -38,31 +38,34 @@ class DataFunction {
 	}
 
 	private function traverse($name, $data) {
-		$parts = explode('.', $name);
+		$parts = explode('.', $name[0]);
 		$obj = $data;
 		foreach ($parts as $part) {
 			if ($part == '') continue;
-			$obj = is_array($obj) ? $obj[$part] : $obj->$part;
+			if (is_callable([$obj, $part])) $obj = call_user_func([$obj, $part]); 
+			else $obj = is_array($obj) ? $obj[$part] : $obj->$part;
 		}
 		return $obj;
 	}
 
 	public function attr($val, $element) {
-		return $element->getAttribute(trim($val));
+		return $element->getAttribute(trim($val[0]));
 	}
 
 	public function template($val, $element) {
-		$parts = explode(',', trim($val, '"'));
-
-		$newTemplate = new \Transphporm\Builder($parts[0]);
+		$newTemplate = new \Transphporm\Builder($val[0]);
 
 		$doc = $newTemplate->output([], true);
 		
 		$newNode = $element->ownerDocument->importNode($doc->documentElement, true);
 
+		$result = [];
+
 		if ($newNode->tagName == 'template') {
-			foreach ($newNode->childNodes as $node) $element->appendChild($node->cloneNode(true));
+			foreach ($newNode->childNodes as $node) $result[] = $node->cloneNode(true);
 		}		
-		else $element->appendChild($newNode);
+		else $result[] = $newNode;
+
+		return $result;
 	}
 }

@@ -68,15 +68,28 @@ class Rule implements \Transphporm\Hook {
 
 	private function parseFunction($function) {
 		$open = strpos($function, '(');
-		$close = strpos($function, ')', $open);
-		$name = substr($function, 0, $open);
-		$params = substr($function, $open+1, $close-$open-1);
-		return ['name' => $name, 'params' => $params, 'endPoint' => $close];
+		if ($open) {
+			$close = strpos($function, ')', $open);
+
+			//Count the number of fresh opening ( before $close
+			$cPos = $open+1;
+			$count = 0;
+			while (($cPos = strpos($function, '(', $cPos+1)) !== false) $count++;			
+
+			//Find the matching closing )
+			for ($i = 0; $i < $count; $i++) $close = strpos($function, ')', $close+1);
+			$name = substr($function, 0, $open);
+
+			$params = substr($function, $open+1, $close-$open-1);
+			return ['name' => $name, 'params' => $params, 'endPoint' => $close];
+		}
+		else return ['name' => null, 'params' => $function, 'endPoint' => strlen($function)];
+		
 	}
 
 	private function parseValue($function, $element) {
 		$result = [];
-		if (in_array($function[0], ['\'', '"'])) {
+		if ($function && in_array($function[0], ['\'', '"'])) {
 			$finalPos = $this->findMatchingPos($function, $function[0]);
 			$result[] = $this->extractQuotedString($function[0], $function);
 		}
@@ -85,8 +98,8 @@ class Rule implements \Transphporm\Hook {
 			$finalPos = $func['endPoint'];			
 			$name = $func['name'];
 
-			if (is_callable([$this->dataFunction, $name])) {
-				$data = $this->dataFunction->$name($func['params'], $element);	
+			if ($name && is_callable([$this->dataFunction, $name])) {
+				$data = $this->dataFunction->$name($this->parseValue($func['params'], $element), $element);	
 				if (is_array($data)) $result += $data;
 				else $result[] = $data;
 			} 
