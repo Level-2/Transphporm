@@ -51,5 +51,6 @@ class Builder {
 		$this->registerProperty('content', [$basicProperties, 'content']);
 		$this->registerProperty('repeat', [$basicProperties, 'repeat']);
 		$this->registerProperty('display', [$basicProperties, 'display']);
+		$this->registerProperty('bind', [$basicProperties, 'bind']);
 	}
 }

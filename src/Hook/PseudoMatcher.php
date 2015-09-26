@@ -4,6 +4,7 @@ namespace Transphporm\Hook;
 class PseudoMatcher {
 	private $pseudo;
 	private $dataFunction;
+	private $operatorsToXpath = ['!' => 'not'];
 
 	public function __construct($pseudo, DataFunction $dataFunction) {
 		$this->pseudo = $pseudo;
@@ -28,20 +29,23 @@ class PseudoMatcher {
 		$criteria = substr($pseudo, $pos+1, $end-$pos-1);
 		list ($field, $value) = explode('=', $criteria);
 
-		$operator = '';
-		if ($field[strlen($field)-1] == '!') {
-			$operator = 'not';
-			$field = trim($field, '!');
-		}
+		$operator = $this->getOperator($field);
+		$field = trim($field, $operator);		
 		$value = trim($value, '"');
 
 		$lookupValue = $this->dataFunction->$name([$field], $element);
 
 		$matched = true;
 		if ($lookupValue != $value) $matched = false;
-		if ($operator == 'not') $matched = !$matched;
-		return $matched;
+		return $operator === '!' ? !$matched : $matched;
 		
+	}
+
+	private function getOperator($field) {
+		if ($field[strlen($field)-1] == '!') {
+			return '!';
+		}
+		else return '';
 	}
 
 	private function nth($pseudo, $element) {

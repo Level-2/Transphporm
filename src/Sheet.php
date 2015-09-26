@@ -15,21 +15,13 @@ class Sheet {
 		$count = 0;
 
 		while ($next = strpos($tss, '{', $pos)) {
-
 			//Ignore comments... this will only work for comments that aren't inside { and }
-			if (strpos($tss, '/*', $pos) !== false && strpos($tss, '/*', $pos) < $next) {
-				$pos = strpos($tss, '*/', $pos+1);
-			}
+			if ($comment = $this->skipComment($tss, $pos, $next)) $pos = $comment;			
 
-			$atPos = strpos($tss, '@', $pos);
-			if ($atPos !== false && $atPos < $next) {
-				$spacePos = strpos($tss, ' ', $atPos);
-				$funcName = substr($tss, $atPos+1, $spacePos-$atPos-1);
-				$endPos = strpos($tss, ';', $spacePos);
-				$args = substr($tss, $spacePos+1, $endPos-$spacePos-1);
-				$rules = array_merge($this->$funcName($args), $rules);
-				$pos = $endPos+1;
-			}
+			if ($processing = $this->processingInstructions($tss, $pos, $next)) {
+				$pos = $processing['endPos']+1;
+				$rules = array_merge($processing['rules'], $rules);
+			}			
 
 			$rule = new \stdclass;
 			$selector = trim(substr($tss, $pos, $next-$pos));
@@ -51,6 +43,26 @@ class Sheet {
 		//Now sort $rules by depth, index
 		usort($rules, [$this, 'sortRules']);
 		return $rules;
+	}
+
+	private function skipComment($tss, $pos, $next) {
+		if (strpos($tss, '/*', $pos) !== false && strpos($tss, '/*', $pos) < $next) {
+			return strpos($tss, '*/', $pos+1);
+		}
+		return false;
+	}
+
+	private function processingInstructions($tss, $pos, $next) {
+		$atPos = strpos($tss, '@', $pos);
+		if ($atPos !== false && $atPos < $next) {
+			$spacePos = strpos($tss, ' ', $atPos);
+			$funcName = substr($tss, $atPos+1, $spacePos-$atPos-1);
+			$endPos = strpos($tss, ';', $spacePos);
+			$args = substr($tss, $spacePos+1, $endPos-$spacePos-1);
+			//$rules = array_merge(, $rules);
+			return ['rules' => $this->$funcName($args), 'endPos' => $endPos];			
+		}
+		else return false;
 	}
 
 	private function import($args) {

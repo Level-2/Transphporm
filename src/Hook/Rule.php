@@ -98,7 +98,7 @@ class Rule implements \Transphporm\Hook {
 			$finalPos = $func['endPoint'];			
 			$name = $func['name'];
 
-			if ($name && is_callable([$this->dataFunction, $name])) {
+			if (($data = $this->callFunc($func['name'], $func['params'], $element)) !== false) {
 				$data = $this->dataFunction->$name($this->parseValue($func['params'], $element), $element);	
 				if (is_array($data)) $result += $data;
 				else $result[] = $data;
@@ -107,6 +107,14 @@ class Rule implements \Transphporm\Hook {
 		}
 		$remaining = trim(substr($function, $finalPos+1));
 		return $this->parseNextValue($remaining, $result, $element);
+	}
+
+
+	private function callFunc($name, $params, $element) {
+		if ($name && is_callable([$this->dataFunction, $name])) {
+			return $this->dataFunction->$name($this->parseValue($params, $element), $element);	
+		}
+		return false;
 	}
 
 	private function parseNextValue($remaining, $result, $element) {

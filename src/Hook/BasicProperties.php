@@ -20,7 +20,7 @@ class BasicProperties {
 	}
 
 	private function appendContent($element, $content) {
-		if ($content[0] instanceof \DomNode) {
+		if (isset($content[0]) && $content[0] instanceof \DomNode) {
 			foreach ($content as $node) $element->appendChild($node);
 		}
 		else $element->appendChild($element->ownerDocument->createTextNode(implode('', $content)));		
@@ -55,6 +55,10 @@ class BasicProperties {
 
 	public function display($value, $element, $rule) {
 		if (strtolower($value[0]) === 'none') $element->parentNode->removeChild($element);
+	}
+
+	public function bind($value, $element, $rule) {
+		$this->data->bind($element, $value);
 	}
 
 }

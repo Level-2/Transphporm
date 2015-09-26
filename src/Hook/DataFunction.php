@@ -38,14 +38,20 @@ class DataFunction {
 	}
 
 	private function traverse($name, $data) {
+		$name[0] = str_replace(['[', ']'], ['.', ''], $name[0]);
 		$parts = explode('.', $name[0]);
 		$obj = $data;
 		foreach ($parts as $part) {
 			if ($part == '') continue;
 			if (is_callable([$obj, $part])) $obj = call_user_func([$obj, $part]); 
-			else $obj = is_array($obj) ? $obj[$part] : $obj->$part;
+			else $obj = $this->ifNull($obj, $part);
 		}
 		return $obj;
+	}
+
+	private function ifNull($obj, $key) {
+		if (is_array($obj)) return isset($obj[$key]) ? $obj[$key] : null;
+		else return isset($obj->$key) ? $obj->$key : null;
 	}
 
 	public function attr($val, $element) {
