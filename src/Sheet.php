@@ -2,36 +2,47 @@
 namespace Transphporm;
 /** Parses a .cds file into individual rules, each rule has a query e,g, `ul li` and a set of rules e.g. `display: none; data: iteration(id);` */
 class Sheet {
-	private $cds;
+	private $tss;
 
-	public function __construct($cds) {
-		$this->cds = $cds;
+	public function __construct($tss) {
+		$this->tss = $tss;
 	}
 
 	public function parse() {
-		$css = $this->cds;
+		$tss = $this->tss;
 		$rules = [];
 		$pos = 0;
 		$count = 0;
 
-		while ($next = strpos($css, '{', $pos)) {
+		while ($next = strpos($tss, '{', $pos)) {
+
 			//Ignore comments... this will only work for comments that aren't inside { and }
-			if (strpos($css, '/*', $pos) !== false && strpos($css, '/*', $pos) < $next) {
-				$pos = strpos($css, '*/', $pos+1);
+			if (strpos($tss, '/*', $pos) !== false && strpos($tss, '/*', $pos) < $next) {
+				$pos = strpos($tss, '*/', $pos+1);
 			}
+
+			$atPos = strpos($tss, '@', $pos);
+			if ($atPos !== false && $atPos < $next) {
+				$spacePos = strpos($tss, ' ', $atPos);
+				$funcName = substr($tss, $atPos+1, $spacePos-$atPos-1);
+				$endPos = strpos($tss, ';', $spacePos);
+				$args = substr($tss, $spacePos+1, $endPos-$spacePos-1);
+				$rules = array_merge($this->$funcName($args), $rules);
+				$pos = $endPos+1;
+			}
+
 			$rule = new \stdclass;
-			$selector = trim(substr($css, $pos, $next-$pos));
+			$selector = trim(substr($tss, $pos, $next-$pos));
 			$x = new CssToXpath($selector);
 
 			$rule->query = $x->getXpath();
 			$rule->pseudo = $x->getPseudo();
 			$rule->depth = $x->getDepth();
 			$rule->index = $count++;
-
 			
 
-			$pos =  strpos($css, '}', $next)+1;
-			$rule->rules = $this->getRules(trim(substr($css, $next+1, $pos-2-$next)));
+			$pos =  strpos($tss, '}', $next)+1;
+			$rule->rules = $this->getRules(trim(substr($tss, $next+1, $pos-2-$next)));
 
 			if (isset($rules[$selector])) $rule->rules = array_merge($rules[$selector], $rule->rules);
 			$rules[$selector] = $rule;
@@ -40,6 +51,11 @@ class Sheet {
 		//Now sort $rules by depth, index
 		usort($rules, [$this, 'sortRules']);
 		return $rules;
+	}
+
+	private function import($args) {
+		$sheet = new Sheet(file_get_contents(trim($args, '\'" ')));
+		return $sheet->parse();
 	}
 
 	private function sortRules($a, $b) {
