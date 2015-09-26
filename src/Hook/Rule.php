@@ -98,7 +98,7 @@ class Rule implements \Transphporm\Hook {
 			$finalPos = $func['endPoint'];			
 
 			if (($data = $this->callFunc($func['name'], $func['params'], $element)) !== false) {
-				$result = $this->appendToArray($data);
+				$result = $this->appendToArray($result, $data);
 			} 
 			else $result[] = trim($function);
 		}
