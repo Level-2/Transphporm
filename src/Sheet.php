@@ -36,12 +36,19 @@ class Sheet {
 			$pos =  strpos($tss, '}', $next)+1;
 			$rule->rules = $this->getRules(trim(substr($tss, $next+1, $pos-2-$next)));
 
-			if (isset($rules[$selector])) $rule->rules = array_merge($rules[$selector], $rule->rules);
-			$rules[$selector] = $rule;
+		
+			 $rules = $this->writeRule($rules, $selector, $rule);
 		}
 
 		//Now sort $rules by depth, index
 		usort($rules, [$this, 'sortRules']);
+		return $rules;
+	}
+
+	private function writeRule($rules, $selector, $newRule) {
+		if (isset($rules[$selector])) $newRule->rules = array_merge($rules[$selector], $newRule->rules);
+		$rules[$selector] = $newRule;
+		
 		return $rules;
 	}
 
