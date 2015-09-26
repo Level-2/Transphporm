@@ -5,7 +5,7 @@ class Sheet {
 	private $tss;
 
 	public function __construct($tss) {
-		$this->tss = $tss;
+		$this->tss = $this->stripComments($tss);
 	}
 
 	public function parse() {
@@ -15,21 +15,13 @@ class Sheet {
 		$count = 0;
 
 		while ($next = strpos($tss, '{', $pos)) {
-			//Ignore comments... this will only work for comments that aren't inside { and }
-			if ($comment = $this->skipComment($tss, $pos, $next)) $pos = $comment;			
-
 			if ($processing = $this->processingInstructions($tss, $pos, $next)) {
 				$pos = $processing['endPos']+1;
 				$rules = array_merge($processing['rules'], $rules);
 			}
 
-			$rule = new \stdclass;
 			$selector = trim(substr($tss, $pos, $next-$pos));
-			$x = new CssToXpath($selector);
-			$rule->query = $x->getXpath();
-			$rule->pseudo = $x->getPseudo();
-			$rule->depth = $x->getDepth();
-			$rule->index = $count++;			
+			$rule = $this->cssToRule($selector, $count++);	
 
 			$pos =  strpos($tss, '}', $next)+1;
 			$rule->rules = $this->getRules(trim(substr($tss, $next+1, $pos-2-$next)));	
@@ -40,18 +32,22 @@ class Sheet {
 		return $rules;
 	}
 
+	private function CssToRule($selector, $index) {
+		$rule = new \stdclass;
+		$xPath = new CssToXpath($selector);
+		$rule->query = $xPath->getXpath();
+		$rule->pseudo = $xPath->getPseudo();
+		$rule->depth = $xPath->getDepth();
+		$rule->index = $index++;
+
+		return $rule;
+	}
+
 	private function writeRule($rules, $selector, $newRule) {
 		if (isset($rules[$selector])) $newRule->rules = array_merge($rules[$selector], $newRule->rules);
 		$rules[$selector] = $newRule;
 		
 		return $rules;
-	}
-
-	private function skipComment($tss, $pos, $next) {
-		if (strpos($tss, '/*', $pos) !== false && strpos($tss, '/*', $pos) < $next) {
-			return strpos($tss, '*/', $pos+1);
-		}
-		return false;
 	}
 
 	private function processingInstructions($tss, $pos, $next) {
@@ -89,9 +85,6 @@ class Sheet {
 	}
 
 	private function getRules($str) {
-		//Strip comments from inside { and }
-		$str = $this->stripComments($str);
-
 		$rules = explode(';', $str);
 		$return = [];
 		
