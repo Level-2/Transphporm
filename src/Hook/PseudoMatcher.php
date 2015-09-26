@@ -4,7 +4,6 @@ namespace Transphporm\Hook;
 class PseudoMatcher {
 	private $pseudo;
 	private $dataFunction;
-	private $operatorsToXpath = ['!' => 'not'];
 
 	public function __construct($pseudo, DataFunction $dataFunction) {
 		$this->pseudo = $pseudo;
@@ -37,8 +36,7 @@ class PseudoMatcher {
 
 		$matched = true;
 		if ($lookupValue != $value) $matched = false;
-		return $operator === '!' ? !$matched : $matched;
-		
+		return $operator === '!' ? !$matched : $matched;		
 	}
 
 	private function getOperator($field) {

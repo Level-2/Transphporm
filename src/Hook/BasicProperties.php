@@ -53,11 +53,11 @@ class BasicProperties {
 		return false;
 	}
 
-	public function display($value, $element, $rule) {
+	public function display($value, $element) {
 		if (strtolower($value[0]) === 'none') $element->parentNode->removeChild($element);
 	}
 
-	public function bind($value, $element, $rule) {
+	public function bind($value, $element) {
 		$this->data->bind($element, $value);
 	}
 
