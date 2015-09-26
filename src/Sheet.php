@@ -21,24 +21,20 @@ class Sheet {
 			if ($processing = $this->processingInstructions($tss, $pos, $next)) {
 				$pos = $processing['endPos']+1;
 				$rules = array_merge($processing['rules'], $rules);
-			}			
+			}
 
 			$rule = new \stdclass;
 			$selector = trim(substr($tss, $pos, $next-$pos));
 			$x = new CssToXpath($selector);
-
 			$rule->query = $x->getXpath();
 			$rule->pseudo = $x->getPseudo();
 			$rule->depth = $x->getDepth();
-			$rule->index = $count++;
-			
+			$rule->index = $count++;			
 
 			$pos =  strpos($tss, '}', $next)+1;
-			$rule->rules = $this->getRules(trim(substr($tss, $next+1, $pos-2-$next)));
-	
+			$rule->rules = $this->getRules(trim(substr($tss, $next+1, $pos-2-$next)));	
 			$rules = $this->writeRule($rules, $selector, $rule);
 		}
-
 		//Now sort $rules by depth, index
 		usort($rules, [$this, 'sortRules']);
 		return $rules;
@@ -82,13 +78,19 @@ class Sheet {
 		return ($a->depth < $b->depth) ? -1 : 1;
 	}
 
-	private function getRules($str) {
-		//Strip comments from inside { and }
+	private function stripComments($str) {
 		$pos = 0;
 		while (($pos = strpos($str, '/*', $pos)) !== false) {
 			$end = strpos($str, '*/', $pos);
 			$str = substr_replace($str, '', $pos, $end-$pos+2);
 		}
+
+		return $str;
+	}
+
+	private function getRules($str) {
+		//Strip comments from inside { and }
+		$str = $this->stripComments($str);
 
 		$rules = explode(';', $str);
 		$return = [];
