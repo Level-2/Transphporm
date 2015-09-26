@@ -35,9 +35,8 @@ class Sheet {
 
 			$pos =  strpos($tss, '}', $next)+1;
 			$rule->rules = $this->getRules(trim(substr($tss, $next+1, $pos-2-$next)));
-
-		
-			 $rules = $this->writeRule($rules, $selector, $rule);
+	
+			$rules = $this->writeRule($rules, $selector, $rule);
 		}
 
 		//Now sort $rules by depth, index
@@ -66,7 +65,6 @@ class Sheet {
 			$funcName = substr($tss, $atPos+1, $spacePos-$atPos-1);
 			$endPos = strpos($tss, ';', $spacePos);
 			$args = substr($tss, $spacePos+1, $endPos-$spacePos-1);
-			//$rules = array_merge(, $rules);
 			return ['rules' => $this->$funcName($args), 'endPos' => $endPos];			
 		}
 		else return false;
