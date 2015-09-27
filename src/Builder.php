@@ -24,11 +24,7 @@ class Builder {
 	public function output($data = null, $document = false) {
 		$locale = $this->getLocale();
 		$data = new Hook\DataFunction(new \SplObjectStorage(), $data, $locale);
-		$basicProperties = new Hook\BasicProperties($data);
-		$basicProperties->registerFormatter(new Formatter\Number($locale));
-		$basicProperties->registerFormatter(new Formatter\String());
-		$this->registerProperties($basicProperties);
-
+		$this->registerProperties($this->getBasicProperties($data, $locale));
 
 		//To be a valid XML document it must have a root element, automatically wrap it in <template> to ensure it does
 		//If it's a file, don't assume template partials and don't wrap in <template>
@@ -46,6 +42,13 @@ class Builder {
 		}
 		
 		return $template->output($document);
+	}
+
+	private function getBasicProperties($data, $locale) {
+		$basicProperties = new Hook\BasicProperties($data);
+		$basicProperties->registerFormatter(new Formatter\Number($locale));
+		$basicProperties->registerFormatter(new Formatter\String());
+		return $basicProperties;
 	}
 
 	private function getLocale() {
