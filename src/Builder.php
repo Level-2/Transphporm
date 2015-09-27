@@ -27,16 +27,13 @@ class Builder {
 		$this->registerProperties($this->getBasicProperties($data, $locale));
 
 		//To be a valid XML document it must have a root element, automatically wrap it in <template> to ensure it does
-		//If it's a file, don't assume template partials and don't wrap in <template>
 		if (!$this->isFile) $template = new Template('<template>' . $this->template . '</template>');
 		else $template = new Template($this->template);
 
-		$tss = new Sheet($this->tss);
-		$rules = $tss->parse();
+		$rules = (new Sheet($this->tss))->parse();
 
 		foreach ($rules as $rule) {
-			$pseudoMatcher = new Hook\PseudoMatcher($rule->pseudo, $data);
-			$hook = new Hook\Rule($rule->rules, $pseudoMatcher, $data);
+			$hook = new Hook\Rule($rule->rules, new Hook\PseudoMatcher($rule->pseudo, $data), $data);
 			foreach ($this->registeredProperties as $properties) $hook->registerProperties($properties);
 			$template->addHook($rule->query, $hook);	
 		}
