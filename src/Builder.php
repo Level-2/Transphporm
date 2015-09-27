@@ -21,7 +21,7 @@ class Builder {
 
 	public function output($data = null, $document = false) {
 		$data = new Hook\DataFunction(new \SplObjectStorage(), $data);
-		$this->registerBaseProperties($data);
+		$this->registerProperties(new Hook\BasicProperties($data));
 
 		//To be a valid XML document it must have a root element, automatically wrap it in <template> to ensure it does
 		//If it's a file, don't assume template partials and don't wrap in <template>
@@ -34,23 +34,14 @@ class Builder {
 		foreach ($rules as $rule) {
 			$pseudoMatcher = new Hook\PseudoMatcher($rule->pseudo, $data);
 			$hook = new Hook\Rule($rule->rules, $pseudoMatcher, $data);
-			foreach ($this->registeredProperties as $name => $closure) $hook->registerProperty($name, $closure);
+			foreach ($this->registeredProperties as $properties) $hook->registerProperties($properties);
 			$template->addHook($rule->query, $hook);	
 		}
 		
 		return $template->output($document);
 	}
 
-	public function registerProperty($name, $closure) {
-		$this->registeredProperties[$name] = $closure;
-	}
-
-	private function registerBaseProperties($data) {
-		$basicProperties = new Hook\BasicProperties($data);
-
-		$this->registerProperty('content', [$basicProperties, 'content']);
-		$this->registerProperty('repeat', [$basicProperties, 'repeat']);
-		$this->registerProperty('display', [$basicProperties, 'display']);
-		$this->registerProperty('bind', [$basicProperties, 'bind']);
+	public function registerProperties($object) {
+		$this->registeredProperties[] = $object;
 	}
 }

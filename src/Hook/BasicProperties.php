@@ -43,7 +43,7 @@ class BasicProperties {
 			unset($newRules['repeat']);
 
 			$hook = new Rule($newRules, $rule->getPseudoMatcher(), $this->data);
-			foreach ($rule->getProperties() as $name => $value) $hook->registerProperty($name, $value);
+			foreach ($rule->getProperties() as $obj) $hook->registerProperties($obj);
 			$hook->run($clone);
 		}
 

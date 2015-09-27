@@ -5,7 +5,6 @@ class Rule implements \Transphporm\Hook {
 	private $rules;
 	private $dataFunction;
 	private $pseudoMatcher;
-	private $functions = [];
 	private $properties = [];
 
 	public function __construct(array $rules, PseudoMatcher $pseudoMatcher, DataFunction $dataFunction) {
@@ -32,8 +31,8 @@ class Rule implements \Transphporm\Hook {
 		return $this->rules;
 	}
 
-	public function registerProperty($name, $closure) {
-		$this->properties[$name] = $closure;
+	public function registerProperties($object) {
+		$this->properties[] = $object;
 	}
 
 	public function getProperties() {
@@ -41,10 +40,12 @@ class Rule implements \Transphporm\Hook {
 	}
 
 	private function callProperty($name, $element, $value) {
-		if (isset($this->properties[$name])) {
-			$result = call_user_func($this->properties[$name], $value, $element, $this);
+		foreach ($this->properties as $obj) {
+			if (is_callable([$obj, $name])) {
+				return call_user_func([$obj, $name], $value, $element, $this);
+			}
 		}
-		else throw new \InvalidArgumentException('There is no Transphporm Property: ' . $name);
+		throw new \InvalidArgumentException('There is no Transphporm Property: ' . $name);
 
 		return $result;
 	}
