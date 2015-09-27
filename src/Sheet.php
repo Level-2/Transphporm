@@ -27,10 +27,8 @@ class Sheet {
 			$rules = $this->writeRule($rules, $selector, $rule);
 		}
 		//there may be processing instructions at the end
-		if ($processing = $this->processingInstructions($tss, $pos, strlen($tss))) {
-			$pos = $processing['endPos']+1;
-			$rules = array_merge($processing['rules'], $rules);
-		}
+		if ($processing = $this->processingInstructions($tss, $pos, strlen($tss))) $rules = array_merge($processing['rules'], $rules);
+
 		//Now sort $rules by depth, index
 		usort($rules, [$this, 'sortRules']);
 		return $rules;
