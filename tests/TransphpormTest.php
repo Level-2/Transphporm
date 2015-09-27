@@ -89,7 +89,7 @@ class TransphpormTest extends PHPUnit_Framework_TestCase {
 	}
 
 	private function stripTabs($str) {
-		return trim(str_replace("\t", '', $str));
+		return trim(str_replace(["\t", "\n", "\r"], '', $str));
 	}
 
 	public function testRepeatObjectChildNode() {
@@ -602,6 +602,102 @@ class TransphpormTest extends PHPUnit_Framework_TestCase {
 		$template = new \Transphporm\Builder($template, $tss);
 
 		$this->assertEquals('<div>foo</div>', $template->output());
+	}
+
+	public function testContentTemplate() {
+		$template = '
+			<div>Test</div>
+		';
+
+		$includeFile = __DIR__ . DIRECTORY_SEPARATOR . 'include.xml';
+
+		$tss = "div {content: template($includeFile); }";
+		$template = new \Transphporm\Builder($template, $tss);
+
+		$this->assertEquals('<div><p>foo</p></div>', $this->stripTabs($template->output()));
+	}
+
+	public function testNestedFunction() {
+		//Reads from the data using an attribute from the HTML
+		//In this case, sets the input's value attribute by reading it's name from data
+		// attr(name) reads the value of the name attribute from the input
+		// data(foo) reads the `foo` property from the supplied data
+		// so data(attr(name)) will read the data with the key of the element's name attribute
+		// input:attr(value) {content: "text"} will set the content of the value attribute
+		// Putting all this together allows us to fill all inputs with a single TSS command
+
+		$template = '<form>
+			<input type="text" name="one" />
+			<input type="text" name="two" />
+		</form>';
+
+		$data = ['one' => 'VALUE-OF-ONE', 'two' => 'VALUE-OF-TWO'];
+
+		$tss = 'input:attr(value) {content: data(attr(name));}';
+
+		$template = new \Transphporm\Builder($template, $tss);
+
+		$this->assertEquals($this->stripTabs('<form>
+			<input type="text" name="one" value="VALUE-OF-ONE" />
+			<input type="text" name="two" value="VALUE-OF-TWO" />
+		</form>'), $this->stripTabs($template->output($data)));
+	}
+
+
+	public function testBind() {
+		//Binds a specific pice of data (which may be an array to an element)
+		//All calls to data() for child elements will use this as the root data object
+
+		$template = '<form>
+			<input type="text" name="one" />
+			<input type="text" name="two" />
+		</form>';
+
+		//This time, the form data isn't the root data() object
+
+		$data = ['formdata' => ['one' => 'VALUE-OF-ONE', 'two' => 'VALUE-OF-TWO']];
+
+		//First bind the form data to the form element, then populate the inputs using it.
+		//For inputs, as they're children of the form element, will use this data
+		$tss = '
+		form {bind: data(formdata);}
+		input:attr(value) {content: data(attr(name));}';
+
+		$template = new \Transphporm\Builder($template, $tss);
+
+		$this->assertEquals($this->stripTabs('<form>
+			<input type="text" name="one" value="VALUE-OF-ONE" />
+			<input type="text" name="two" value="VALUE-OF-TWO" />
+		</form>'), $this->stripTabs($template->output($data)));
+
+	}
+
+	public function testFormatNumber() {
+		$template = '
+			<div>Test</div>
+		';
+
+		$tss = 'div {content: "1.234567"; format: decimal 2;}';
+
+		$template = new \Transphporm\Builder($template, $tss);
+
+		$this->assertEquals('<div>1.23</div>', $this->stripTabs($template->output()));
+
+
+	}
+
+	public function testFormatString() {
+		$template = '
+			<div>Test</div>
+		';
+
+		$tss = 'div {content: "test"; format: uppercase}';
+
+		$template = new \Transphporm\Builder($template, $tss);
+
+		$this->assertEquals('<div>TEST</div>', $this->stripTabs($template->output()));
+
+
 	}
 }
 
