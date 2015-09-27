@@ -33,7 +33,7 @@ class Builder {
 		$rules = (new Sheet($this->tss))->parse();
 
 		foreach ($rules as $rule) {
-			$hook = new Hook\Rule($rule->rules, new Hook\PseudoMatcher($rule->pseudo, $data), $data);
+			$hook = new Hook\Rule($rule->properties, new Hook\PseudoMatcher($rule->pseudo, $data), $data);
 			foreach ($this->registeredProperties as $properties) $hook->registerProperties($properties);
 			$template->addHook($rule->query, $hook);	
 		}

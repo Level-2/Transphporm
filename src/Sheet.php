@@ -9,27 +9,24 @@ class Sheet {
 	}
 
 	public function parse() {
-		$tss = $this->tss;
 		$rules = [];
 		$pos = 0;
 		$count = 0;
 
-		while ($next = strpos($tss, '{', $pos)) {
-			if ($processing = $this->processingInstructions($tss, $pos, $next)) {
+		while ($next = strpos($this->tss, '{', $pos)) {
+			if ($processing = $this->processingInstructions($this->tss, $pos, $next)) {
 				$pos = $processing['endPos']+1;
 				$rules = array_merge($processing['rules'], $rules);
 			}
-			$selector = trim(substr($tss, $pos, $next-$pos));
+			$selector = trim(substr($this->tss, $pos, $next-$pos));
 			$rule = $this->cssToRule($selector, $count++);	
 
-			$pos =  strpos($tss, '}', $next)+1;
-			$rule->rules = $this->getRules(trim(substr($tss, $next+1, $pos-2-$next)));	
+			$pos =  strpos($this->tss, '}', $next)+1;
+			$rule->properties = $this->getProperties(trim(substr($this->tss, $next+1, $pos-2-$next)));	
 			$rules = $this->writeRule($rules, $selector, $rule);
 		}
 		//there may be processing instructions at the end
-		if ($processing = $this->processingInstructions($tss, $pos, strlen($tss))) $rules = array_merge($processing['rules'], $rules);
-
-		//Now sort $rules by depth, index
+		if ($processing = $this->processingInstructions($this->tss, $pos, strlen($this->tss))) $rules = array_merge($processing['rules'], $rules);
 		usort($rules, [$this, 'sortRules']);
 		return $rules;
 	}
@@ -46,7 +43,7 @@ class Sheet {
 	}
 
 	private function writeRule($rules, $selector, $newRule) {
-		if (isset($rules[$selector])) $newRule->rules = array_merge($rules[$selector], $newRule->rules);
+		if (isset($rules[$selector])) $newRule->properties = array_merge($rules[$selector], $newRule->properties);
 		$rules[$selector] = $newRule;
 		
 		return $rules;
@@ -86,7 +83,7 @@ class Sheet {
 		return $str;
 	}
 
-	private function getRules($str) {
+	private function getProperties($str) {
 		$rules = explode(';', $str);
 		$return = [];
 		
