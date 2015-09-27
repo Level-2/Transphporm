@@ -2,12 +2,14 @@
 namespace Transphporm\Hook;
 class BasicProperties {
 	private $data;
+	private $formatters = [];
 
 	public function __construct($data) {
 		$this->data = $data;
 	}
 
 	public function content($value, $element, $rule) {
+		$value = $this->format($value, $rule->getRules());
 		if ($attr = $rule->getPseudoMatcher()->attr()) $element->setAttribute($attr, implode('', $value));
 		else if (in_array('before', $rule->getPseudoMatcher()->getPseudo())) $element->firstChild->nodeValue = implode('', $value) . $element->firstChild->nodeValue;
 		else if (in_array('after', $rule->getPseudoMatcher()->getPseudo())) $element->firstChild->nodeValue .= implode('', $value);
@@ -28,6 +30,25 @@ class BasicProperties {
 
 	private function removeAllChildren($element) {
 		while ($element->hasChildNodes()) $element->removeChild($element->firstChild);
+	}
+
+	public function registerFormatter($formatter) {
+		$this->formatters[] = $formatter;
+	}
+
+	private function format($value, $rules) {
+		if (!isset($rules['format'])) return $value;
+		$format = explode(' ', $rules['format']);
+		$functionName = array_shift($format);
+
+		foreach ($value as &$val) {
+			foreach ($this->formatters as $formatter) {
+				if (is_callable([$formatter, $functionName])) {
+					$val = $formatter->$functionName($val, ...$format);
+				}
+			}
+		}
+		return $value;
 	}
 
 	public function repeat($value, $element, $rule) {

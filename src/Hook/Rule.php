@@ -45,9 +45,7 @@ class Rule implements \Transphporm\Hook {
 				return call_user_func([$obj, $name], $value, $element, $this);
 			}
 		}
-		throw new \InvalidArgumentException('There is no Transphporm Property: ' . $name);
-
-		return $result;
+		return false;
 	}
 
 	private function findMatchingPos($string, $char, $start = 0, $escape = '\\') {
