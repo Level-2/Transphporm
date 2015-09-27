@@ -41,6 +41,11 @@ class BasicProperties {
 		$format = explode(' ', $rules['format']);
 		$functionName = array_shift($format);
 
+		return $this->processFormat($format, $functionName, $value);
+		
+	}
+
+	private function processFormat($format, $functionName, $value) {
 		foreach ($value as &$val) {
 			foreach ($this->formatters as $formatter) {
 				if (is_callable([$formatter, $functionName])) {

@@ -19,13 +19,17 @@ class Sheet {
 				$pos = $processing['endPos']+1;
 				$rules = array_merge($processing['rules'], $rules);
 			}
-
 			$selector = trim(substr($tss, $pos, $next-$pos));
 			$rule = $this->cssToRule($selector, $count++);	
 
 			$pos =  strpos($tss, '}', $next)+1;
 			$rule->rules = $this->getRules(trim(substr($tss, $next+1, $pos-2-$next)));	
 			$rules = $this->writeRule($rules, $selector, $rule);
+		}
+		//there may be processing instructions at the end
+		if ($processing = $this->processingInstructions($tss, $pos, strlen($tss))) {
+			$pos = $processing['endPos']+1;
+			$rules = array_merge($processing['rules'], $rules);
 		}
 		//Now sort $rules by depth, index
 		usort($rules, [$this, 'sortRules']);
@@ -50,9 +54,9 @@ class Sheet {
 		return $rules;
 	}
 
-	private function processingInstructions($tss, $pos, $next) {
+	private function processingInstructions($tss, $pos, $next) {		
 		$atPos = strpos($tss, '@', $pos);
-		if ($atPos !== false && $atPos < $next) {
+		if ($atPos !== false && $atPos <= (int) $next) {
 			$spacePos = strpos($tss, ' ', $atPos);
 			$funcName = substr($tss, $atPos+1, $spacePos-$atPos-1);
 			$endPos = strpos($tss, ';', $spacePos);
