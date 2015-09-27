@@ -8,18 +8,14 @@ class Sheet {
 		$this->tss = $this->stripComments($tss);
 	}
 
-	public function parse() {
-		$rules = [];
-		$pos = 0;
-		$count = 0;
-
+	public function parse($pos = 0, $rules = []) {
 		while ($next = strpos($this->tss, '{', $pos)) {
 			if ($processing = $this->processingInstructions($this->tss, $pos, $next)) {
 				$pos = $processing['endPos']+1;
 				$rules = array_merge($processing['rules'], $rules);
 			}
 			$selector = trim(substr($this->tss, $pos, $next-$pos));
-			$rule = $this->cssToRule($selector, $count++);	
+			$rule = $this->cssToRule($selector, count($rules));	
 
 			$pos =  strpos($this->tss, '}', $next)+1;
 			$rule->properties = $this->getProperties(trim(substr($this->tss, $next+1, $pos-2-$next)));	
