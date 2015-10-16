@@ -906,7 +906,7 @@ $xml = '
 <ul>
 	<li>
 		<h3>Name</h3>
-		<a href="mailto:email">email</span>
+		<a href="mailto:email">email</a>
 	</li>	
 </ul>';
 
