@@ -31,10 +31,7 @@ class Builder {
 		$this->registerProperties($this->getBasicProperties($data, $locale));
 
 		//To be a valid XML document it must have a root element, automatically wrap it in <template> to ensure it does
-		if (!$this->isFile) $template = new Template('<template>' . $this->template . '</template>');
-		else $template = new Template($this->template);
-
-
+		$template = new Template($this->isFile ? $this->template : '<template>' . $this->template . '</template>');
 		$rules = (new Sheet($this->tss, $this->baseDir))->parse();
 
 		foreach ($rules as $rule) {
@@ -43,9 +40,7 @@ class Builder {
 			$template->addHook($rule->query, $hook);	
 		}
 		
-		$output = $template->output($document);
-		
-		
+		$output = $template->output($document);		
 		return $output;
 	}
 
