@@ -19,24 +19,34 @@ class PseudoMatcher {
 		return $matches;
 	}
 
+
 	private function attribute($pseudo, $element) {
 		$pos = strpos($pseudo, '[');
 		if ($pos === false) return true;
 		$end = strpos($pseudo, ']', $pos);
 
 		$name = substr($pseudo, 0, $pos);
+
+		if (strpos($pseudo, '=') === false) return true;
+
 		$criteria = substr($pseudo, $pos+1, $end-$pos-1);
 		list ($field, $value) = explode('=', $criteria);
 
 		$operator = $this->getOperator($field);
 		$field = trim($field, $operator);		
-		$value = trim($value, '"');
-
+		$value = $this->parseValue(trim($value, '"'));
 		$lookupValue = $this->dataFunction->$name([$field], $element);
 
 		$matched = true;
 		if ($lookupValue != $value) $matched = false;
 		return $operator === '!' ? !$matched : $matched;		
+	}
+
+
+	private function parseValue($value) {
+		if ($value == 'true') return true;
+		else if ($value == 'false') return false;
+		else return $value;
 	}
 
 	private function getOperator($field) {
@@ -67,6 +77,14 @@ class PseudoMatcher {
 		}
 
 		return false;
+	}
+
+	public function header($element)  {
+		if ($this->matches($element)) {
+			foreach ($this->pseudo as $pseudo) {
+				if (strpos($pseudo, 'header') === 0) return $this->getBetween($pseudo, '[', ']');
+			}
+		}
 	}
 
 	private function odd($num) {

@@ -92,7 +92,7 @@ $tss = 'h1 {content: "Replaced Title"; }';
 
 $template = new \Transphporm\Builder($xml, $tss);
 
-echo $template->output();
+echo $template->output()['body'];
 
 ```
 
@@ -127,7 +127,7 @@ $tss = 'h1 {content: data(); }';
 
 $template = new \Transphporm\Builder($xml, $tss)
 
-echo $template->output($data);
+echo $template->output($data)['body'];
 
 ```
 
@@ -160,7 +160,7 @@ $tss = '
 
 $template = new \Transphporm\Builder($xml, $tss);
 
-echo $template->output($data);
+echo $template->output($data)['body'];
 
 
 ```
@@ -189,7 +189,7 @@ $tss = 'h1 {content: "Title: ", data(); }';
 
 $template = new \Transphporm\Builder($xml, $tss);
 
-echo $template->output($data);
+echo $template->output($data)['body'];
 
 ```
 
@@ -241,7 +241,7 @@ $data = ['users' => $users];
 
 $template = new \Transphporm\Builder($xml, $tss);
 
-echo $template->output($data);
+echo $template->output($data)['body'];
 
 ```
 
@@ -283,7 +283,7 @@ $data = ['users' => $users];
 
 $template = new \Transphporm\Builder($xml, $tss);
 
-echo $template->output($data);
+echo $template->output($data)['body'];
 
 ```
 
@@ -331,7 +331,7 @@ $data = ['users' => $users];
 
 $template = new \Transphporm\Builder($xml, $tss)
 
-echo $template->output($data);
+echo $template->output($data)['body'];
 
 
 ```
@@ -376,7 +376,7 @@ $tss = '
 
 $template = new \Transphporm\Builder($xml, $tss);
 
-echo $template->output();
+echo $template->output()['body'];
 
 ```
 
@@ -412,7 +412,7 @@ p.middle {content: "Middle paragraph"; }
 
 $template = new \Transphporm\Builder($xml, $tss);
 
-echo $template->output();
+echo $template->output()['body'];
 
 ```
 
@@ -457,7 +457,7 @@ li > span {content: "REPLACED";}
 
 $template = new \Transphporm\Builder($xml, $tss);
 
-echo $template->output();
+echo $template->output()['body'];
 
 ```
 
@@ -496,7 +496,7 @@ $tss = '
 
 $template = new \Transphporm\Builder($xml, $tss)
 
-echo $template->output();
+echo $template->output()['body'];
 
 ```
 
@@ -536,7 +536,7 @@ textarea[name="Two"] {content: "TEST"; }
 
 $template = new \Transphporm\Builder($xml, $tss);
 
-echo $template->output();
+echo $template->output()['body'];
 
 ```
 
@@ -579,7 +579,7 @@ textarea[name] {content: "TEST"; }
 
 $template = new \Transphporm\Builder($xml, $tss);
 
-echo $template->output();
+echo $template->output()['body'];
 
 ```
 
@@ -643,7 +643,7 @@ $tss = '
 
 $template = new \Transphporm\Builder($xml, $tss);
 
-echo $template->output($data);
+echo $template->output($data)['body'];
 
 ```
 
@@ -675,7 +675,7 @@ $tss = '
 
 $template = new \Transphporm\Builder($xml, $tss)
 
-echo $template->output($data);
+echo $template->output($data)['body'];
 
 ```
 
@@ -709,7 +709,7 @@ $tss = 'ul li:nth-child(2) {content: "REPLACED"}';
 
 $template = new \Transphporm\Builder($template, $tss);
 
-echo $template->output();
+echo $template->output()['body'];
 ```
 
 Output: 
@@ -742,7 +742,7 @@ $xml = '
 $tss = 'ul li:nth-child(even) {content: "REPLACED"}';
 
 $template = new \Transphporm\Builder($template, $tss);
-echo $template->output();
+echo $template->output()['body'];
 ```
 
 Output: 
@@ -774,7 +774,7 @@ $xml = '
 $tss = 'ul li:nth-child(even) {content: "REPLACED"}';
 
 $template = new \Transphporm\Builder($template, $tss);
-echo $template->output();
+echo $template->output()['body'];
 ```
 
 Output: 
@@ -851,7 +851,7 @@ $data = ['users' => $users];
 
 $template = new \Transphporm\Builder($xml, $tss);
 
-echo $template->output($data);
+echo $template->output($data)['body'];
 
 
 ```
@@ -922,7 +922,7 @@ $data = ['users' => $users];
 
 $template = new \Transphporm\Builder($xml, $tss);
 
-echo $template->output($data);
+echo $template->output($data)['body'];
 
 
 
@@ -963,7 +963,7 @@ $tss = 'h1 {content: attr(class);}';
 
 $template = new \Transphporm\Builder($xml, $tss);
 
-echo $template->output();
+echo $template->output()['body'];
 ```
 
 Output:

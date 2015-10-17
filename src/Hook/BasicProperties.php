@@ -3,14 +3,17 @@ namespace Transphporm\Hook;
 class BasicProperties {
 	private $data;
 	private $formatters = [];
+	private $headers;
 
-	public function __construct($data) {
+	public function __construct($data, &$headers) {
 		$this->data = $data;
+		$this->headers = &$headers;
 	}
 
 	public function content($value, $element, $rule) {
 		$value = $this->format($value, $rule->getRules());
 		if ($attr = $rule->getPseudoMatcher()->attr()) $element->setAttribute($attr, implode('', $value));
+		else if ($header = $rule->getPseudoMatcher()->header($element)) $this->headers[] = [$header, implode('', $value)];
 		else if (in_array('before', $rule->getPseudoMatcher()->getPseudo())) $element->firstChild->nodeValue = implode('', $value) . $element->firstChild->nodeValue;
 		else if (in_array('after', $rule->getPseudoMatcher()->getPseudo())) $element->firstChild->nodeValue .= implode('', $value);
 		else {
@@ -41,8 +44,7 @@ class BasicProperties {
 		$format = explode(' ', $rules['format']);
 		$functionName = array_shift($format);
 
-		return $this->processFormat($format, $functionName, $value);
-		
+		return $this->processFormat($format, $functionName, $value);		
 	}
 
 	private function processFormat($format, $functionName, $value) {

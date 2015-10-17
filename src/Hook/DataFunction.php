@@ -6,6 +6,7 @@ class DataFunction {
 	private $data;
 	private $locale;
 	private $baseDir;
+	private $headers;
 
 	public function __construct(\SplObjectStorage $objectStorage, $data, $locale, $baseDir) {
 		$this->dataStorage = $objectStorage;
@@ -18,7 +19,6 @@ class DataFunction {
 	public function bind(\DomElement $element, $data) {
 		$this->dataStorage[$element] = $data;
 	}
-
 
 	public function iteration($val, $element) {
 		$data = $this->getData($element);
@@ -66,7 +66,7 @@ class DataFunction {
 		$newTemplate = new \Transphporm\Builder($this->baseDir . $val[0]);
 		$newTemplate->setLocale($this->locale);
 
-		$doc = $newTemplate->output([], true);
+		$doc = $newTemplate->output([], true)['body'];
 		
 		$newNode = $element->ownerDocument->importNode($doc->documentElement, true);
 

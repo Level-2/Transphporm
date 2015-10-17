@@ -28,7 +28,8 @@ class Builder {
 	public function output($data = null, $document = false) {
 		$locale = $this->getLocale();
 		$data = new Hook\DataFunction(new \SplObjectStorage(), $data, $locale, $this->baseDir);
-		$this->registerProperties($this->getBasicProperties($data, $locale));
+		$headers = [];
+		$this->registerProperties($this->getBasicProperties($data, $locale, $headers));
 
 		//To be a valid XML document it must have a root element, automatically wrap it in <template> to ensure it does
 		$template = new Template($this->isFile ? $this->template : '<template>' . $this->template . '</template>');
@@ -39,13 +40,15 @@ class Builder {
 			foreach ($this->registeredProperties as $properties) $hook->registerProperties($properties);
 			$template->addHook($rule->query, $hook);	
 		}
+
 		
-		$output = $template->output($document);		
-		return $output;
+		$output = $template->output($document);	
+		
+		return ['headers' => $headers, 'body' => $output];
 	}
 
-	private function getBasicProperties($data, $locale) {
-		$basicProperties = new Hook\BasicProperties($data);
+	private function getBasicProperties($data, $locale, &$headers) {
+		$basicProperties = new Hook\BasicProperties($data, $headers);
 		$basicProperties->registerFormatter(new Formatter\Number($locale));
 		$basicProperties->registerFormatter(new Formatter\String());
 		return $basicProperties;
