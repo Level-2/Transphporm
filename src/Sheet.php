@@ -3,9 +3,11 @@ namespace Transphporm;
 /** Parses a .cds file into individual rules, each rule has a query e,g, `ul li` and a set of rules e.g. `display: none; data: iteration(id);` */
 class Sheet {
 	private $tss;
+	private $baseDir;
 
-	public function __construct($tss) {
+	public function __construct($tss, $baseDir) {
 		$this->tss = $this->stripComments($tss);
+		$this->baseDir = $baseDir;
 	}
 
 	public function parse($pos = 0, $rules = []) {
@@ -58,7 +60,7 @@ class Sheet {
 	}
 
 	private function import($args) {
-		$sheet = new Sheet(file_get_contents(trim($args, '\'" ')));
+		$sheet = new Sheet(file_get_contents($this->baseDir . trim($args, '\'" ')), $this->baseDir);
 		return $sheet->parse();
 	}
 

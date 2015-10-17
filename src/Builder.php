@@ -8,11 +8,15 @@ class Builder {
 	private $formatters = [];
 	private $isFile = false;
 	private $locale;
+	private $baseDir;
 
 	public function __construct($template, $tss = '') {
 		if (trim($template)[0] !== '<') {
 			$this->template = file_get_contents($template);
-			if ($tss) $this->tss = file_get_contents($tss);
+			if ($tss) {
+				$this->baseDir = dirname(realpath($tss)) . DIRECTORY_SEPARATOR;
+				$this->tss = file_get_contents($tss);	
+			} 
 			$this->isFile = true;
 		}
 		else {
@@ -23,14 +27,15 @@ class Builder {
 
 	public function output($data = null, $document = false) {
 		$locale = $this->getLocale();
-		$data = new Hook\DataFunction(new \SplObjectStorage(), $data, $locale);
+		$data = new Hook\DataFunction(new \SplObjectStorage(), $data, $locale, $this->baseDir);
 		$this->registerProperties($this->getBasicProperties($data, $locale));
 
 		//To be a valid XML document it must have a root element, automatically wrap it in <template> to ensure it does
 		if (!$this->isFile) $template = new Template('<template>' . $this->template . '</template>');
 		else $template = new Template($this->template);
 
-		$rules = (new Sheet($this->tss))->parse();
+
+		$rules = (new Sheet($this->tss, $this->baseDir))->parse();
 
 		foreach ($rules as $rule) {
 			$hook = new Hook\Rule($rule->properties, new Hook\PseudoMatcher($rule->pseudo, $data), $data);
@@ -38,7 +43,10 @@ class Builder {
 			$template->addHook($rule->query, $hook);	
 		}
 		
-		return $template->output($document);
+		$output = $template->output($document);
+		
+		
+		return $output;
 	}
 
 	private function getBasicProperties($data, $locale) {
