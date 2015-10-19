@@ -12,7 +12,7 @@ class BasicProperties {
 
 	public function content($value, $element, $rule) {
 		$value = $this->format($value, $rule->getRules());
-		if ($this->processPseudo($value, $element, $rule)) {
+		if (!$this->processPseudo($value, $element, $rule)) {
 			//Remove the current contents
 			$this->removeAllChildren($element);
 			//Now make a text node
@@ -21,11 +21,35 @@ class BasicProperties {
 	}
 
 	private function processPseudo($value, $element, $rule) {
-		if ($attr = $rule->getPseudoMatcher()->attr()) $element->setAttribute($attr, implode('', $value));
-		else if ($header = $rule->getPseudoMatcher()->header($element)) $this->headers[] = [$header, implode('', $value)];
-		else if (in_array('before', $rule->getPseudoMatcher()->getPseudo())) $element->firstChild->nodeValue = implode('', $value) . $element->firstChild->nodeValue;
-		else if (in_array('after', $rule->getPseudoMatcher()->getPseudo())) $element->firstChild->nodeValue .= implode('', $value);
-		else return true;
+		return $this->pseudoAttr($value, $element, $rule) || $this->pseudoHeader($value, $element, $rule) || $this->pseudoBefore($value, $element, $rule) || $this->pseudoAfter($value, $element, $rule);
+	}
+
+	private function pseudoAttr($value, $element, $rule) {
+		if ($attr = $rule->getPseudoMatcher()->attr()) {
+			$element->setAttribute($attr, implode('', $value));
+			return true;
+		}
+	}
+
+	private function pseudoHeader($value, $element, $rule) {
+		if ($header = $rule->getPseudoMatcher()->header($element)) {
+			$this->headers[] = [$header, implode('', $value)];
+			return true;
+		}
+	}
+
+	private function pseudoBefore($value, $element, $rule) {
+		if (in_array('before', $rule->getPseudoMatcher()->getPseudo())) {
+			$element->firstChild->nodeValue = implode('', $value) . $element->firstChild->nodeValue;
+			return true;
+		}
+	}
+
+	private function pseudoAfter($value, $element, $rule) {
+		 if (in_array('after', $rule->getPseudoMatcher()->getPseudo())) {
+		 	$element->firstChild->nodeValue .= implode('', $value);
+		 	return true;
+		 }		 
 	}
 
 	private function appendContent($element, $content) {
