@@ -6,8 +6,7 @@ class DataFunction {
 	private $data;
 	private $locale;
 	private $baseDir;
-	private $headers;
-
+	
 	public function __construct(\SplObjectStorage $objectStorage, $data, $locale, $baseDir) {
 		$this->dataStorage = $objectStorage;
 		$this->data = $data;
