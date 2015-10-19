@@ -37,10 +37,9 @@ class PseudoMatcher {
 		$value = $this->parseValue(trim($value, '"'));
 		$lookupValue = $this->dataFunction->$name([$field], $element);
 
-		$matched = $lookupValue == $value
+		$matched = $lookupValue == $value;
 		return $operator === '!' ? !$matched : $matched;		
 	}
-
 
 	private function parseValue($value) {
 		if ($value == 'true') return true;

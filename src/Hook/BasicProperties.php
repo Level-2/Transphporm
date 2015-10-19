@@ -12,16 +12,20 @@ class BasicProperties {
 
 	public function content($value, $element, $rule) {
 		$value = $this->format($value, $rule->getRules());
-		if ($attr = $rule->getPseudoMatcher()->attr()) $element->setAttribute($attr, implode('', $value));
-		else if ($header = $rule->getPseudoMatcher()->header($element)) $this->headers[] = [$header, implode('', $value)];
-		else if (in_array('before', $rule->getPseudoMatcher()->getPseudo())) $element->firstChild->nodeValue = implode('', $value) . $element->firstChild->nodeValue;
-		else if (in_array('after', $rule->getPseudoMatcher()->getPseudo())) $element->firstChild->nodeValue .= implode('', $value);
-		else {
+		if ($this->processPseudo($value, $element, $rule)) {
 			//Remove the current contents
 			$this->removeAllChildren($element);
 			//Now make a text node
 			$this->appendContent($element, $value);
 		}
+	}
+
+	private function processPseudo($value, $element, $rule) {
+		if ($attr = $rule->getPseudoMatcher()->attr()) $element->setAttribute($attr, implode('', $value));
+		else if ($header = $rule->getPseudoMatcher()->header($element)) $this->headers[] = [$header, implode('', $value)];
+		else if (in_array('before', $rule->getPseudoMatcher()->getPseudo())) $element->firstChild->nodeValue = implode('', $value) . $element->firstChild->nodeValue;
+		else if (in_array('after', $rule->getPseudoMatcher()->getPseudo())) $element->firstChild->nodeValue .= implode('', $value);
+		else return true;
 	}
 
 	private function appendContent($element, $content) {
