@@ -699,6 +699,47 @@ class TransphpormTest extends PHPUnit_Framework_TestCase {
 
 
 	}
+
+	public function testSemicolonInString() {
+
+		$template = '
+			<div>Test</div>
+		';
+
+		$tss = 'div {content: "te;st"; format: uppercase}';
+
+		$template = new \Transphporm\Builder($template, $tss);
+
+		$this->assertEquals('<div>TE;ST</div>', $this->stripTabs($template->output()['body']));
+	}
+
+
+	public function testColonInString() {
+
+		$template = '
+			<div>Test</div>
+		';
+
+		$tss = 'div {content: "te:st"; format: uppercase}';
+
+		$template = new \Transphporm\Builder($template, $tss);
+
+		$this->assertEquals('<div>TE:ST</div>', $this->stripTabs($template->output()['body']));
+	}
+
+
+	public function testSemicolonInStrings() {
+
+		$template = '
+			<div>Test</div>
+		';
+
+		$tss = 'div {content: "t;e;s;t", "t;w;o"; format: uppercase}';
+
+		$template = new \Transphporm\Builder($template, $tss);
+
+		$this->assertEquals('<div>T;E;S;TT;W;O</div>', $this->stripTabs($template->output()['body']));
+	}
 }
 
 
