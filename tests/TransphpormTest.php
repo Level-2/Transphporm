@@ -740,6 +740,54 @@ class TransphpormTest extends PHPUnit_Framework_TestCase {
 
 		$this->assertEquals('<div>T;E;S;TT;W;O</div>', $this->stripTabs($template->output()['body']));
 	}
+
+	public function testMultipleReadIteration() {
+		$data = new stdclass;
+		$data->list = [];
+
+		$one = new stdclass;		
+		$one->name = 'One';
+		$one->id = '1';
+		$data->list[] = $one;
+
+		$two = new stdclass;		
+		$two->name = 'Two';
+		$two->id = '2';
+		$data->list[] = $two;
+
+		$three = new stdclass;
+		$three->name = 'Three';
+		$three->id = '3';
+		$data->list[] = $three;
+
+
+		$template = '
+				<ul>
+					<li>
+						<h2>header</h2>
+					</li>
+				</ul>
+		';
+
+		$css = 'ul li {repeat: data(list);}
+		ul li h2 {content: iteration(id), " ", iteration(name); }';
+
+
+		$template = new \Transphporm\Builder($template, $css);
+
+
+		$this->assertEquals($this->stripTabs('<ul>
+			<li>
+				<h2>1 One</h2>
+			</li><li>
+				<h2>2 Two</h2>
+			</li><li>
+				<h2>3 Three</h2>
+			</li>			
+		</ul>'), $this->stripTabs($template->output($data)['body']));
+
+	}
+
 }
 
 
