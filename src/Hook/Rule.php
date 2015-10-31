@@ -72,11 +72,8 @@ class Rule implements \Transphporm\Hook {
 
 			//Count the number of fresh opening ( before $close
 			$cPos = $open+1;
-			$count = 0;
-			while (($cPos = strpos($function, '(', $cPos+1)) !== false && $cPos < $close) $count++;			
+			while (($cPos = strpos($function, '(', $cPos+1)) !== false && $cPos < $close) $close = strpos($function, ')', $close+1);
 
-			//Find the matching closing )
-			for ($i = 0; $i < $count; $i++) $close = strpos($function, ')', $close+1);
 			$name = substr($function, 0, $open);
 
 			$params = substr($function, $open+1, $close-$open-1);
