@@ -49,9 +49,8 @@ class Date {
 		$parts = ['h' => 'hours', 'i' => 'minutes', 's'  => 'seconds'];
 
 		foreach ($parts as $l => $time) {
-			if ($diff->$l > 0) {
-				$plural = $diff->$l === 1 ? '_singular' : '_plural';
-				$result = sprintf($str, $diff->$l, $strings[$time . $plural]);
+			if ($diff->$l > 0) {				
+				$result = sprintf($str, $diff->$l, $this->getPlural($strings, $diff->$l, $time));
 				break;
 			}
 		}
@@ -74,14 +73,18 @@ class Date {
 		];
 	}
 
+	private function getPlural($strings, $num, $interval) {
+		if ($interval !== '') return $num == 1 ? $strings[$interval . '_singular'] : $strings[$interval . '_plural'];
+		else return '';
+	}
+
 	private function dayOffset($diffDays) {
 		$strings = $this->locale['offset_strings'];
 
 		foreach ($this->getRanges($strings) as list($lower, $upper, $str, $divisor, $plural)) {
 			if ($diffDays >= $lower && $diffDays <= $upper) {
 				$num = abs(round($diffDays / $divisor));
-				if ($plural !== '') $result = sprintf($str, $num, $num == 1 ? $strings[$plural . '_singular'] : $strings[$plural . '_plural']);
-				else $result = sprintf($str, $num / $divisor);
+				$result = sprintf($str, $num, $this->getPlural($strings, $num, $plural));				
 				break;
 			}
 		}
