@@ -12,6 +12,8 @@ class Number {
 	}
 
 	public function currency($num) {
-		$num = $this->decimal($num, $this->locale['currency_decimals']);		
+		$num = $this->decimal($num, $this->locale['currency_decimals']);
+		if ($this->locale['currency_position'] === 'before') return $this->locale['currency'] . $num;
+		else return $num . $this->locale['currency'];
 	}
 }

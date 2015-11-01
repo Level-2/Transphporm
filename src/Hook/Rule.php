@@ -50,12 +50,14 @@ class Rule implements \Transphporm\Hook {
 
 	private function findMatchingPos($string, $char, $start = 0, $escape = '\\') {
 		$pos = $start+1;
-
-		while (true) {
-			$end = strpos($string, $char, $pos);
+		$end = 0;
+		while ($end = strpos($string, $char, $pos)) {
 			if ($string[$end-1] === $escape) $pos = $end+1;
-			else return $end;
+			else {
+				break;
+			}
 		}
+		return $end;
 	}
 
 	private function extractQuotedString($marker, $str) {

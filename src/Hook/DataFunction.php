@@ -45,7 +45,7 @@ class DataFunction {
 		$parts = explode('.', $name[0]);
 		$obj = $data;
 		foreach ($parts as $part) {
-			if ($part == '') continue;
+			if ($part === '') continue;
 			if (is_callable([$obj, $part])) $obj = call_user_func([$obj, $part]); 
 			else $obj = $this->ifNull($obj, $part);
 		}
@@ -71,10 +71,10 @@ class DataFunction {
 
 		$result = [];
 
-		if ($newNode->tagName == 'template') {
+		if ($newNode->tagName === 'template') {
 			foreach ($newNode->childNodes as $node) $result[] = $node->cloneNode(true);
 		}		
-		else $result[] = $newNode;
+		//else $result[] = $newNode;
 
 		return $result;
 	}

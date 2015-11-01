@@ -416,6 +416,57 @@ class TransphpormTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testIterationPseudoNotEquals() {
+		$data = new stdclass;
+		$data->list = [];
+
+		$one = new stdclass;
+		$one->name = 'One';
+		$one->id = '1';
+		$data->list[] = $one;
+
+		$two = new stdclass;		
+		$two->name = 'Two';
+		$two->id = '2';
+		$data->list[] = $two;
+
+		$three = new stdclass;
+		$three->name = 'Three';
+		$three->id = '3';
+		$data->list[] = $three;
+
+
+		$template = '
+				<ul>
+					<li>
+						<h2>header</h2>
+						<span>TEST1</span>
+					</li>
+				</ul>
+		';
+
+		$css = 'ul li {repeat: data(list);}
+		ul li h2 {content: iteration(id)}
+		ul li span {content: iteration(name); }
+		ul li span:iteration[id!="2"] {display: none;}
+		';
+
+
+		$template = new \Transphporm\Builder($template, $css);
+
+
+		$this->assertEquals($this->stripTabs('<ul>
+			<li>
+				<h2>1</h2>
+			</li><li>
+				<h2>2</h2>
+				<span>Two</span>
+			</li><li>
+				<h2>3</h2>
+			</li>
+		</ul>'), $this->stripTabs($template->output($data)['body']));
+
+	}
 	public function testMultiPseudo() {
 		$data = new stdclass;
 		$data->list = [];
@@ -604,6 +655,25 @@ class TransphpormTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('<div>foo</div>', $template->output()['body']);
 	}
 
+	public function testImportMiddleOfFile() {
+		$template = '
+			<span>foo</span>
+			<div>Test</div>
+			<h1>foo</h1>
+		';
+
+		$file = __DIR__ . DIRECTORY_SEPARATOR . 'import.tss';
+		$tss = "
+			span {content: 'test1';}
+			@import '$file';
+			h1 {content: 'h1';}
+		";
+
+		$template = new \Transphporm\Builder($template, $tss);
+
+		$this->assertEquals($this->stripTabs('<span>test1</span><div>foo</div><h1>h1</h1>'), $this->stripTabs($template->output()['body']));
+	}
+
 	public function testContentTemplate() {
 		$template = '
 			<div>Test</div>
@@ -686,7 +756,37 @@ class TransphpormTest extends PHPUnit_Framework_TestCase {
 
 	}
 
-	public function testFormatString() {
+	public function testFormatCurrency() {
+		$template = '
+			<div>Test</div>
+		';
+
+		$tss = 'div {content: "1.234567"; format: currency;}';
+
+		$template = new \Transphporm\Builder($template, $tss);
+
+		$this->assertEquals('<div>£1.23</div>', $this->stripTabs($template->output()['body']));
+
+
+	}
+
+
+	public function testFormatCurrencyAfter() {
+		$template = '
+			<div>Test</div>
+		';
+
+		$tss = 'div {content: "1.234567"; format: currency;}';
+
+		$template = new \Transphporm\Builder($template, $tss);
+		$locale = json_decode(file_get_contents('src/Formatter/Locale/enGB.json'), true);
+		$locale['currency_position'] = 'after';
+		$template->setLocale($locale);
+
+		$this->assertEquals('<div>1.23£</div>', $this->stripTabs($template->output()['body']));
+	}
+
+	public function testFormatStringUpper() {
 		$template = '
 			<div>Test</div>
 		';
@@ -699,6 +799,51 @@ class TransphpormTest extends PHPUnit_Framework_TestCase {
 
 
 	}
+
+
+	public function testFormatStringLower() {
+		$template = '
+			<div>Test</div>
+		';
+
+		$tss = 'div {content: "test"; format: lowercase}';
+
+		$template = new \Transphporm\Builder($template, $tss);
+
+		$this->assertEquals('<div>test</div>', $this->stripTabs($template->output()['body']));
+
+
+	}
+
+	public function testCustomFormatter() {
+		$template = '
+			<div>Test</div>
+		';
+
+		$tss = 'div {content: "test"; format: reverse}';
+
+		$template = new \Transphporm\Builder($template, $tss);	
+		require_once 'tests/ReverseFormatter.php';
+		$template->registerFormatter(new ReverseFormatter);
+
+		$this->assertEquals('<div>tset</div>', $this->stripTabs($template->output()['body']));
+
+	}
+
+	public function testFormatStringTitle() {
+		$template = '
+			<div>test</div>
+		';
+
+		$tss = 'div {content: "a test title"; format: titlecase}';
+
+		$template = new \Transphporm\Builder($template, $tss);
+
+		$this->assertEquals('<div>A Test Title</div>', $this->stripTabs($template->output()['body']));
+
+
+	}
+
 
 	public function testSemicolonInString() {
 
@@ -788,6 +933,23 @@ class TransphpormTest extends PHPUnit_Framework_TestCase {
 
 	}
 
+	public function testLoadTssFromFile() {
+		$template = new \Transphporm\Builder('tests/external.xml', 'tests/external.tss');
+		$this->assertEquals('<div>Content from external TSS</div>', $this->stripTabs($template->output()['body']));
+	}
+
+	public function testHTTPHeader() {
+		$template = '
+			<html><div>Test</div></html>
+		';
+
+		$tss = 'html:header[location] {content: "/test"}';
+
+		$template = new \Transphporm\Builder($template, $tss);
+
+		$this->assertEquals([['location', '/test']], $template->output()['headers']);
+
+	}
 }
 
 

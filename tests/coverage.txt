@@ -1,0 +1,30 @@
+
+
+Code Coverage Report:       
+  2015-11-01 16:57:25       
+                            
+ Summary:                   
+  Classes: 100.00% (10/10)  
+  Methods: 100.00% (84/84)  
+  Lines:   100.00% (379/379)
+
+\Transphporm::Builder
+  Methods: 100.00% ( 7/ 7)   Lines: 100.00% ( 38/ 38)
+\Transphporm::CssToXpath
+  Methods: 100.00% ( 6/ 6)   Lines: 100.00% ( 31/ 31)
+\Transphporm::Sheet
+  Methods: 100.00% (10/10)   Lines: 100.00% ( 65/ 65)
+\Transphporm::Template
+  Methods: 100.00% ( 5/ 5)   Lines: 100.00% ( 20/ 20)
+\Transphporm\Formatter::Number
+  Methods: 100.00% ( 3/ 3)   Lines: 100.00% (  6/  6)
+\Transphporm\Formatter::String
+  Methods: 100.00% ( 3/ 3)   Lines: 100.00% (  3/  3)
+\Transphporm\Hook::BasicProperties
+  Methods: 100.00% (15/15)   Lines: 100.00% ( 63/ 63)
+\Transphporm\Hook::DataFunction
+  Methods: 100.00% ( 9/ 9)   Lines: 100.00% ( 39/ 39)
+\Transphporm\Hook::PseudoMatcher
+  Methods: 100.00% (12/12)   Lines: 100.00% ( 52/ 52)
+\Transphporm\Hook::Rule
+  Methods: 100.00% (14/14)   Lines: 100.00% ( 60/ 60)

@@ -16,6 +16,7 @@ class Sheet {
 				$pos = $processing['endPos']+1;
 				$rules = array_merge($processing['rules'], $rules);
 			}
+			
 			$selector = trim(substr($this->tss, $pos, $next-$pos));
 			$rule = $this->cssToRule($selector, count($rules));	
 
@@ -54,7 +55,7 @@ class Sheet {
 			$funcName = substr($tss, $atPos+1, $spacePos-$atPos-1);
 			$endPos = strpos($tss, ';', $spacePos);
 			$args = substr($tss, $spacePos+1, $endPos-$spacePos-1);
-			return ['rules' => $this->$funcName($args), 'endPos' => $endPos];			
+			return ['rules' => $this->$funcName($args), 'endPos' => $endPos];
 		}
 		else return false;
 	}

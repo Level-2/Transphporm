@@ -51,6 +51,7 @@ class Builder {
 		$basicProperties = new Hook\BasicProperties($data, $headers);
 		$basicProperties->registerFormatter(new Formatter\Number($locale));
 		$basicProperties->registerFormatter(new Formatter\String());
+		foreach ($this->formatters as $formatter) $basicProperties->registerFormatter($formatter);
 		return $basicProperties;
 	}
 
