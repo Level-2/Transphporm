@@ -1215,3 +1215,41 @@ Prints:
 
 
 For date, time and currency formatting, Transphporm supports Locales. Currently only enGB is supplied but you can write your own. 
+
+
+## Importing other files
+
+Like CSS, transphporm supports `@import` for importing other tss files:
+
+
+`imported.tss` 
+
+```css
+h1 {content: "From imported tss"}
+```
+
+
+```php
+$xml = '
+<h1> </h1>
+<div> </div>
+';
+
+$tss = "
+	@import 'imported.tss';
+	div {content: 'From main tss'}
+";
+
+$template = new \Transphporm\Builder($xml, $tss);
+
+echo $template->output()['body'];
+```
+
+Output:
+
+```html
+<h1>From imported tss</h1>
+<div>From main tss</div>
+
+```
+
