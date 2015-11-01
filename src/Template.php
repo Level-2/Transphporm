@@ -5,11 +5,22 @@ class Template {
 	private $hooks = [];
 	private $document;
 	private $xpath;
+	private $prefix = '';
 
 	public function __construct($doc) {
 		$this->document = new \DomDocument;
+
 		$this->document->loadXML($doc);
 		$this->xpath = new \DomXPath($this->document);
+
+		if ($this->document->documentElement->namespaceURI !== null) {
+			$this->xpath->registerNamespace('nsprefix', $this->document->documentElement->namespaceURI);
+			$this->prefix = 'nsprefix:';
+		}
+	}
+
+	public function getPrefix() {
+		return $this->prefix;
 	}
 	
 	public function addHook($xpath, $hook) {

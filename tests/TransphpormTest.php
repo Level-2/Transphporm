@@ -951,6 +951,13 @@ class TransphpormTest extends PHPUnit_Framework_TestCase {
 
 	}
 
+	public function testTemplateWithXmlns() {
+
+		$template = new \Transphporm\Builder('tests/namespaced.xml', 'tests/namespaced.tss');
+
+		$this->assertEquals($this->stripTabs('<foo xmlns="http://foo/"><bar>yy</bar></foo>'), $this->stripTabs($template->output()['body']));
+	}
+
 }
 
 

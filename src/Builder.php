@@ -33,17 +33,15 @@ class Builder {
 
 		//To be a valid XML document it must have a root element, automatically wrap it in <template> to ensure it does
 		$template = new Template($this->isFile ? $this->template : '<template>' . $this->template . '</template>');
-		$rules = (new Sheet($this->tss, $this->baseDir))->parse();
+		$rules = (new Sheet($this->tss, $this->baseDir, $template->getPrefix()))->parse();
 
 		foreach ($rules as $rule) {
 			$hook = new Hook\Rule($rule->properties, new Hook\PseudoMatcher($rule->pseudo, $data), $data);
 			foreach ($this->registeredProperties as $properties) $hook->registerProperties($properties);
 			$template->addHook($rule->query, $hook);	
 		}
-
 		
-		$output = $template->output($document);	
-		
+		$output = $template->output($document);		
 		return ['headers' => $headers, 'body' => $output];
 	}
 

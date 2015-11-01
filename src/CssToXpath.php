@@ -6,12 +6,12 @@ class CssToXpath {
 	private $css;
 	private $depth;
 
-	public function __construct($css) {
+	public function __construct($css, $prefix = '') {
 		$this->css = str_replace([' >', '> '],['>', '>'], trim($css));
 		$this->translators = [
-			' ' => function($string) { 	return '//' . $string;	},
-			'' => function($string) { return '/' . $string;	},
-			'>' => function($string) { return '/' . $string; },
+			' ' => function($string) use ($prefix) { return '//' . $prefix . $string;	},
+			'' => function($string) use ($prefix) { return '/' . $prefix . $string;	},
+			'>' => function($string) use ($prefix) { return '/' . $prefix  . $string; },
 			'#' => function($string) { return '[@id=\'' . $string . '\']'; },
 			'.' => function($string) { return '[contains(concat(\' \', normalize-space(@class), \' \'), \' ' . $string . ' \')]'; }, 
 			'[' => function($string) { return '[@' . $string . ']';	},
