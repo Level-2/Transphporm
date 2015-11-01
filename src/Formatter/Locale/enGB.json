@@ -6,5 +6,26 @@
 	"currency_decimals": "2",
 	"date_format": "d/m/Y",
 	"time_format": "H:i",
-	"timezone": "Europe/London"
+	"timezone": "Europe/London",
+	"offset_strings": {
+		"past": "%d %s ago",
+		"future": "In %d %s",
+		"weeks_singular": "week",
+		"weeks_plural": "weeks",
+		"days_singular": "day",
+		"days_plural": "days",
+		"months_singular": "month",
+		"months_plural": "months",
+		"years_singular": "year",
+		"years_plural": "years",
+		"hours_singular": "hour",
+		"hours_plural": "hours",
+		"minutes_singular": "minute",
+		"minutes_plural": "minutes",
+		"seconds_singular": "second",
+		"seconds_plural": "seconds",
+		"today": "Today",
+		"yesterday": "Yesterday",
+		"tomorrow": "Tomorrow"
+	}
 }

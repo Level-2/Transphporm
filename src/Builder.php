@@ -50,6 +50,7 @@ class Builder {
 	private function getBasicProperties($data, $locale, &$headers) {
 		$basicProperties = new Hook\BasicProperties($data, $headers);
 		$basicProperties->registerFormatter(new Formatter\Number($locale));
+		$basicProperties->registerFormatter(new Formatter\Date($locale));
 		$basicProperties->registerFormatter(new Formatter\StringFormatter());
 		foreach ($this->formatters as $formatter) $basicProperties->registerFormatter($formatter);
 		return $basicProperties;

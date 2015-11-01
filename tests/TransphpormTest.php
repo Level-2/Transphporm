@@ -950,6 +950,7 @@ class TransphpormTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals([['location', '/test']], $template->output()['headers']);
 
 	}
+
 }
 
 
