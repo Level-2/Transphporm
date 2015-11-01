@@ -1,6 +1,6 @@
 <?php
 namespace Transphporm\Formatter;
-class String {
+class StringFormatter {
 	public function uppercase($val) {
 		return strtoupper($val);
 	}
