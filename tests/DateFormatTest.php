@@ -1,13 +1,29 @@
 <?php
 class DateFormatTest extends PHPUnit_Framework_TestCase {
 
+	private function getFormatter() {
+		$locale = json_decode(file_get_contents('src/Formatter/Locale/enGB.json'), true);
+
+		return new \Transphporm\Formatter\Date($locale);
+	}
+
+	public function testFormatDate() {
+		$this->assertEquals('25/12/2014', $this->getFormatter()->date('2014-12-25'));
+	}
+
+	public function testFormatTime() {
+		$this->assertEquals('13:34', $this->getFormatter()->time('2014-12-25 13:34'));
+	}
+
+	public function testFormatDateTime() {
+		$this->assertEquals('25/12/2014 13:34', $this->getFormatter()->datetime('2014-12-25 13:34'));
+	}
+
 	private function relative($modify) {
 		$date = new \DateTime();
 		$date->modify($modify);
 
-		$locale = json_decode(file_get_contents('src/Formatter/Locale/enGB.json'), true);
-
-		$formatter = new \Transphporm\Formatter\Date($locale);
+		$formatter = $this->getFormatter();
 
 		return $formatter->relative($date);
 	}

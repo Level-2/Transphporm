@@ -16,16 +16,16 @@ class Date {
 	public function date($val, $format = null) {
 		$format = $format ? $format : $this->locale['date_format'];
 
-		return $this->getDate->format($format);
+		return $this->getDate($val)->format($format);
 	}
 
 	public function time($val, $format = null) {
 		$format = $format ? $format : $this->locale['time_format'];
-		return $this->getDate->format($format);
+		return $this->getDate($val)->format($format);
 	}
 
 	public function dateTime($val) {
-		return $this->date($val, $this->loocale['date_format'] . ' ' , $this->locale['time_format']);
+		return $this->date($val, $this->locale['date_format'] . ' ' . $this->locale['time_format']);
 	}
 
 	public function relative($val) {
@@ -51,9 +51,12 @@ class Date {
 		foreach ($parts as $l => $time) {
 			if ($diff->$l > 0) {
 				$plural = $diff->$l === 1 ? '_singular' : '_plural';
-				return sprintf($str, $diff->$l, $strings[$time . $plural]);
+				$result = sprintf($str, $diff->$l, $strings[$time . $plural]);
+				break;
 			}
 		}
+
+		return $result;
 	}
 
 	private function getRanges($strings) {
@@ -77,9 +80,12 @@ class Date {
 		foreach ($this->getRanges($strings) as list($lower, $upper, $str, $divisor, $plural)) {
 			if ($diffDays >= $lower && $diffDays <= $upper) {
 				$num = abs(round($diffDays / $divisor));
-				if ($plural !== '') return sprintf($str, $num, $num == 1 ? $strings[$plural . '_singular'] : $strings[$plural . '_plural']);
-				else return sprintf($str, $num / $divisor);
+				if ($plural !== '') $result = sprintf($str, $num, $num == 1 ? $strings[$plural . '_singular'] : $strings[$plural . '_plural']);
+				else $result = sprintf($str, $num / $divisor);
+				break;
 			}
 		}
+
+		return $result;
 	}
 }

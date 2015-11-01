@@ -1,24 +1,26 @@
 
 
 Code Coverage Report:       
-  2015-11-01 16:57:25       
+  2015-11-01 22:17:35       
                             
  Summary:                   
-  Classes: 100.00% (10/10)  
-  Methods: 100.00% (84/84)  
-  Lines:   100.00% (379/379)
+  Classes: 100.00% (11/11)  
+  Methods: 100.00% (93/93)  
+  Lines:   100.00% (426/426)
 
 \Transphporm::Builder
-  Methods: 100.00% ( 7/ 7)   Lines: 100.00% ( 38/ 38)
+  Methods: 100.00% ( 7/ 7)   Lines: 100.00% ( 39/ 39)
 \Transphporm::CssToXpath
   Methods: 100.00% ( 6/ 6)   Lines: 100.00% ( 31/ 31)
 \Transphporm::Sheet
   Methods: 100.00% (10/10)   Lines: 100.00% ( 65/ 65)
 \Transphporm::Template
   Methods: 100.00% ( 5/ 5)   Lines: 100.00% ( 20/ 20)
+\Transphporm\Formatter::Date
+  Methods: 100.00% ( 9/ 9)   Lines: 100.00% ( 46/ 46)
 \Transphporm\Formatter::Number
   Methods: 100.00% ( 3/ 3)   Lines: 100.00% (  6/  6)
-\Transphporm\Formatter::String
+\Transphporm\Formatter::StringFormatter
   Methods: 100.00% ( 3/ 3)   Lines: 100.00% (  3/  3)
 \Transphporm\Hook::BasicProperties
   Methods: 100.00% (15/15)   Lines: 100.00% ( 63/ 63)
