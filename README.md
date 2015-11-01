@@ -973,3 +973,245 @@ Output:
 <h1 class="foo">foo</h1>
 
 ```
+
+
+## HTTP Headers
+
+Transphporm supports setting HTTP Headers. You must target an element on the page such as HTML and you can use the `:header` pseudo element to set a HTTP header. For example a redirect can be done like this:
+
+```css
+
+html:header[location] {content: "/redirect-url"; }
+
+```
+
+Transphporm does not directly write HTTP headers. The return value of the `output()` function is an array consisting of a `body` and `headers`. `body` is the rendered HTML code and `headers` contains any HTTP headers which have been set.
+
+```php
+
+$xml = '<html><div>Foo</div></html>';
+$tss = 'html:header[location] {content: "/redirect-url"; }';
+
+$template = new \Transphporm\Builder($xml, $tss);
+
+print_r($template->output());
+```
+
+Will print:
+
+```php
+Array (
+	'body' => '<html><div>foo</div></html>',
+	'headers' => Array (
+		Array (
+			[0] => 'location',
+			[1] => '/redirect-url'
+		) 
+
+
+
+	)
+	
+)
+```
+
+To actually send the headers to the browser you need to manually call the header command:
+
+
+```php
+
+foreach ($template->output()['headers'] as $header) {
+	header($header[0] . ': ' . $header[1]);
+}
+
+```
+
+
+### Conditionally applying HTTP headers
+
+In most cases, you will want to conditionally display a header. For example:
+
+- Redirect on success
+- Send a 404 header when a record could not be found
+
+
+To do this, you can use conditional data lookups:
+
+
+```php
+
+class Model {
+	public function getProduct() {
+		return false;
+	}
+}
+
+
+
+$tss = 'html:data[getProduct='']:header[status] {content: '404'}
+
+$xml = '<html></html>';
+
+$data = new Model;
+
+$template = new \Transphporm\Builder($xml, $tss);
+
+$output = $template->output($data);
+
+print_r($output['headers'])
+
+```
+
+Prints:
+
+```php
+Array (
+	[0] => 'status',
+	[1] => '404'
+
+)
+
+```
+
+To use this, you should then call the inbuilt php `http_response_code` function with this status:
+
+
+```php
+foreach ($template->output()['headers'] as $header) {
+	if ($header[0] === 'status') http_response_code($header[1]);
+	else header($header[0] . ': ' . $header[1]);
+}
+```
+
+
+### Transphporm does not send any headers
+
+Transphporm does not send any output to the browser by default. This is for maximum flexibility, you must still manually send the headers and echo the body.
+
+
+
+## Formatting data
+
+Transphporm supports formatting of data as it's output. The syntax for formatting is this:
+
+
+```css
+
+h1 {content: "content of element"; format: [NAME-OF-FORMAT] [OPTIONAL ARGUMENT OF FORMAT];}
+```
+
+### String formatting
+
+Transphporm  currently supports the following formats for strings:
+
+- uppercase
+- lowercase
+- titlecase
+
+Examples:
+
+
+### String format: uppercase
+
+```php
+$xml = '
+<h1> </h1>
+';
+
+$tss = 'h1 {content: "TeSt"; format: uppercase}';
+
+$template = new \Transphporm\Builder($xml, $tss);
+
+echo $template->output()['body'];
+```
+
+Prints:
+
+
+```html
+<h1>TEST</h1>
+
+```
+
+
+
+### String format: lowercase
+
+```php
+$xml = '
+<h1> </h1>
+';
+
+$tss = 'h1 {content: "TeSt"; format: lowercase}';
+
+$template = new \Transphporm\Builder($xml, $tss);
+
+echo $template->output()['body'];
+```
+
+Prints:
+
+
+```html
+<h1>test</h1>
+
+```
+
+
+
+### String format: titlecase
+
+```php
+$xml = '
+<h1> </h1>
+';
+
+$tss = 'h1 {content: "test"; format: titlecase}';
+
+$template = new \Transphporm\Builder($xml, $tss);
+
+echo $template->output()['body'];
+```
+
+Prints:
+
+
+```html
+<h1>Test</h1>
+
+```
+
+
+## Number formats
+
+Transphporm supports formatting numbers to a number of decimal places using the `decimal` format. You can specify the number of decimal places:
+
+
+### Number format: decimal
+
+
+```php
+$xml = '
+<h1> </h1>
+';
+
+$tss = 'h1 {content: "11.234567"; format: decimal 2}';
+
+$template = new \Transphporm\Builder($xml, $tss);
+
+echo $template->output()['body'];
+```
+
+Prints:
+
+
+```html
+<h1>1.23</h1>
+
+```
+
+
+## Locales 
+
+
+For date, time and currency formatting, Transphporm supports Locales. Currently only enGB is supplied but you can write your own. 
