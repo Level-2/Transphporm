@@ -92,7 +92,7 @@ $tss = 'h1 {content: "Replaced Title"; }';
 
 $template = new \Transphporm\Builder($xml, $tss);
 
-echo $template->output()['body'];
+echo $template->output()->body;
 
 ```
 
@@ -127,7 +127,7 @@ $tss = 'h1 {content: data(); }';
 
 $template = new \Transphporm\Builder($xml, $tss)
 
-echo $template->output($data)['body'];
+echo $template->output($data)->body;
 
 ```
 
@@ -160,7 +160,7 @@ $tss = '
 
 $template = new \Transphporm\Builder($xml, $tss);
 
-echo $template->output($data)['body'];
+echo $template->output($data)->body;
 
 
 ```
@@ -189,7 +189,7 @@ $tss = 'h1 {content: "Title: ", data(); }';
 
 $template = new \Transphporm\Builder($xml, $tss);
 
-echo $template->output($data)['body'];
+echo $template->output($data)->body;
 
 ```
 
@@ -241,7 +241,7 @@ $data = ['users' => $users];
 
 $template = new \Transphporm\Builder($xml, $tss);
 
-echo $template->output($data)['body'];
+echo $template->output($data)->body;
 
 ```
 
@@ -283,7 +283,7 @@ $data = ['users' => $users];
 
 $template = new \Transphporm\Builder($xml, $tss);
 
-echo $template->output($data)['body'];
+echo $template->output($data)->body;
 
 ```
 
@@ -331,7 +331,7 @@ $data = ['users' => $users];
 
 $template = new \Transphporm\Builder($xml, $tss)
 
-echo $template->output($data)['body'];
+echo $template->output($data)->body;
 
 
 ```
@@ -376,7 +376,7 @@ $tss = '
 
 $template = new \Transphporm\Builder($xml, $tss);
 
-echo $template->output()['body'];
+echo $template->output()->body;
 
 ```
 
@@ -412,7 +412,7 @@ p.middle {content: "Middle paragraph"; }
 
 $template = new \Transphporm\Builder($xml, $tss);
 
-echo $template->output()['body'];
+echo $template->output()->body;
 
 ```
 
@@ -457,7 +457,7 @@ li > span {content: "REPLACED";}
 
 $template = new \Transphporm\Builder($xml, $tss);
 
-echo $template->output()['body'];
+echo $template->output()->body;
 
 ```
 
@@ -496,7 +496,7 @@ $tss = '
 
 $template = new \Transphporm\Builder($xml, $tss)
 
-echo $template->output()['body'];
+echo $template->output()->body;
 
 ```
 
@@ -536,7 +536,7 @@ textarea[name="Two"] {content: "TEST"; }
 
 $template = new \Transphporm\Builder($xml, $tss);
 
-echo $template->output()['body'];
+echo $template->output()->body;
 
 ```
 
@@ -579,7 +579,7 @@ textarea[name] {content: "TEST"; }
 
 $template = new \Transphporm\Builder($xml, $tss);
 
-echo $template->output()['body'];
+echo $template->output()->body;
 
 ```
 
@@ -643,7 +643,7 @@ $tss = '
 
 $template = new \Transphporm\Builder($xml, $tss);
 
-echo $template->output($data)['body'];
+echo $template->output($data)->body;
 
 ```
 
@@ -675,7 +675,7 @@ $tss = '
 
 $template = new \Transphporm\Builder($xml, $tss)
 
-echo $template->output($data)['body'];
+echo $template->output($data)->body;
 
 ```
 
@@ -709,7 +709,7 @@ $tss = 'ul li:nth-child(2) {content: "REPLACED"}';
 
 $template = new \Transphporm\Builder($template, $tss);
 
-echo $template->output()['body'];
+echo $template->output()->body;
 ```
 
 Output: 
@@ -742,7 +742,7 @@ $xml = '
 $tss = 'ul li:nth-child(even) {content: "REPLACED"}';
 
 $template = new \Transphporm\Builder($template, $tss);
-echo $template->output()['body'];
+echo $template->output()->body;
 ```
 
 Output: 
@@ -774,7 +774,7 @@ $xml = '
 $tss = 'ul li:nth-child(even) {content: "REPLACED"}';
 
 $template = new \Transphporm\Builder($template, $tss);
-echo $template->output()['body'];
+echo $template->output()->body;
 ```
 
 Output: 
@@ -851,7 +851,7 @@ $data = ['users' => $users];
 
 $template = new \Transphporm\Builder($xml, $tss);
 
-echo $template->output($data)['body'];
+echo $template->output($data)->body;
 
 
 ```
@@ -922,7 +922,7 @@ $data = ['users' => $users];
 
 $template = new \Transphporm\Builder($xml, $tss);
 
-echo $template->output($data)['body'];
+echo $template->output($data)->body;
 
 
 
@@ -963,7 +963,7 @@ $tss = 'h1 {content: attr(class);}';
 
 $template = new \Transphporm\Builder($xml, $tss);
 
-echo $template->output()['body'];
+echo $template->output()->body;
 ```
 
 Output:
@@ -1020,7 +1020,7 @@ To actually send the headers to the browser you need to manually call the header
 
 ```php
 
-foreach ($template->output()['headers'] as $header) {
+foreach ($template->output()->headers as $header) {
 	header($header[0] . ': ' . $header[1]);
 }
 
@@ -1058,7 +1058,7 @@ $template = new \Transphporm\Builder($xml, $tss);
 
 $output = $template->output($data);
 
-print_r($output['headers'])
+print_r($output->headers)
 
 ```
 
@@ -1077,7 +1077,7 @@ To use this, you should then call the inbuilt php `http_response_code` function 
 
 
 ```php
-foreach ($template->output()['headers'] as $header) {
+foreach ($template->output()->headers as $header) {
 	if ($header[0] === 'status') http_response_code($header[1]);
 	else header($header[0] . ': ' . $header[1]);
 }
@@ -1122,7 +1122,7 @@ $tss = 'h1 {content: "TeSt"; format: uppercase}';
 
 $template = new \Transphporm\Builder($xml, $tss);
 
-echo $template->output()['body'];
+echo $template->output()->body;
 ```
 
 Prints:
@@ -1146,7 +1146,7 @@ $tss = 'h1 {content: "TeSt"; format: lowercase}';
 
 $template = new \Transphporm\Builder($xml, $tss);
 
-echo $template->output()['body'];
+echo $template->output()->body;
 ```
 
 Prints:
@@ -1170,7 +1170,7 @@ $tss = 'h1 {content: "test"; format: titlecase}';
 
 $template = new \Transphporm\Builder($xml, $tss);
 
-echo $template->output()['body'];
+echo $template->output()->body;
 ```
 
 Prints:
@@ -1199,7 +1199,7 @@ $tss = 'h1 {content: "11.234567"; format: decimal 2}';
 
 $template = new \Transphporm\Builder($xml, $tss);
 
-echo $template->output()['body'];
+echo $template->output()->body;
 ```
 
 Prints:
@@ -1242,7 +1242,7 @@ $tss = "
 
 $template = new \Transphporm\Builder($xml, $tss);
 
-echo $template->output()['body'];
+echo $template->output()->body;
 ```
 
 Output:

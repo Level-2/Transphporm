@@ -7,6 +7,7 @@ class Template {
 	private $xpath;
 	private $prefix = '';
 
+	/** Takes an XML string and loads it into a DomDocument object */
 	public function __construct($doc) {
 		$this->document = new \DomDocument;
 
@@ -19,32 +20,38 @@ class Template {
 		}
 	}
 
+	/** Returns the document's XML prefix */
 	public function getPrefix() {
 		return $this->prefix;
 	}
 	
+	/** Assigns a $hook which will be run on any element that matches the given $xpath query */
 	public function addHook($xpath, $hook) {
 		$this->hooks[] = [$xpath, $hook];
 	}
 
+	/** Loops through all assigned hooks, runs the Xpath query and calls the hook */
 	private function processHooks() {
 		foreach ($this->hooks as list($query, $hook)) {
 			foreach ($this->xpath->query($query) as $element) $hook->run($element);
 		}
 	}
 
+	/** Prints out the current DomDocument as HTML */
 	private function printDocument(\DomDocument $doc) {
 		$output = '';
 		foreach ($doc->documentElement->childNodes as $node) $output .= $doc->saveXML($node, LIBXML_NOEMPTYTAG);
 		return $output;
 	}
 
+	/** Outputs the template's header/body. Returns an array containing both parts */
 	public function output($document = false) {
 		//Process all hooks
 		 $this->processHooks();
 
 		//Generate the document by taking only the childnodes of the template, ignoring the <template> and </template> tags
 		//TODO: Is there a faster way of doing this without string manipulation on the output or this loop through childnodes?
+		 //Either return a whole DomDocument or return the output HTML
 		if ($document) return $this->document;
 
 
@@ -58,4 +65,3 @@ class Template {
 		return trim($output);
 	}
 }
-

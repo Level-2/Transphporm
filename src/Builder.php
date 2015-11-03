@@ -42,7 +42,7 @@ class Builder {
 		}
 		
 		$output = $template->output($document);		
-		return ['headers' => $headers, 'body' => $output];
+		return (object) ['headers' => $headers, 'body' => $output];
 	}
 
 	private function getBasicProperties($data, $locale, &$headers) {

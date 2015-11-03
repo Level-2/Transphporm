@@ -1,5 +1,6 @@
 <?php
 namespace Transphporm\Formatter;
+/** Date/time formatting for use in formmat: property*/
 class Date {
 	private $locale;
 
@@ -7,27 +8,32 @@ class Date {
 		$this->locale = $locale;
 	}
 
+	/** Converts $val into a \DateTime object if it's not already */
 	private function getDate($val) {
 		$date =  $val instanceof \DateTime ? $val : new \DateTime($val);
 		$date->setTimeZone(new \DateTimeZone($this->locale['timezone']));
 		return $date;
 	}
 
+	/** Formats date based on supplied $format or default format from $locale */
 	public function date($val, $format = null) {
 		$format = $format ? $format : $this->locale['date_format'];
-
 		return $this->getDate($val)->format($format);
 	}
 
+	/** Formats \DateTime as time based on supplied $format or default format from $locale */
 	public function time($val, $format = null) {
 		$format = $format ? $format : $this->locale['time_format'];
 		return $this->getDate($val)->format($format);
 	}
 
+	/** Formats \DateTime as Date and Time using formats from $locale */
 	public function dateTime($val) {
 		return $this->date($val, $this->locale['date_format'] . ' ' . $this->locale['time_format']);
 	}
 
+	/** Generates relative time offsets based on system clock. e.g "10 minutes ago" or "In 6 months"
+		using strings from $locale	*/
 	public function relative($val) {
 		$now = $this->getDate(null);
 		$date = $this->getDate($val);
@@ -41,6 +47,7 @@ class Date {
 		else return $this->timeOffset($diff);
 	}
 
+	/** Calculates offset in hours/minutes/seconds */
 	private function timeOffset($diff) {
 		$strings = $this->locale['offset_strings'];
 
@@ -58,6 +65,7 @@ class Date {
 		return $result;
 	}
 
+	/** Gets date ranges to represent uses of weeks/months/days/etc */
 	private function getRanges($strings) {
 		return [
 			[1, 1, $strings['yesterday'], 1, ''],
@@ -73,11 +81,13 @@ class Date {
 		];
 	}
 
+	/** Converts "week" to "weeks", "month" to "months" etc when plural is required using language from $locale */
 	private function getPlural($strings, $num, $interval) {
 		if ($interval !== '') return $num == 1 ? $strings[$interval . '_singular'] : $strings[$interval . '_plural'];
 		else return '';
 	}
 
+	/** Calculates offset in days/weeks/month/years */
 	private function dayOffset($diffDays) {
 		$strings = $this->locale['offset_strings'];
 
