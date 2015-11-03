@@ -1216,6 +1216,36 @@ Prints:
 
 For date, time and currency formatting, Transphporm supports Locales. Currently only enGB is supplied but you can write your own. 
 
+To set a locale, use the `builder::setLocale` method. This takes either a locale name, for a locale inside `Formatter/Locale/{name}.json` e.g.
+
+```php
+
+$template = new \Transphporm\Builder($xml, $tss);
+$template->setLocale('enGB');
+
+```
+
+Currently only enGB is supported. Alternatively, you can provide an array which matches the format used in `Formatter/Locale/enGB.json`.
+
+
+### Date formats
+
+Transphporm supports formatting dates. Either you can reference a \DateTime object or a string. Strings will be attempted to be converted to dates automatically:
+
+```php
+$xml = '
+<div> </div>
+';
+
+$tss = 'div {content: "2015-10-05"; format: date}';
+
+$template = new \Transphporm\Builder($xml, $tss);
+
+echo $template->output()->body;
+```
+
+
+This will output 
 
 ## Importing other files
 
@@ -1252,4 +1282,5 @@ Output:
 <div>From main tss</div>
 
 ```
+
 

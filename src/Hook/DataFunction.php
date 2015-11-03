@@ -65,7 +65,7 @@ class DataFunction {
 		$newTemplate = new \Transphporm\Builder($this->baseDir . $val[0]);
 		$newTemplate->setLocale($this->locale);
 
-		$doc = $newTemplate->output([], true)['body'];
+		$doc = $newTemplate->output([], true)->body;
 		
 		$newNode = $element->ownerDocument->importNode($doc->documentElement, true);
 

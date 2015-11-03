@@ -958,6 +958,34 @@ class TransphpormTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals($this->stripTabs('<foo xmlns="http://foo/"><bar>yy</bar></foo>'), $this->stripTabs($template->output()->body));
 	}
 
+	public function testFormatDate() {
+
+		$template = '
+			<div>test</div>
+		';
+
+		$tss = 'div {content: "2015-10-05"; format: date}';
+
+		$template = new \Transphporm\Builder($template, $tss);
+
+
+		$this->assertEquals($this->stripTabs('<div>05/10/2015</div>'), $this->stripTabs($template->output()->body));
+	}
+
+	public function testFormatDateCustom() {
+
+		$template = '
+			<div>test</div>
+		';
+
+		$tss = 'div {content: "2015-10-05"; format: date "jS M"}';
+
+		$template = new \Transphporm\Builder($template, $tss);
+
+
+		$this->assertEquals($this->stripTabs('<div>5th Oct</div>'), $this->stripTabs($template->output()->body));
+	}
+
 }
 
 
