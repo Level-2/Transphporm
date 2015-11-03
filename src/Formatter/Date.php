@@ -10,8 +10,9 @@ class Date {
 
 	/** Converts $val into a \DateTime object if it's not already */
 	private function getDate($val) {
-		$date =  $val instanceof \DateTime ? $val : new \DateTime($val);
-		$date->setTimeZone(new \DateTimeZone($this->locale['timezone']));
+		$tz = new \DateTimeZone($this->locale['timezone']);
+		$date =  $val instanceof \DateTime ? $val : new \DateTime($val, $tz);
+		$date->setTimeZone($tz);
 		return $date;
 	}
 

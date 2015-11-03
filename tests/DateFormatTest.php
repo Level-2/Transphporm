@@ -3,7 +3,6 @@ class DateFormatTest extends PHPUnit_Framework_TestCase {
 
 	private function getFormatter() {
 		$locale = json_decode(file_get_contents('src/Formatter/Locale/enGB.json'), true);
-
 		return new \Transphporm\Formatter\Date($locale);
 	}
 
