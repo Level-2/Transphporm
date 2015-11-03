@@ -1237,7 +1237,7 @@ $xml = '
 <div> </div>
 ';
 
-$tss = 'div {content: "2015-10-05"; format: date}';
+$tss = 'div {content: "2015-12-22"; format: date}';
 
 $template = new \Transphporm\Builder($xml, $tss);
 
@@ -1245,7 +1245,66 @@ echo $template->output()->body;
 ```
 
 
-This will output 
+This will format the date using the date format specified in the locale. For enGB this is `d/m/Y`
+
+```html
+<div>22/12/2015</div>
+```
+
+Alternatively you can specify a format as the second parameter of the formatter:
+
+
+```php
+$xml = '
+<div> </div>
+';
+
+$tss = 'div {content: "2015-12-22"; format: date "jS M Y"}';
+
+$template = new \Transphporm\Builder($xml, $tss);
+
+echo $template->output()->body;
+```
+
+
+```html
+<div>22nd Dec 2015</div>
+```
+
+
+You can also format using `time` which defaults to `H:i` in the locale:
+
+
+```php
+$xml = '
+<div> </div>
+';
+
+$tss = 'div {content: "2015-12-22 14:34"; format: time}';
+
+$template = new \Transphporm\Builder($xml, $tss);
+
+echo $template->output()->body;
+```
+
+
+```html
+<div>14:34</div>
+```
+
+## Relative times
+
+You can supply the `relative` formatter to a date, which will display things like:
+
+- "Tomorrow"
+- "Yesterady"
+- "Two hours ago"
+- "3 weeks ago"
+- "In 3 months"
+- "In 10 years"
+
+The strings are specified in the locale.
+
 
 ## Importing other files
 
