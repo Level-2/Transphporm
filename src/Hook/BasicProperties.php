@@ -84,7 +84,7 @@ class BasicProperties {
 		foreach ($value as &$val) {
 			foreach ($this->formatters as $formatter) {
 				if (is_callable([$formatter, $functionName])) {
-					$val = $formatter->$functionName($val, ...$format);
+					$val = call_user_func_array([$formatter, $functionName], array_merge([$val], $format));
 				}
 			}
 		}
