@@ -1,0 +1,31 @@
+﻿{
+	"thousands_separator": ".",
+	"decimal_separator": ",",
+	"currency": "€",
+	"currency_position": "after",
+	"currency_decimals": "2",
+	"date_format": "d/m/Y",
+	"time_format": "H:i",
+	"timezone": "Europe/Berlin",
+	"offset_strings": {
+		"past": "vor %d %s",
+		"future": "In %d %s",
+		"weeks_singular": "Woche",
+		"weeks_plural": "Wochen",
+		"days_singular": "Tag",
+		"days_plural": "Tage",
+		"months_singular": "Monat",
+		"months_plural": "Monate",
+		"years_singular": "Jahr",
+		"years_plural": "Jahre",
+		"hours_singular": "Stunde",
+		"hours_plural": "Stunden",
+		"minutes_singular": "Minute",
+		"minutes_plural": "Minuten",
+		"seconds_singular": "Sekunde",
+		"seconds_plural": "Sekunden",
+		"today": "Heute",
+		"yesterday": "Gestern",
+		"tomorrow": "Morgen"
+	}
+}
