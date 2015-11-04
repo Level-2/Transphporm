@@ -13,4 +13,9 @@ class StringFormatter {
 		return ucwords($val);
 	}
 
+	public function html($val) {
+		$doc = new \DomDocument();
+		$doc->loadXML($val);
+		return $doc->documentElement;
+	}
 }

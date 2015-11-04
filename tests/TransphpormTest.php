@@ -986,6 +986,18 @@ class TransphpormTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals($this->stripTabs('<div>5th Oct</div>'), $this->stripTabs($template->output()->body));
 	}
 
+	public function testHTMLFormat() {
+		$template = '
+			<div>test</div>
+		';
+
+		$tss = 'div {content: "<span>foobar</span>"; format: html}';
+
+		$template = new \Transphporm\Builder($template, $tss);
+
+		$this->assertEquals($this->stripTabs('<div><span>foobar</span></div>'), $this->stripTabs($template->output()->body));
+	}
+
 }
 
 

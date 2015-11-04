@@ -54,7 +54,10 @@ class BasicProperties {
 
 	private function appendContent($element, $content) {
 		if (isset($content[0]) && $content[0] instanceof \DomNode) {
-			foreach ($content as $node) $element->appendChild($node);
+			foreach ($content as $node) {
+				$node = $element->ownerDocument->importNode($node, true);
+				$element->appendChild($node);
+			}
 		}
 		else $element->appendChild($element->ownerDocument->createTextNode(implode('', $content)));		
 	}
