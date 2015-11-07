@@ -61,11 +61,26 @@ class DataFunction {
 		return $element->getAttribute(trim($val[0]));
 	}
 
+	private function templateSubsection($css, $doc, $element) {
+		$xpathStr = (new \Transphporm\CssToXpath($css))->getXpath();
+		$xpath = new \DomXpath($doc);
+		$nodes = $xpath->query($xpathStr);
+		$result = [];
+
+		foreach ($nodes as $node) {
+			$result[] = $element->ownerDocument->importNode($node, true);
+		}
+
+		return $result;
+	}
+
 	public function template($val, $element) {
 		$newTemplate = new \Transphporm\Builder($this->baseDir . $val[0]);
 		$newTemplate->setLocale($this->locale);
 
 		$doc = $newTemplate->output([], true)->body;
+
+		if (isset($val[1])) return $this->templateSubsection($val[1], $doc, $element);
 		
 		$newNode = $element->ownerDocument->importNode($doc->documentElement, true);
 

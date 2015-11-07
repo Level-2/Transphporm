@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<template>
+
+	<p>This is a template partial. Only the following node should be included:</p>
+
+	<span class="test">foobar</span>
+
+	<p>fooooo</p>
+
+</template>

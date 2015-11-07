@@ -84,7 +84,6 @@ class Sheet {
 	}
 
 	private function getProperties($str) {
-
 		$stringExtractor = new \Transphporm\StringExtractor($str);
 		$rules = explode(';', $stringExtractor);
 		$return = [];

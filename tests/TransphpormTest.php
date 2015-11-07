@@ -998,6 +998,21 @@ class TransphpormTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals($this->stripTabs('<div><span>foobar</span></div>'), $this->stripTabs($template->output()->body));
 	}
 
+
+	public function testIncludeTemplatePartial() {
+		$template = '
+			<div>test</div>
+		';
+
+		$tss = 'div {content: template("tests/include2.xml", ".test"); }';
+
+		$template = new \Transphporm\Builder($template, $tss);
+
+		$this->assertEquals($this->stripTabs('<div><span class="test">foobar</span></div>'), $this->stripTabs($template->output()->body));
+
+
+	
+	}
 }
 
 
