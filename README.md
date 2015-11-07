@@ -1342,4 +1342,156 @@ Output:
 
 ```
 
+# Building a whole page
+
+Transphporm uses a top-down approach to construct pages. Most frameworks require writing a layout template and then pulling content into it. It becomes very difficult to make changes to the layout on a per-page basis. (At minimum you need to add some code to the layout HTML). Transphporm uses a top-down approach rather than the popular bottom-up approach where the child template is inserted into the layout at a specific point. 
+
+You still have two files, one for the layout and one for the content, but the TSS is applied to the *layout* which means the TSS can change anything in the layout you want (adding script tags, adding CSS, changing the page title and meta tags, etc)
+
+`layout.xml`
+
+```html
+<!DOCTYPE HTML>
+<html>
+	<head>
+		<title>My Website</title>
+	</head>
+	<body>
+		<header>
+			<img src="logo.png" />
+		</header>
+
+		<nav>
+			<ul>
+				<li><a href="/">Home</a></li>
+				<li><a href="about.html">About</a></li>
+				<li><a href="contact.html">Contact</a></li>
+			</ul>
+		</nav>
+
+		<main>
+			Main content
+
+		</main>
+
+		<footer>
+			Copyright <span>year</span>
+		</footer>
+	</body>
+</html>
+```
+
+And then `home.xml`:
+
+```html
+<?xml version="1.0"?>
+<template>
+	<p>Welcome to my website</p>
+</template>
+
+```
+
+The TSS file can then be used to include one inside another:
+
+`home.tss`
+
+```css
+
+title {content: "My Site"}
+
+main {content: template("home.xml")}
+
+footer span {content: "now"; format: date "Y"}
+
+```
+
+Which will then set the content of the `<main>` element to the content of the template stored in `home.xml` using the following code:
+
+
+```php
+$template = new \Transphporm\Builder('layout.xml', 'home.tss');
+
+echo $template->output()->body;
+
+```
+
+Obviously you could then add an about page by adding the relevant `about.xml` and then a TSS:
+
+```css
+
+title {content: "About me"}
+
+main {content: template("about.xml")}
+
+footer span {content: "now"; format: date "Y"}
+
+```
+
+
+```php
+$template = new \Transphporm\Builder('layout.xml', 'about.tss');
+
+echo $template->output()->body;
+
+```
+
+There's a little repetition here which can be solved in two ways. 
+
+### 1) Put the layout rules in their own file, e.g. base.tss:
+
+```css
+
+footer span {content: "now"; format: date "Y"}
+
+
+```
+
+
+And then import it in `about.tss` and `home.tss` e.g.
+
+```css
+
+@import "base.tss";
+
+title {content: "About me"}
+
+main {content: template("about.xml")}
+
+```
+
+
+### 2) Use data to describe the relevant parts externally:
+
+`page.tss`
+
+```css
+title {content: data(title);}
+
+main {content: template(data(page));}
+
+footer span {content: "now"; format: date "Y"}
+
+```
+
+
+```php
+
+//Home template:
+
+$template = new \Transphporm\Builder('layout.xml', 'page.tss');
+
+$template->output(['title' => 'My Website', 'page' => 'home.xml'])->body;
+
+
+
+//About template:
+$template = new \Transphporm\Builder('layout.xml', 'page.tss');
+
+$template->output(['title' => 'About Me', 'page' => 'about.xml'])->body;
+
+```
+
+
+This allows a top down approach. Most frameworks work on a bottom up approach where you build the layout, then build the content and put the output of one in the other. The presents a problem: How do you set the title per page? Or perhaps include a different sidebar on each page? Frameworks tend to do this using what are essentially global variables to store the page title and any layout options. TSS builds the entire page in one go, so any page can alter any part of the layout.
+
 
