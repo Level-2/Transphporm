@@ -937,11 +937,11 @@ Output:
 <ul>
 	<li>
 		<h3>Tom</h3>
-		<a href="Tom@example.org">Tom@example.org</span>
+		<a href="mailto:Tom@example.org">Tom@example.org</span>
 	</li>
 	<li>
 		<h3>Scott</h3>
-		<a href="scott@example.org">scott@example.org</span>
+		<a href="mailto:scott@example.org">scott@example.org</span>
 	</li>	
 </ul>
 ```

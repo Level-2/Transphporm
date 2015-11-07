@@ -4,12 +4,12 @@
 	"currency": "€",
 	"currency_position": "after",
 	"currency_decimals": "2",
-	"date_format": "d/m/Y",
+	"date_format": "d.m.Y",
 	"time_format": "H:i",
 	"timezone": "Europe/Berlin",
 	"offset_strings": {
 		"past": "vor %d %s",
-		"future": "In %d %s",
+		"future": "in %d %s",
 		"weeks_singular": "Woche",
 		"weeks_plural": "Wochen",
 		"days_singular": "Tag",
@@ -24,8 +24,10 @@
 		"minutes_plural": "Minuten",
 		"seconds_singular": "Sekunde",
 		"seconds_plural": "Sekunden",
-		"today": "Heute",
-		"yesterday": "Gestern",
-		"tomorrow": "Morgen"
+		"today": "heute",
+		"yesterday": "gestern",
+		"tomorrow": "morgen",
+		"day_before_yesterday": "übermorgen",
+		"day_after_tomorrow": "vorgestern"
 	}
 }
