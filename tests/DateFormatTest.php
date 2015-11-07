@@ -18,11 +18,11 @@ class DateFormatTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('25/12/2014 13:34', $this->getFormatter()->datetime('2014-12-25 13:34'));
 	}
 
-	private function relative($modify) {
+	private function relative($modify, $formatter = null) {
 		$date = new \DateTime();
 		$date->modify($modify);
 
-		$formatter = $this->getFormatter();
+		$formatter = empty($formatter) ? $this->getFormatter() : $formatter;
 
 		return $formatter->relative($date);
 	}
@@ -91,4 +91,28 @@ class DateFormatTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('In 15 years', $this->relative('+15 years'));
 	}
 
+	public function testDayBeforeYesterdayNotSet() {
+		$this->assertEquals('2 days ago', $this->relative('-2 days'));
+	}
+
+	public function testDayBeforeYesterdaySet() {
+		$locale = json_decode(file_get_contents('src/Formatter/Locale/enGB.json'), true);
+		$locale['offset_strings']['day_before_yesterday'] = 'custom day before yesterday string';
+		$formatter = new \Transphporm\Formatter\Date($locale);	
+
+		$this->assertEquals('custom day before yesterday string', $this->relative('-2 days', $formatter));
+	}
+
+
+	public function testDayAfterTomorrowNotSet() {
+		$this->assertEquals('In 2 days', $this->relative('+2 days'));
+	}
+
+	public function testDayAfterTomorrowSet() {
+		$locale = json_decode(file_get_contents('src/Formatter/Locale/enGB.json'), true);
+		$locale['offset_strings']['day_after_tomorrow'] = 'custom day after tomorrow string';
+		$formatter = new \Transphporm\Formatter\Date($locale);	
+
+		$this->assertEquals('custom day after tomorrow string', $this->relative('+2 days', $formatter));
+	}
 }
