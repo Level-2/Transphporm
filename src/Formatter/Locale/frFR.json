@@ -8,8 +8,8 @@
 	"time_format": "H:i",
 	"timezone": "Europe/Paris",
 	"offset_strings": {
-		"past": "Depuis %d %s",
-		"future": "Dans %d %s",
+		"past": "depuis %d %s",
+		"future": "dans %d %s",
 		"weeks_singular": "semaine",
 		"weeks_plural": "semaines",
 		"days_singular": "jour",
@@ -24,8 +24,10 @@
 		"minutes_plural": "minutes",
 		"seconds_singular": "seconde",
 		"seconds_plural": "secondes",
-		"today": "Aujourd'hui",
-		"yesterday": "Hier",
-		"tomorrow": "Demain"
+		"today": "aujourd'hui",
+		"yesterday": "hier",
+		"tomorrow": "demain",
+		"day_before_yesterday": "avant-hier",
+		"day_after_tomorrow": "après-demain"
 	}
 }
