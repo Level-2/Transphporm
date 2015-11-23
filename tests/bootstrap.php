@@ -3,7 +3,7 @@
  * @author          Tom Butler tom@r.je                                             *
  * @copyright       2015 Tom Butler <tom@r.je> | https://r.je/                      *
  * @license         http://www.opensource.org/licenses/bsd-license.php  BSD License *
- * @version         2.0                                                             */
+ * @version         0.9                                                             */
 //Autoloader for Vision classes
 spl_autoload_register(function($class) {
 	$parts = explode('\\', ltrim($class, '\\'));
