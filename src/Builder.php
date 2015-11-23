@@ -6,7 +6,6 @@ class Builder {
 	private $tss;
 	private $registeredProperties = [];
 	private $formatters = [];
-	private $isFile = false;
 	private $locale;
 	private $baseDir;
 
@@ -15,13 +14,12 @@ class Builder {
 			$this->template = file_get_contents($template);
 			if ($tss) {
 				$this->baseDir = dirname(realpath($tss)) . DIRECTORY_SEPARATOR;
-				$this->tss = file_get_contents($tss);	
+				$this->tss = trim(file_get_contents($tss));	
 			} 
-			$this->isFile = true;
 		}
 		else {
 			$this->template =  $template;
-			$this->tss = $tss;
+			$this->tss = trim($tss);
 		}	
 	}
 
@@ -32,7 +30,7 @@ class Builder {
 		$this->registerProperties($this->getBasicProperties($data, $locale, $headers));
 
 		//To be a valid XML document it must have a root element, automatically wrap it in <template> to ensure it does
-		$template = new Template($this->isFile ? $this->template : '<template>' . $this->template . '</template>');
+		$template = new Template($this->isValidDoc() ? $this->template : '<template>' . $this->template . '</template>' );
 		$rules = (new Sheet($this->tss, $this->baseDir, $template->getPrefix()))->parse();
 
 		foreach ($rules as $rule) {
@@ -70,5 +68,9 @@ class Builder {
 
 	public function setLocale($locale) {
 		$this->locale = $locale;
+	}
+
+	private function isValidDoc() {
+		return strpos($this->template, '<!') === 0 || strpos($this->template, '<?') === 0;
 	}
 }
