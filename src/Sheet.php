@@ -1,4 +1,9 @@
 <?php
+/* @description     Transformation Style Sheets - Revolutionising PHP templating    *
+ * @author          Tom Butler tom@r.je                                             *
+ * @copyright       2015 Tom Butler <tom@r.je> | https://r.je/                      *
+ * @license         http://www.opensource.org/licenses/bsd-license.php  BSD License *
+ * @version         2.0                                                             */
 namespace Transphporm;
 /** Parses a .cds file into individual rules, each rule has a query e,g, `ul li` and a set of rules e.g. `display: none; data: iteration(id);` */
 class Sheet {
