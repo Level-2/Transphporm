@@ -1060,9 +1060,42 @@ class TransphpormTest extends PHPUnit_Framework_TestCase {
 		$template = new \Transphporm\Builder($template, $tss);
 
 		$this->assertEquals($this->stripTabs('<div><span class="test">foobar</span></div>'), $this->stripTabs($template->output()->body));
-
-
 	
+	}
+
+	public function testBindFormArray() {
+		$tss = 'form {bind: data(array); }
+				form input[name]:attr(value) {content: data(attr(name))}';
+
+		$xml = '<form><input type="text" name="f1" /><input type="text" name="f2" /></form>';
+
+
+		$data = ['array' => ['f1' => 'v1', 'f2' => 'v2']];
+
+		$template = new \Transphporm\Builder($xml, $tss);
+
+		$this->assertEquals($this->stripTabs('<form><input type="text" name="f1" value="v1" /><input type="text" name="f2" value="v2" /></form>'), $this->stripTabs($template->output($data)->body));
+
+	}
+
+
+
+	public function testBindFormObject() {
+		$tss = 'form {bind: data(object); }
+				form input[name]:attr(value) {content: data(attr(name))}';
+
+		$xml = '<form><input type="text" name="f1" /><input type="text" name="f2" /></form>';
+
+
+		$obj = new stdclass;
+		$obj->f1 = 'v1';
+		$obj->f2 = 'v2';
+		$data = ['object' => $obj];
+
+		$template = new \Transphporm\Builder($xml, $tss);
+
+		$this->assertEquals($this->stripTabs('<form><input type="text" name="f1" value="v1" /><input type="text" name="f2" value="v2" /></form>'), $this->stripTabs($template->output($data)->body));
+
 	}
 }
 
