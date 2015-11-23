@@ -51,7 +51,7 @@ class Sheet {
 
 	private function processingInstructions($tss, $pos, $next) {
 		$rules = [];
-		while ($atPos = strpos($tss, '@', $pos)) {
+		while (($atPos = strpos($tss, '@', $pos)) !== false) {
 			if ($atPos  <= (int) $next) {
 				$spacePos = strpos($tss, ' ', $atPos);
 				$funcName = substr($tss, $atPos+1, $spacePos-$atPos-1);
@@ -59,14 +59,14 @@ class Sheet {
 				$args = substr($tss, $spacePos+1, $pos-$spacePos-1);
 				$rules = array_merge($rules, $this->$funcName($args));
 			}
-			else return false;
+			else break;
 		}
+
 		return empty($rules) ? false : ['endPos' => $pos, 'rules' => $rules];
 	}
 
 	private function import($args) {
 		$sheet = new Sheet(file_get_contents($this->baseDir . trim($args, '\'" ')), $this->baseDir);
-		var_dump($sheet->parse());
 		return $sheet->parse();
 	}
 
