@@ -26,8 +26,6 @@
 		"seconds_plural": "seconds",
 		"today": "today",
 		"yesterday": "yesterday",
-		"tomorrow": "tomorrow",
-		"day_before_yesterday": "the day before yesterday",
-		"day_after_tomorrow": "the day after tomorrow"
+		"tomorrow": "tomorrow"
 	}
 }
