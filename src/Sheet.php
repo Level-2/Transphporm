@@ -49,20 +49,24 @@ class Sheet {
 		return $rules;
 	}
 
-	private function processingInstructions($tss, $pos, $next) {		
-		$atPos = strpos($tss, '@', $pos);
-		if ($atPos !== false && $atPos <= (int) $next) {
-			$spacePos = strpos($tss, ' ', $atPos);
-			$funcName = substr($tss, $atPos+1, $spacePos-$atPos-1);
-			$endPos = strpos($tss, ';', $spacePos);
-			$args = substr($tss, $spacePos+1, $endPos-$spacePos-1);
-			return ['rules' => $this->$funcName($args), 'endPos' => $endPos];
+	private function processingInstructions($tss, $pos, $next) {
+		$rules = [];
+		while ($atPos = strpos($tss, '@', $pos)) {
+			if ($atPos  <= (int) $next) {
+				$spacePos = strpos($tss, ' ', $atPos);
+				$funcName = substr($tss, $atPos+1, $spacePos-$atPos-1);
+				$pos = strpos($tss, ';', $spacePos);
+				$args = substr($tss, $spacePos+1, $pos-$spacePos-1);
+				$rules = array_merge($rules, $this->$funcName($args));
+			}
+			else return false;
 		}
-		else return false;
+		return empty($rules) ? false : ['endPos' => $pos, 'rules' => $rules];
 	}
 
 	private function import($args) {
 		$sheet = new Sheet(file_get_contents($this->baseDir . trim($args, '\'" ')), $this->baseDir);
+		var_dump($sheet->parse());
 		return $sheet->parse();
 	}
 

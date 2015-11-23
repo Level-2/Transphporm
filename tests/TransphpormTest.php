@@ -674,6 +674,52 @@ class TransphpormTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals($this->stripTabs('<span>test1</span><div>foo</div><h1>h1</h1>'), $this->stripTabs($template->output()->body));
 	}
 
+	public function testMultiImport() {
+		$template = '
+			<span>test</span>
+			<div>Test</div>
+			<h1>foo</h1>
+		';
+
+		$file = __DIR__ . DIRECTORY_SEPARATOR . 'import.tss';
+		$file2 = __DIR__ . DIRECTORY_SEPARATOR . 'import2.tss';
+		$tss = "
+			span {content: 'test1';}
+			@import '$file';
+			h1 {content: 'h1';}
+			@import '$file2';
+		";
+
+		$template = new \Transphporm\Builder($template, $tss);
+
+		$this->assertEquals($this->stripTabs('<span>bar</span><div>foo</div><h1>h1</h1>'), $this->stripTabs($template->output()->body));
+			
+	}
+
+
+	public function testMultiImportTogether() {
+		$template = '
+			<span>test</span>
+			<div>Test</div>
+			<h1>foo</h1>
+		';
+
+		$file = __DIR__ . DIRECTORY_SEPARATOR . 'import.tss';
+		$file2 = __DIR__ . DIRECTORY_SEPARATOR . 'import2.tss';
+		$tss = "
+			span {content: 'test1';}
+			@import '$file';			
+			@import '$file2';
+			h1 {content: 'h1';}
+			
+		";
+
+		$template = new \Transphporm\Builder($template, $tss);
+
+		$this->assertEquals($this->stripTabs('<span>bar</span><div>foo</div><h1>h1</h1>'), $this->stripTabs($template->output()->body));
+			
+	}
+
 	public function testContentTemplate() {
 		$template = '
 			<div>Test</div>
