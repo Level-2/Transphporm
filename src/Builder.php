@@ -13,19 +13,13 @@ class Builder {
 	private $formatters = [];
 	private $locale;
 	private $baseDir;
+	private $cache;
+	private $userCache;
 
 	public function __construct($template, $tss = '') {
-		if (trim($template)[0] !== '<') {
-			$this->template = file_get_contents($template);
-			if ($tss) {
-				$this->baseDir = dirname(realpath($tss)) . DIRECTORY_SEPARATOR;
-				$this->tss = trim(file_get_contents($tss));	
-			} 
-		}
-		else {
-			$this->template =  $template;
-			$this->tss = trim($tss);
-		}	
+		$this->template = $template;
+		$this->tss = $tss;
+		$this->cache = new FileCache(new \ArrayObject());
 	}
 
 	public function output($data = null, $document = false) {
@@ -34,18 +28,44 @@ class Builder {
 		$headers = [];
 		$this->registerProperties($this->getBasicProperties($data, $locale, $headers));
 
+		$cachedOutput = $this->loadTemplate();
+		$xml = $cachedOutput['body'];
 		//To be a valid XML document it must have a root element, automatically wrap it in <template> to ensure it does
-		$template = new Template($this->isValidDoc() ? $this->template : '<template>' . $this->template . '</template>' );
-		$rules = (new Sheet($this->tss, $this->baseDir, $template->getPrefix()))->parse();
+		$template = new Template($this->isValidDoc($xml) ? $xml : '<template>' . $xml . '</template>' );
+		$time = time();
 
-		foreach ($rules as $rule) {
-			$hook = new Hook\Rule($rule->properties, new Hook\PseudoMatcher($rule->pseudo, $data), $data);
-			foreach ($this->registeredProperties as $properties) $hook->registerProperties($properties);
-			$template->addHook($rule->query, $hook);	
+		foreach ($this->getRules($template) as $rule) {
+			if ($rule->shouldRun($time)) {
+				$rule->touch();
+				$hook = new Hook\Rule($rule->properties, new Hook\PseudoMatcher($rule->pseudo, $data), $data);
+				foreach ($this->registeredProperties as $properties) $hook->registerProperties($properties);
+				$template->addHook($rule->query, $hook);
+			}			
 		}
 		
-		$output = $template->output($document);		
-		return (object) ['headers' => $headers, 'body' => $output];
+		$output = $template->output($document);	
+		$result = ['headers' => array_merge($cachedOutput['headers'], $headers), 'body' => $output];
+		$this->cache->write($this->template, $result);
+		return (object) $result;
+	}
+
+	private function loadTemplate() {
+		if (trim($this->template)[0] !== '<') {			
+			$xml = $this->cache->load($this->template, filemtime($this->template));
+			return $xml ? $xml : $this->cache->write($this->template, ['body' => file_get_contents($this->template), 'headers' => []]);
+		}
+		else return ['body' => $this->template, 'headers' => []];	
+	}
+
+	private function getRules($template) {		
+		if (is_file($this->tss)) {
+			$this->baseDir = dirname(realpath($this->tss)) . DIRECTORY_SEPARATOR;
+			$key = $this->tss . $template->getPrefix() . $this->baseDir;
+			$rules = $this->cache->load($key, filemtime($this->tss));
+			if (!$rules) return $this->cache->write($key, (new Sheet(file_get_contents($this->tss), $this->baseDir, $template->getPrefix()))->parse());
+			else return $rules;
+		}
+		else return (new Sheet($this->tss, $this->baseDir, $template->getPrefix()))->parse();
 	}
 
 	private function getBasicProperties($data, $locale, &$headers) {
@@ -54,7 +74,12 @@ class Builder {
 		$basicProperties->registerFormatter(new Formatter\Date($locale));
 		$basicProperties->registerFormatter(new Formatter\StringFormatter());
 		foreach ($this->formatters as $formatter) $basicProperties->registerFormatter($formatter);
-		return $basicProperties;
+
+		return isset($this->userCache) ? new Hook\Cache($basicProperties, $this->userCache) : $basicProperties;
+	}
+
+	public function setCache(\ArrayAccess $cache) {
+		$this->cache = new FileCache($cache);
 	}
 
 	private function getLocale() {
@@ -75,7 +100,7 @@ class Builder {
 		$this->locale = $locale;
 	}
 
-	private function isValidDoc() {
-		return strpos($this->template, '<!') === 0 || strpos($this->template, '<?') === 0;
+	private function isValidDoc($xml) {
+		return strpos($xml, '<!') === 0 || strpos($xml, '<?') === 0;
 	}
 }

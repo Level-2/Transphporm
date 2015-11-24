@@ -37,13 +37,8 @@ class Sheet {
 	}
 
 	private function CssToRule($selector, $index) {
-		$rule = new \stdclass;
 		$xPath = new CssToXpath($selector, $this->prefix);
-		$rule->query = $xPath->getXpath();
-		$rule->pseudo = $xPath->getPseudo();
-		$rule->depth = $xPath->getDepth();
-		$rule->index = $index++;
-
+		$rule = new Rule($xPath->getXpath(), $xPath->getPseudo(), $xPath->getDepth(), $index++);
 		return $rule;
 	}
 
