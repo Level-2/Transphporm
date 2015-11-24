@@ -35,18 +35,20 @@ class Builder {
 		$time = time();
 
 		foreach ($this->getRules($template) as $rule) {
-			if ($rule->shouldRun($time)) {
-				$rule->touch();
-				$hook = new Hook\Rule($rule->properties, new Hook\PseudoMatcher($rule->pseudo, $data), $data);
-				foreach ($this->registeredProperties as $properties) $hook->registerProperties($properties);
-				$template->addHook($rule->query, $hook);
-			}			
+			if ($rule->shouldRun($time)) $this->executeTssRule($rule, $template, $data);			
 		}
 		
 		$output = $template->output($document);	
 		$result = ['headers' => array_merge($cachedOutput['headers'], $headers), 'body' => $output];
 		$this->cache->write($this->template, $result);
 		return (object) $result;
+	}
+
+	private function executeTssRule($rule, $template, $data) {
+		$rule->touch();
+		$hook = new Hook\Rule($rule->properties, new Hook\PseudoMatcher($rule->pseudo, $data), $data);
+		foreach ($this->registeredProperties as $properties) $hook->registerProperties($properties);
+		$template->addHook($rule->query, $hook);
 	}
 
 	private function loadTemplate() {
