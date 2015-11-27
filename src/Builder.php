@@ -19,7 +19,7 @@ class Builder {
 	public function __construct($template, $tss = '') {
 		$this->template = $template;
 		$this->tss = $tss;
-		$this->cache = new FileCache(new \ArrayObject());
+		$this->cache = new Cache(new \ArrayObject());
 	}
 
 	public function output($data = null, $document = false) {
@@ -81,7 +81,7 @@ class Builder {
 	}
 
 	public function setCache(\ArrayAccess $cache) {
-		$this->cache = new FileCache($cache);
+		$this->cache = new Cache($cache);
 	}
 
 	private function getLocale() {

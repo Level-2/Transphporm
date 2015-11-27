@@ -5,7 +5,7 @@
  * @license         http://www.opensource.org/licenses/bsd-license.php  BSD License *
  * @version         0.9                                                             */
 namespace Transphporm;
-class FileCache {
+class Cache {
 	private $cache;
 
 	public function __construct(\ArrayAccess $cache) {
