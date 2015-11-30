@@ -112,6 +112,23 @@ $template = new \Transphporm\Builder('template.xml', 'stylesheet.tss');
 
 ```
 
+
+# Installation
+
+The preferred method of installing Transphprom is via composer. However, if you don't want to use composer you can manually install Transphporm:
+
+1. Download and extract Transphporm into your project
+2. Use a PSR-0 compliant autoloader such as [Axel](https://github.com/Level-2/Axel)
+3. Register Transphporm's `src` directory with the autoloader. Using Axel this is done via:
+
+```php
+require_once 'axel/axel.php';
+$axel = new \Axel\Axel;
+$axel->addModule(new \Axel\Module\PSR0('./path/to/Transphporm/src', '\\Transphporm'));
+```
+
+
+
 ### Data
 
 It's not usually possible to specify the content in a static file like a stylesheet. The `tss` format also allows referencing external data. This data is supplied using to the template builder's `output` method and can be referened in the stylesheet using the `data()` function. This can be though of like the `url()` function in CSS, in that it references an external resource.
@@ -1493,5 +1510,7 @@ $template->output(['title' => 'About Me', 'page' => 'about.xml'])->body;
 
 
 This allows a top down approach. Most frameworks work on a bottom up approach where you build the layout, then build the content and put the output of one in the other. The presents a problem: How do you set the title per page? Or perhaps include a different sidebar on each page? Frameworks tend to do this using what are essentially global variables to store the page title and any layout options. TSS builds the entire page in one go, so any page can alter any part of the layout.
+
+
 
 
