@@ -22,7 +22,7 @@ class Builder {
 		$this->cache = new Cache(new \ArrayObject());
 	}
 
-	public function output($data = null, $document = false) {
+	public function output($data = null, $document = false, $time = null) {
 		$locale = $this->getLocale();
 		$data = new Hook\DataFunction(new \SplObjectStorage(), $data, $locale, $this->baseDir);
 		$headers = [];
@@ -32,7 +32,9 @@ class Builder {
 		$xml = $cachedOutput['body'];
 		//To be a valid XML document it must have a root element, automatically wrap it in <template> to ensure it does
 		$template = new Template($this->isValidDoc($xml) ? $xml : '<template>' . $xml . '</template>' );
-		$time = time();
+
+		//Allow $time to be set via arguments to spoof time passage during tests
+		if (!$time) $time = time();
 
 		foreach ($this->getRules($template) as $rule) {
 			if ($rule->shouldRun($time)) $this->executeTssRule($rule, $template, $data);			

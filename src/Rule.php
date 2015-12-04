@@ -39,6 +39,15 @@ class Rule {
 			$frequency = $this->properties['update-frequency'];
 			$static = ['always' => true, 'never' => false];
 			if (isset($static[$frequency])) return $static[$frequency];
+
+			$num = (int) $frequency;
+			$unit = strtoupper(trim(str_replace($num, '', $frequency)));
+			
+			$offset = $num * constant(self::class . '::' . $unit);
+
+			if ($time > $this->lastRun + $offset) return true;
+			else return false;
+
 		}
 		else return true;
 	}

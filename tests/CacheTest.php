@@ -17,15 +17,55 @@ class CacheTest extends PHPUnit_Framework_TestCase {
 		return __DIR__ . DIRECTORY_SEPARATOR . 'temp.xml';	
 	}
 
-	public function testCacheBasic() {
-
+	private function createFiles() {
 		$xml = $this->makeXML('
 				<div>test</div>
 		');
 
 		$css = $this->makeTss('div {content: data(getRand); update-frequency: never;}');
 
+		return [$xml, $css];
+	}
 
+	private function buildTemplateWithRandom($xml, $css, $cache, $random) {
+
+		$template = new Builder($xml, $css);
+		$template->setCache($cache);
+
+		return  $template->output($random)->body;
+	}
+
+	public function testCacheBasic() {
+
+		$cache = new \ArrayObject;
+		$args = $this->createFiles();
+		$args[] = $cache;
+		$random = new RandomGenerator;
+		$args[] = $random;
+
+
+		$o1 = $this->buildTemplateWithRandom(...$args);
+
+		$o2 = $this->buildTemplateWithRandom(...$args);
+
+		// If the cache is working, the content should not be updated the second time
+		$this->assertEquals($o1, $o2);
+
+		//And the getRand function on the random class should only be called once
+		$this->assertEquals(1, $random->getCount());
+
+	}
+
+
+	public function testCacheMinutes() {
+		$xml = $this->makeXML('
+				<div>test</div>
+		');
+
+		$css = $this->makeTss('div {content: data(getRand); update-frequency: 10m;}');
+
+		$date = new \DateTime();
+		
 		$random = new RandomGenerator;
 		$cache = new \ArrayObject;
 
@@ -44,6 +84,17 @@ class CacheTest extends PHPUnit_Framework_TestCase {
 
 		//And the getRand function on the random class should only be called once
 		$this->assertEquals(1, $random->getCount());
+
+		$date->modify('+11 minutes');
+
+
+		$template = new Builder($xml, $css);
+		$template->setCache($cache);
+
+		$o3 = $template->output($random, false, $date->format('U'))->body;
+
+		$this->assertNotEquals($o3, $o1);
+		$this->assertEquals(2, $random->getCount());
 
 	}
 

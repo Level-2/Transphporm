@@ -1,1 +1,1 @@
-div {content: data(getRand); update-frequency: never;}
+div {content: data(getRand); update-frequency: 10m;}

@@ -12,7 +12,7 @@ class Cache {
 		$this->cache = $cache;
 	}
 
-	public function write($key, $content) {		
+	public function write($key, $content) {
 		$this->cache[$key] = ['content' => $content, 'timestamp' => time()];		
 		return $content;
 	}
