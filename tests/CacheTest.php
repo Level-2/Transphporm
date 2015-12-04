@@ -32,11 +32,13 @@ class CacheTest extends PHPUnit_Framework_TestCase {
 		return [$xml, $css];
 	}
 
-	private function buildTemplate($frequency, $cache) {
+	private function buildTemplate($frequency, $cache, $time = null) {
 		list($xml, $css) = $this->createFiles($frequency);
 
 		$template = new Builder($xml, $css);
+		if ($time) $template->setTime($time);
 		$template->setCache($cache);
+
 
 		return  $template;
 	}
@@ -87,7 +89,7 @@ class CacheTest extends PHPUnit_Framework_TestCase {
 		$date->modify('+11 minutes');
 
 
-		$o3 = $this->buildTemplate('10m', $cache)->output($random, false, $date->format('U'))->body;
+		$o3 = $this->buildTemplate('10m', $cache, $date->format('U'))->output($random, false)->body;
 
 		//The random nummber should now be refreshed and the contents changed
 		$this->assertNotEquals($o3, $o1);

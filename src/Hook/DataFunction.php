@@ -22,10 +22,13 @@ class DataFunction {
 	/** Binds data to an element */
 	public function bind(\DomElement $element, $data) {
 		//This is a bit of a hack to workaround #24, might need a better way of doing this if it causes a problem
-		if (is_array($data) && count($data) === 1 && isset($data[0]) && is_object($data[0])) $data = $data[0];
+		if (is_array($data) && $this->isObjectArray($data)) $data = $data[0];
 		$this->dataStorage[$element] = $data;
 	}
 
+	private function isObjectArray(array $data) {
+		return count($data) === 1 && isset($data[0]) && is_object($data[0]);
+	}
 	public function iteration($val, $element) {
 		$data = $this->getData($element);
 		$value = $this->traverse($val, $data);

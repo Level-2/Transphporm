@@ -120,7 +120,7 @@ class BasicProperties {
 	}
 
 	public function display($value, $element) {
-		if (strtolower($value[0]) === 'none') $element->parentNode->removeChild($element);
+		if (strtolower($value[0]) === 'none') $element->setAttribute('transphporm', 'remove');
 	}
 
 	public function bind($value, $element) {

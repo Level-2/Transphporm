@@ -15,6 +15,7 @@ class Builder {
 	private $baseDir;
 	private $cache;
 	private $userCache;
+	private $time;
 
 	public function __construct($template, $tss = '') {
 		$this->template = $template;
@@ -22,7 +23,11 @@ class Builder {
 		$this->cache = new Cache(new \ArrayObject());
 	}
 
-	public function output($data = null, $document = false, $time = null) {
+	public function setTime($time) {
+		$this->time = $time;
+	}
+
+	public function output($data = null, $document = false) {
 		$locale = $this->getLocale();
 		$data = new Hook\DataFunction(new \SplObjectStorage(), $data, $locale, $this->baseDir);
 		$headers = [];
@@ -34,15 +39,16 @@ class Builder {
 		$template = new Template($this->isValidDoc($xml) ? $xml : '<template>' . $xml . '</template>' );
 
 		//Allow $time to be set via arguments to spoof time passage during tests
-		if (!$time) $time = time();
-
 		foreach ($this->getRules($template) as $rule) {
-			if ($rule->shouldRun($time)) $this->executeTssRule($rule, $template, $data);			
+			if ($rule->shouldRun($this->time)) $this->executeTssRule($rule, $template, $data);			
 		}
 		
-		$output = $template->output($document);	
+		$output = $template->output($document);
 		$result = ['headers' => array_merge($cachedOutput['headers'], $headers), 'body' => $output];
 		$this->cache->write($this->template, $result);
+		//Add the postprocessing hook
+		$template->addHook('//*[@transphporm]', new Hook\PostProcess());
+		$result['body'] = $template->output($document);
 		return (object) $result;
 	}
 

@@ -40,6 +40,7 @@ class Template {
 		foreach ($this->hooks as list($query, $hook)) {
 			foreach ($this->xpath->query($query) as $element) $hook->run($element);
 		}
+		$this->hooks = [];
 	}
 
 	/** Prints out the current DomDocument as HTML */
