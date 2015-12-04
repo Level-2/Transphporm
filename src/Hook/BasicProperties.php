@@ -121,6 +121,7 @@ class BasicProperties {
 
 	public function display($value, $element) {
 		if (strtolower($value[0]) === 'none') $element->setAttribute('transphporm', 'remove');
+		else $element->setAttribute('transphporm', 'show');
 	}
 
 	public function bind($value, $element) {

@@ -97,6 +97,50 @@ class CacheTest extends PHPUnit_Framework_TestCase {
 
 	}
 
+	public function testCacheDisplay() {
+		$xml = $this->makeXml('<div>
+			<span>Test</span>
+			</div>');
+
+		$tss = $this->makeTss('
+			span {display: block; update-frequency: 10m}
+			span:data[show=false] { display:none; update-frequency: 10m }');
+
+		$cache = new \ArrayObject();
+
+		$template = new \Transphporm\Builder($xml, $tss);
+		$template->setCache($cache);
+
+		//Hide the span
+		$o1 = $template->output(['show' => false])->body;
+		
+		$this->assertFalse(strpos($o1, '<span>'));
+
+
+		//The span should still be hidden even if the data has changed due to the cache
+		$template = new \Transphporm\Builder($xml, $tss);
+		$template->setCache($cache);
+
+		$o1 = $template->output(['show' => true])->body;
+		
+		$this->assertFalse(strpos($o1, '<span>'));
+
+	
+		//Expire the cache by advancing time 10 mintes
+		$date = new \DateTime();
+		$date->modify('+11 minutes');
+
+
+					
+		$template = new \Transphporm\Builder($xml, $tss);
+		$template->setCache($cache);
+		$template->setTime($date->format('U'));
+
+		$o1 = $template->output(['show' => true])->body;
+		
+		//This time the span should be visible
+		$this->assertTrue((bool) strpos($o1, '<span>'));
+	}
 
 }
 

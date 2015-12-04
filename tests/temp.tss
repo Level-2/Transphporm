@@ -1,1 +1,3 @@
-div {content: data(getRand); update-frequency: 10m;}
+
+			span {display: block; update-frequency: 10m}
+			span:data[show=false] { display:none; update-frequency: 10m }

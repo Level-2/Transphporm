@@ -9,6 +9,7 @@ namespace Transphporm\Hook;
 class PostProcess implements \Transphporm\Hook {
 	public function run(\DomElement $element) {
 		$transphporm = $element->getAttribute('transphporm');
+		var_dump($transphporm);
 		if ($transphporm == 'remove') $element->parentNode->removeChild($element);
 		else $element->removeAttribute('transphporm');
 	}
