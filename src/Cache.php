@@ -13,11 +13,12 @@ class Cache {
 	}
 
 	public function write($key, $content) {
-		$this->cache[$key] = ['content' => $content, 'timestamp' => time()];		
+		$this->cache[md5($key)] = ['content' => $content, 'timestamp' => time()];		
 		return $content;
 	}
 
 	public function load($key, $modified = 0) {
+		$key = md5($key);
 		if (isset($this->cache[$key]) && $this->cache[$key]['timestamp'] >= $modified) {
 			return $this->cache[$key]['content'];
 		}

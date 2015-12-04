@@ -59,7 +59,9 @@ class Sheet {
 				$args = substr($tss, $spacePos+1, $pos-$spacePos-1);
 				$rules = array_merge($rules, $this->$funcName($args));
 			}
-			else break;
+			else {
+				break;	
+			} 
 		}
 
 		return empty($rules) ? false : ['endPos' => $pos, 'rules' => $rules];

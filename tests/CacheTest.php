@@ -7,46 +7,55 @@
 use Transphporm\Builder;
 class CacheTest extends PHPUnit_Framework_TestCase {
 
+	private function writeFile($name, $contents) {
+		if (file_get_contents($name) != $contents) {
+			file_put_contents($name, $contents)	;
+		}
+	}
 	private function makeTss($tss) {
-		file_put_contents(__DIR__ . DIRECTORY_SEPARATOR . 'temp.tss', $tss);
+		$this->writeFile(__DIR__ . DIRECTORY_SEPARATOR . 'temp.tss', $tss);
 		return __DIR__ . DIRECTORY_SEPARATOR . 'temp.tss';
 	}
 
 	private function makeXml($xml) {
-		file_put_contents(__DIR__ . DIRECTORY_SEPARATOR . 'temp.xml', $xml);
+		$this->writeFile(__DIR__ . DIRECTORY_SEPARATOR . 'temp.xml', $xml);
 		return __DIR__ . DIRECTORY_SEPARATOR . 'temp.xml';	
 	}
 
-	private function createFiles() {
+	private function createFiles($frequency) {
 		$xml = $this->makeXML('
 				<div>test</div>
 		');
 
-		$css = $this->makeTss('div {content: data(getRand); update-frequency: never;}');
+		$css = $this->makeTss('div {content: data(getRand); update-frequency: ' . $frequency . ';}');
 
 		return [$xml, $css];
 	}
 
-	private function buildTemplateWithRandom($xml, $css, $cache, $random) {
+	private function buildTemplate($frequency, $cache) {
+		list($xml, $css) = $this->createFiles($frequency);
 
 		$template = new Builder($xml, $css);
 		$template->setCache($cache);
 
-		return  $template->output($random)->body;
+		return  $template;
+	}
+
+	public function testCacheWrite() {
+				$cache = new \ArrayObject;
+		$random = new RandomGenerator;
+
+				$o1 = $this->buildTemplate('never', $cache)->output($random)->body;
+
 	}
 
 	public function testCacheBasic() {
 
 		$cache = new \ArrayObject;
-		$args = $this->createFiles();
-		$args[] = $cache;
 		$random = new RandomGenerator;
-		$args[] = $random;
-
-
-		$o1 = $this->buildTemplateWithRandom(...$args);
-
-		$o2 = $this->buildTemplateWithRandom(...$args);
+		
+		$o1 = $this->buildTemplate('never', $cache)->output($random)->body;
+		$o2 = $this->buildTemplate('never', $cache)->output($random)->body;
 
 		// If the cache is working, the content should not be updated the second time
 		$this->assertEquals($o1, $o2);
@@ -58,41 +67,29 @@ class CacheTest extends PHPUnit_Framework_TestCase {
 
 
 	public function testCacheMinutes() {
-		$xml = $this->makeXML('
-				<div>test</div>
-		');
-
-		$css = $this->makeTss('div {content: data(getRand); update-frequency: 10m;}');
-
-		$date = new \DateTime();
 		
-		$random = new RandomGenerator;
 		$cache = new \ArrayObject;
+		$random = new RandomGenerator;
+	
+		$o1 = $this->buildTemplate('10m', $cache)->output($random)->body;
+		$o2 = $this->buildTemplate('10m', $cache)->output($random)->body;
 
-		$template = new Builder($xml, $css);
-		$template->setCache($cache);
-
-		$o1 = $template->output($random)->body;
 		
-		$template = new Builder($xml, $css);
-		$template->setCache($cache);
-
-		$o2 = $template->output($random)->body;
-
 		// If the cache is working, the content should not be updated the second time
 		$this->assertEquals($o1, $o2);
 
 		//And the getRand function on the random class should only be called once
 		$this->assertEquals(1, $random->getCount());
 
+
+		//advance the clock 11 minutes so the cache is expired
+		$date = new \DateTime();
 		$date->modify('+11 minutes');
 
 
-		$template = new Builder($xml, $css);
-		$template->setCache($cache);
+		$o3 = $this->buildTemplate('10m', $cache)->output($random, false, $date->format('U'))->body;
 
-		$o3 = $template->output($random, false, $date->format('U'))->body;
-
+		//The random nummber should now be refreshed and the contents changed
 		$this->assertNotEquals($o3, $o1);
 		$this->assertEquals(2, $random->getCount());
 
