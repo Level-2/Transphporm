@@ -43,10 +43,8 @@ class Builder {
 			if ($rule->shouldRun($this->time)) $this->executeTssRule($rule, $template, $data);			
 		}
 		
-		$output = $template->output($document);
-		$result = ['headers' => array_merge($cachedOutput['headers'], $headers), 'body' => $output];
+		$result = ['headers' => array_merge($cachedOutput['headers'], $headers), 'body' => $template->output($document)];
 		$this->cache->write($this->template, $result);
-		//Add the postprocessing hook
 		$template->addHook('//*[@transphporm]', new Hook\PostProcess());
 		$result['body'] = $template->output($document);
 		return (object) $result;
