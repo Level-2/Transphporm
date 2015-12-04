@@ -44,10 +44,15 @@ class Builder {
 		}
 		
 		$result = ['headers' => array_merge($cachedOutput['headers'], $headers), 'body' => $template->output($document)];
-		$this->cache->write($this->template, $result);
-		$template->addHook('//*[@transphporm]', new Hook\PostProcess());
-		$result['body'] = $template->output($document);
+		$this->cache->write($this->template, $result);		
+		$result['body'] = $this->doPostProcessing($template)->output($document);
+		
 		return (object) $result;
+	}
+
+	private function doPostProcessing($template) {
+		$template->addHook('//*[@transphporm]', new Hook\PostProcess());
+		return $template;
 	}
 
 	private function executeTssRule($rule, $template, $data) {
