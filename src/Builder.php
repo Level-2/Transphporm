@@ -34,9 +34,8 @@ class Builder {
 		$this->registerProperties($this->getBasicProperties($data, $locale, $headers));
 
 		$cachedOutput = $this->loadTemplate();
-		$xml = $cachedOutput['body'];
 		//To be a valid XML document it must have a root element, automatically wrap it in <template> to ensure it does
-		$template = new Template($this->isValidDoc($xml) ? $xml : '<template>' . $xml . '</template>' );
+		$template = new Template($this->isValidDoc($cachedOutput['body']) ? $cachedOutput['body'] : '<template>' . $cachedOutput['body'] . '</template>' );
 
 		//Allow $time to be set via arguments to spoof time passage during tests
 		foreach ($this->getRules($template) as $rule) {
@@ -46,7 +45,7 @@ class Builder {
 		$result = ['headers' => array_merge($cachedOutput['headers'], $headers), 'body' => $template->output($document)];
 		$this->cache->write($this->template, $result);		
 		$result['body'] = $this->doPostProcessing($template)->output($document);
-		
+
 		return (object) $result;
 	}
 
