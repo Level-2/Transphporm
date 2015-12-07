@@ -1108,6 +1108,17 @@ class TransphpormTest extends PHPUnit_Framework_TestCase {
 
 		$this->assertEquals('<!DOCTYPE html><html><body>bar</body></html>', $this->stripTabs($template->output()->body));
 	}
+
+	public function testDoctypeFile() {
+		file_put_contents(__DIR__ . '/test.xml', $xml = '<!DOCTYPE html><html><body>foo</body></html>');
+
+		$xml = __DIR__ . '/test.xml';
+		$tss = 'body {content: "bar";}';
+
+		$template = new \Transphporm\Builder($xml, $tss);
+
+		$this->assertEquals('<!DOCTYPE html><html><body>bar</body></html>', $this->stripTabs($template->output()->body));
+	}
 }
 
 
