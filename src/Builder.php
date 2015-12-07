@@ -42,7 +42,7 @@ class Builder {
 			if ($rule->shouldRun($this->time)) $this->executeTssRule($rule, $template, $data);			
 		}
 		
-		$result = ['headers' => array_merge($cachedOutput['headers'], $headers), 'body' => $template->output($document)];
+		$result = ['body' => $template->output($document), 'headers' => array_merge($cachedOutput['headers'], $headers)];
 		$this->cache->write($this->template, $result);		
 		$result['body'] = $this->doPostProcessing($template)->output($document);
 

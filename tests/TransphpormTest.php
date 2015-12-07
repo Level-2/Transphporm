@@ -997,7 +997,6 @@ class TransphpormTest extends PHPUnit_Framework_TestCase {
 		$tss = 'html:header[location] {content: "/test"}';
 
 		$template = new \Transphporm\Builder($template, $tss);
-
 		$this->assertEquals([['location', '/test']], $template->output()->headers);
 
 	}
@@ -1110,7 +1109,7 @@ class TransphpormTest extends PHPUnit_Framework_TestCase {
 	}
 
 	public function testDoctypeFile() {
-		file_put_contents(__DIR__ . '/test.xml', $xml = '<!DOCTYPE html><html><body>foo</body></html>');
+		file_put_contents(__DIR__ . '/test.xml', '<!DOCTYPE html><html><body>foo</body></html>');
 
 		$xml = __DIR__ . '/test.xml';
 		$tss = 'body {content: "bar";}';
