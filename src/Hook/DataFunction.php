@@ -23,7 +23,7 @@ class DataFunction {
 	public function bind(\DomElement $element, $data, $type = 'data') {
 		//This is a bit of a hack to workaround #24, might need a better way of doing this if it causes a problem
 		if (is_array($data) && $this->isObjectArray($data)) $data = $data[0];
-		$content = isset($this->dataStorage[$element]) ? $this->dataStorage[$elemnt] : [];
+		$content = isset($this->dataStorage[$element]) ? $this->dataStorage[$element] : [];
 		$content[$type] = $data;
 		$this->dataStorage[$element] = $content;
 	}
@@ -35,6 +35,11 @@ class DataFunction {
 		$data = $this->getData($element, 'iteration');
 		$value = $this->traverse($val, $data);
 		return $value;
+	}
+
+	public function key($val, $element) {
+		$data = $this->getData($element, 'key');
+		return $data;
 	}
 
 	/** Returns the data that has been bound to $element, or, if no data is bound to $element climb the DOM tree to find the data bound to a parent node*/

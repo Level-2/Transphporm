@@ -97,9 +97,10 @@ class BasicProperties {
 	}
 
 	public function repeat($value, $element, $rule) {
-		foreach ($value as $iteration) {
+		foreach ($value as $key => $iteration) {
 			$clone = $element->cloneNode(true);
 			$this->data->bind($clone, $iteration, 'iteration');
+			$this->data->bind($clone, $key, 'key');
 			$element->parentNode->insertBefore($clone, $element);
 
 			//Re-run the hook on the new element, but use the iterated data

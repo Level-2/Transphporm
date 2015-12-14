@@ -1152,6 +1152,47 @@ class TransphpormTest extends PHPUnit_Framework_TestCase {
 			<li>TEST3</li>
 		</ul>'));
 	}
+
+	public function testIterationKey() {
+		$xml = '<ul>
+			<li>
+				<span>key</span>
+				<p>value</p>
+			</li>
+		</ul>';
+
+
+		$data = [
+			'One' => '1',
+			'Two' => '2',
+			'Three' => '3'
+		];
+
+		$tss = 'li {repeat: data(); }
+		li span {content: key();}
+		li p {content: iteration();}
+		';
+
+		$template = new \Transphporm\Builder($xml, $tss);
+
+		$output = $template->output($data)->body;
+
+		$this->assertEquals($this->stripTabs($output), $this->stripTabs('<ul>
+			<li>
+				<span>One</span>
+				<p>1</p>
+			</li>
+			<li>
+				<span>Two</span>
+				<p>2</p>
+			</li>
+			<li>
+				<span>Three</span>
+				<p>3</p>
+			</li>
+		</ul>'));
+
+	}
 }
 
 
