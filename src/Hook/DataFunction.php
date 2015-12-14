@@ -20,25 +20,27 @@ class DataFunction {
 	}
 
 	/** Binds data to an element */
-	public function bind(\DomElement $element, $data) {
+	public function bind(\DomElement $element, $data, $type = 'data') {
 		//This is a bit of a hack to workaround #24, might need a better way of doing this if it causes a problem
 		if (is_array($data) && $this->isObjectArray($data)) $data = $data[0];
-		$this->dataStorage[$element] = $data;
+		$content = isset($this->dataStorage[$element]) ? $this->dataStorage[$elemnt] : [];
+		$content[$type] = $data;
+		$this->dataStorage[$element] = $content;
 	}
 
 	private function isObjectArray(array $data) {
 		return count($data) === 1 && isset($data[0]) && is_object($data[0]);
 	}
 	public function iteration($val, $element) {
-		$data = $this->getData($element);
+		$data = $this->getData($element, 'iteration');
 		$value = $this->traverse($val, $data);
 		return $value;
 	}
 
 	/** Returns the data that has been bound to $element, or, if no data is bound to $element climb the DOM tree to find the data bound to a parent node*/
-	private function getData(\DomElement $element) {
+	private function getData(\DomElement $element, $type = 'data') {
 		while ($element) {
-			if (isset($this->dataStorage[$element])) return $this->dataStorage[$element];
+			if (isset($this->dataStorage[$element]) && isset($this->dataStorage[$element][$type])) return $this->dataStorage[$element][$type];
 			$element = $element->parentNode;
 		}
 		return $this->data;
