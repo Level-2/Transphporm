@@ -1193,6 +1193,38 @@ class TransphpormTest extends PHPUnit_Framework_TestCase {
 		</ul>'));
 
 	}
+
+	public function testContentModeReplace() {
+		$xml = '<div>
+			<span>Foo</span>
+		</div>';
+
+		$tss = 'span {content: "replaced"; content-mode: replace; }';
+
+
+		$template = new \Transphporm\Builder($xml, $tss);
+
+		$output = $template->output()->body;
+
+		$this->assertEquals($this->stripTabs($output), $this->stripTabs('<div><span>replaced</span></div>'));
+	}
+
+	public function testContentModeReplaceBlock() {
+		$xml = '<div>
+			<span>Foo</span>
+		</div>';
+
+		$tpl = __DIR__ . '/include.xml';
+
+		$tss = 'span {content: template(\'' . $tpl . '\'); content-mode: replace; }';
+
+
+		$template = new \Transphporm\Builder($xml, $tss);
+
+		$output = $template->output()->body;
+
+		$this->assertEquals($this->stripTabs($output), $this->stripTabs('<div><p>foo</p></div>'));
+	}
 }
 
 

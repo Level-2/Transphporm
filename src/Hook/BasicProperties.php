@@ -21,9 +21,16 @@ class BasicProperties {
 		if (!$this->processPseudo($value, $element, $rule)) {
 			//Remove the current contents
 			$this->removeAllChildren($element);
+
+			if ($this->getContentMode($rule->getRules()) === 'replace') $this->replaceContent($element, $value);
 			//Now make a text node
-			$this->appendContent($element, $value);
+			else $this->appendContent($element, $value);
 		}
+	}
+
+	private function getContentMode($rules) {
+		if (isset($rules['content-mode'])) return $rules['content-mode'];
+		else return 'append';
 	}
 
 	private function processPseudo($value, $element, $rule) {
@@ -56,6 +63,19 @@ class BasicProperties {
 		 	$element->firstChild->nodeValue .= implode('', $value);
 		 	return true;
 		 }		 
+	}
+
+	private function replaceContent($element, $content) {
+		if (isset($content[0]) && $content[0] instanceof \DomNode) {
+			foreach ($content as $node) {
+				$node = $element->ownerDocument->importNode($node, true);
+				$element->parentNode->appendChild($node);
+			}
+		}
+		else {
+			$element->parentNode->appendChild($element->ownerDocument->createElement('span', implode('', $content)));
+		}
+		$element->setAttribute('transphporm', 'remove');
 	}
 
 	private function appendContent($element, $content) {
