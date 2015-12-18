@@ -120,8 +120,6 @@ $template = new \Transphporm\Builder('template.xml', 'stylesheet.tss');
 This allows an unprecedented level of flexibility. Rather than having to consider which parts of the content may be dynamic and adding things like `{{user.name}}` in the template at the correct position, these concerns can be ignored when designing the template and some static content inserted in its place. Transphporm can then replace any content on the page. This allows you to-reuse a template. Sometimes you might replace some content, other times you might use the default from the template!
 
 
-
-
 # Installation
 
 The preferred method of installing Transphprom is via composer. However, if you don't want to use composer you can manually install Transphporm:

@@ -96,6 +96,12 @@ class BasicProperties {
 		return $value;
 	}
 
+	private function createHook($newRules, $rule) {
+		$hook = new Rule($newRules, $rule->getPseudoMatcher(), $this->data);
+		foreach ($rule->getProperties() as $obj) $hook->registerProperties($obj);
+		return $hook;
+	}
+
 	public function repeat($value, $element, $rule) {
 		if ($element->getAttribute('transphporm') === 'added') return $element->parentNode->removeChild($element);
 
@@ -109,15 +115,11 @@ class BasicProperties {
 
 			//Re-run the hook on the new element, but use the iterated data
 			$newRules = $rule->getRules();
-
 			//Don't run repeat on the clones element or it will loop forever
 			unset($newRules['repeat']);
-
-			$hook = new Rule($newRules, $rule->getPseudoMatcher(), $this->data);
-			foreach ($rule->getProperties() as $obj) $hook->registerProperties($obj);
-			$hook->run($clone);
+						
+			$this->createHook($newRules, $rule)->run($clone);
 		}
-
 		//Flag the original element for removal
 		$element->setAttribute('transphporm', 'remove');
 
