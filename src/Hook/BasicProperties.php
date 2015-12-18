@@ -63,26 +63,28 @@ class BasicProperties {
 		 }		 
 	}
 
-	private function replaceContent($element, $content) {
+	private function appendToIfNode($element, $content, $appendTo) {
 		if (isset($content[0]) && $content[0] instanceof \DomNode) {
 			foreach ($content as $node) {
 				$node = $element->ownerDocument->importNode($node, true);
-				$element->parentNode->appendChild($node);
+				$appendTo->appendChild($node);
 			}
+			return true;
 		}
-		else $element->parentNode->appendChild($element->ownerDocument->createElement('span', implode('', $content)));
+		return false;
+	}
 
+	private function replaceContent($element, $content) {
+		if (!$this->appendToIfNode($element, $content, $element->parentNode)) {
+			$element->parentNode->appendChild($element->ownerDocument->createElement('span', implode('', $content)));
+		}		
 		$element->setAttribute('transphporm', 'remove');
 	}
 
 	private function appendContent($element, $content) {
-		if (isset($content[0]) && $content[0] instanceof \DomNode) {
-			foreach ($content as $node) {
-				$node = $element->ownerDocument->importNode($node, true);
-				$element->appendChild($node);
-			}
+		if (!$this->appendToIfNode($element, $content, $element)) {
+			$element->appendChild($element->ownerDocument->createTextNode(implode('', $content)));
 		}
-		else $element->appendChild($element->ownerDocument->createTextNode(implode('', $content)));		
 	}
 
 	private function removeAllChildren($element) {
