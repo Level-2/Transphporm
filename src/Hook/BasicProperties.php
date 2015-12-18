@@ -21,16 +21,14 @@ class BasicProperties {
 		if (!$this->processPseudo($value, $element, $rule)) {
 			//Remove the current contents
 			$this->removeAllChildren($element);
-
-			if ($this->getContentMode($rule->getRules()) === 'replace') $this->replaceContent($element, $value);
 			//Now make a text node
+			if ($this->getContentMode($rule->getRules()) === 'replace') $this->replaceContent($element, $value);
 			else $this->appendContent($element, $value);
 		}
 	}
 
 	private function getContentMode($rules) {
-		if (isset($rules['content-mode'])) return $rules['content-mode'];
-		else return 'append';
+		return (isset($rules['content-mode'])) ? $rules['content-mode'] : 'append';
 	}
 
 	private function processPseudo($value, $element, $rule) {
@@ -72,9 +70,8 @@ class BasicProperties {
 				$element->parentNode->appendChild($node);
 			}
 		}
-		else {
-			$element->parentNode->appendChild($element->ownerDocument->createElement('span', implode('', $content)));
-		}
+		else $element->parentNode->appendChild($element->ownerDocument->createElement('span', implode('', $content)));
+
 		$element->setAttribute('transphporm', 'remove');
 	}
 
@@ -118,7 +115,6 @@ class BasicProperties {
 		}
 		//Flag the original element for removal
 		$element->setAttribute('transphporm', 'remove');
-
 		return false;
 	}
 
