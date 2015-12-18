@@ -1,0 +1,10 @@
+<?php
+/* @description     Transformation Style Sheets - Revolutionising PHP templating    *
+ * @author          Tom Butler tom@r.je                                             *
+ * @copyright       2015 Tom Butler <tom@r.je> | https://r.je/                      *
+ * @license         http://www.opensource.org/licenses/bsd-license.php  BSD License *
+ * @version         0.9                                                             */
+namespace Transphporm;
+interface Property {
+	public function run($value, \DomElement $element, Hook\Rule $rule);
+}

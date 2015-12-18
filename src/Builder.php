@@ -14,7 +14,6 @@ class Builder {
 	private $locale;
 	private $baseDir;
 	private $cache;
-	private $userCache;
 	private $time;
 
 	public function __construct($template, $tss = '') {
@@ -33,7 +32,10 @@ class Builder {
 		$locale = $this->getLocale();
 		$data = new Hook\DataFunction(new \SplObjectStorage(), $data, $locale, $this->baseDir);
 		$headers = [];
-		$this->registerProperties($this->getBasicProperties($data, $locale, $headers));
+		$this->registerProperty('content', $this->getContentProperty($data, $locale, $headers));
+		$this->registerProperty('repeat', new Property\Repeat($data));
+		$this->registerProperty('display', new Property\Display);
+		$this->registerProperty('bind', new Property\Bind($data));
 
 		$cachedOutput = $this->loadTemplate();
 		//To be a valid XML document it must have a root element, automatically wrap it in <template> to ensure it does
@@ -61,7 +63,7 @@ class Builder {
 	private function executeTssRule($rule, $template, $data) {
 		$rule->touch();
 		$hook = new Hook\Rule($rule->properties, new Hook\PseudoMatcher($rule->pseudo, $data), $data);
-		foreach ($this->registeredProperties as $properties) $hook->registerProperties($properties);
+		foreach ($this->registeredProperties as $name => $property) $hook->registerProperty($name, $property);
 		$template->addHook($rule->query, $hook);
 	}
 
@@ -91,7 +93,7 @@ class Builder {
 		else return (new Sheet($this->tss, $this->baseDir, $template->getPrefix()))->parse();
 	}
 
-	private function getBasicProperties($data, $locale, &$headers) {
+	private function getContentProperty($data, $locale, &$headers) {
 		$formatter = new Hook\Formatter();
 		$formatter->register(new Formatter\Number($locale));
 		$formatter->register(new Formatter\Date($locale));
@@ -99,9 +101,9 @@ class Builder {
 		
 		foreach ($this->formatters as $format) $formatter->register($format);
 
-		$basicProperties = new Hook\BasicProperties($data, $headers, $formatter);		
+		$basicProperties = new Property\Content($data, $headers, $formatter);
 
-		return isset($this->userCache) ? new Hook\Cache($basicProperties, $this->userCache) : $basicProperties;
+		return $basicProperties;
 	}
 
 	public function setCache(\ArrayAccess $cache) {
@@ -114,8 +116,8 @@ class Builder {
 		else return json_decode(file_get_contents(__DIR__ . DIRECTORY_SEPARATOR . 'Formatter' . DIRECTORY_SEPARATOR . 'Locale' . DIRECTORY_SEPARATOR . 'enGB.json'), true);
 	}
 
-	public function registerProperties($object) {
-		$this->registeredProperties[] = $object;
+	public function registerProperty($name, Property $property) {
+		$this->registeredProperties[$name] = $property;
 	}
 
 	public function registerFormatter($formatter) {

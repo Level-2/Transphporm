@@ -4,19 +4,19 @@
  * @copyright       2015 Tom Butler <tom@r.je> | https://r.je/                      *
  * @license         http://www.opensource.org/licenses/bsd-license.php  BSD License *
  * @version         0.9                                                             */
-namespace Transphporm\Hook;
-class BasicProperties {
+namespace Transphporm\Property;
+class Content implements \Transphporm\Property {
 	private $data;
 	private $headers;
 	private $formatter; 
 
-	public function __construct($data, &$headers, Formatter $formatter) {
+	public function __construct($data, &$headers, \Transphporm\Hook\Formatter $formatter) {
 		$this->data = $data;
 		$this->headers = &$headers;
 		$this->formatter = $formatter;
 	}
 
-	public function content($value, $element, $rule) {
+	public function run($value, \DomElement $element, \Transphporm\Hook\Rule $rule) {
 		$value = $this->formatter->format($value, $rule->getRules());
 		if (!$this->processPseudo($value, $element, $rule)) {
 			//Remove the current contents
@@ -90,43 +90,4 @@ class BasicProperties {
 	private function removeAllChildren($element) {
 		while ($element->hasChildNodes()) $element->removeChild($element->firstChild);
 	}
-
-	private function createHook($newRules, $rule) {
-		$hook = new Rule($newRules, $rule->getPseudoMatcher(), $this->data);
-		foreach ($rule->getProperties() as $obj) $hook->registerProperties($obj);
-		return $hook;
-	}
-
-	public function repeat($value, $element, $rule) {
-		if ($element->getAttribute('transphporm') === 'added') return $element->parentNode->removeChild($element);
-
-		foreach ($value as $key => $iteration) {
-			$clone = $element->cloneNode(true);
-			//Mark this node as having been added by transphporm
-			$clone->setAttribute('transphporm', 'added');
-			$this->data->bind($clone, $iteration, 'iteration');
-			$this->data->bind($clone, $key, 'key');
-			$element->parentNode->insertBefore($clone, $element);
-
-			//Re-run the hook on the new element, but use the iterated data
-			$newRules = $rule->getRules();
-			//Don't run repeat on the clones element or it will loop forever
-			unset($newRules['repeat']);
-
-			$this->createHook($newRules, $rule)->run($clone);
-		}
-		//Flag the original element for removal
-		$element->setAttribute('transphporm', 'remove');
-		return false;
-	}
-
-	public function display($value, $element) {
-		if (strtolower($value[0]) === 'none') $element->setAttribute('transphporm', 'remove');
-		else $element->setAttribute('transphporm', 'show');
-	}
-
-	public function bind($value, $element) {
-		$this->data->bind($element, $value);
-	}
-
 }

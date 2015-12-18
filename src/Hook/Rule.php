@@ -36,8 +36,8 @@ class Rule implements \Transphporm\Hook {
 		return $this->rules;
 	}
 
-	public function registerProperties($object) {
-		$this->properties[] = $object;
+	public function registerProperty($name, \Transphporm\Property $property) {
+		$this->properties[$name] = $property;
 	}
 
 	public function getProperties() {
@@ -45,11 +45,7 @@ class Rule implements \Transphporm\Hook {
 	}
 
 	private function callProperty($name, $element, $value) {
-		foreach ($this->properties as $obj) {
-			if (is_callable([$obj, $name])) {
-				return call_user_func([$obj, $name], $value, $element, $this);
-			}
-		}
+		if (isset($this->properties[$name])) return $this->properties[$name]->run($value, $element, $this);
 		return false;
 	}
 
