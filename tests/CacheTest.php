@@ -7,6 +7,10 @@
 use Transphporm\Builder;
 class CacheTest extends PHPUnit_Framework_TestCase {
 
+	private function stripTabs($str) {
+		return trim(str_replace(["\t", "\n", "\r"], '', $str));
+	}
+
 	private function writeFile($name, $contents) {
 		if (file_get_contents($name) != $contents) {
 			file_put_contents($name, $contents)	;
@@ -140,6 +144,60 @@ class CacheTest extends PHPUnit_Framework_TestCase {
 		
 		//This time the span should be visible
 		$this->assertTrue((bool) strpos($o1, '<span>'));
+	}
+
+	public function testCacheRepeat() {
+		$data = ['One', 'Two', 'Three'];
+
+		$tss = $this->makeTss('li { repeat: data(); content: iteration(); update-frequency: 10m}');
+
+		$xml = $this->makeXml('<ul>
+			<li>List item</li>
+		</ul>');
+
+		$cache = new \ArrayObject();
+		$template = new \Transphporm\Builder($xml, $tss);
+		$template->setCache($cache);
+
+		$expectedOutput = $this->stripTabs('<ul>
+			<li>One</li>
+			<li>Two</li>
+			<li>Three</li>
+		</ul>');
+		$this->assertEquals($this->stripTabs($template->output($data)->body), $expectedOutput);
+
+		//Now update the data:
+		$data = ['Four', 'Five', 'Six'];
+		//And rebuild the template
+		$template = new \Transphporm\Builder($xml, $tss);
+		$template->setCache($cache);
+
+		//The template should be cached and the new data not shown
+		$this->assertEquals($this->stripTabs($template->output($data)->body), $expectedOutput);
+
+
+		//Tick the clock so the cache expires
+		$date = new \DateTime();
+		$date->modify('+11 minutes');
+
+		//And rebuild the template
+
+		//Now update the data:
+		$data = ['Four', 'Five', 'Six'];
+		//And rebuild the template
+		$template = new \Transphporm\Builder($xml, $tss);
+		$template->setCache($cache);
+		$template->setTime($date->format('U'));
+
+		//The output should now reflect the new data
+
+		$expectedOutput = $this->stripTabs('<ul>
+			<li>Four</li>
+			<li>Five</li>
+			<li>Six</li>
+		</ul>');
+		$this->assertEquals($this->stripTabs($template->output($data)->body), $expectedOutput);
+
 	}
 
 }

@@ -97,8 +97,12 @@ class BasicProperties {
 	}
 
 	public function repeat($value, $element, $rule) {
+		if ($element->getAttribute('transphporm') === 'added') return $element->parentNode->removeChild($element);
+
 		foreach ($value as $key => $iteration) {
 			$clone = $element->cloneNode(true);
+			//Mark this node as having been added by transphporm
+			$clone->setAttribute('transphporm', 'added');
 			$this->data->bind($clone, $iteration, 'iteration');
 			$this->data->bind($clone, $key, 'key');
 			$element->parentNode->insertBefore($clone, $element);
@@ -114,8 +118,8 @@ class BasicProperties {
 			$hook->run($clone);
 		}
 
-		//Remove the original element so only the ones that have been looped over will show
-		$element->parentNode->removeChild($element);
+		//Flag the original element for removal
+		$element->setAttribute('transphporm', 'remove');
 
 		return false;
 	}

@@ -51,7 +51,6 @@ class Rule {
 			$static = ['always' => true, 'never' => false];
 			if (isset($static[$frequency])) return $static[$frequency];
 			else return $this->timeFrequency($frequency, $time);
-
 		}
 		else return true;
 	}
