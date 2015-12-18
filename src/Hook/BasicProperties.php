@@ -7,16 +7,17 @@
 namespace Transphporm\Hook;
 class BasicProperties {
 	private $data;
-	private $formatters = [];
 	private $headers;
+	private $formatter; 
 
-	public function __construct($data, &$headers) {
+	public function __construct($data, &$headers, Formatter $formatter) {
 		$this->data = $data;
 		$this->headers = &$headers;
+		$this->formatter = $formatter;
 	}
 
 	public function content($value, $element, $rule) {
-		$value = $this->format($value, $rule->getRules());
+		$value = $this->formatter->format($value, $rule->getRules());
 		if (!$this->processPseudo($value, $element, $rule)) {
 			//Remove the current contents
 			$this->removeAllChildren($element);
@@ -71,31 +72,6 @@ class BasicProperties {
 		while ($element->hasChildNodes()) $element->removeChild($element->firstChild);
 	}
 
-	public function registerFormatter($formatter) {
-		$this->formatters[] = $formatter;
-	}
-
-	private function format($value, $rules) {
-		if (!isset($rules['format'])) return $value;
-		$format = new \Transphporm\StringExtractor($rules['format']);
-		$options = explode(' ', $format);
-		$functionName = array_shift($options);
-		foreach ($options as &$f) $f = trim($format->rebuild($f), '"');
-
-		return $this->processFormat($options, $functionName, $value);		
-	}
-
-	private function processFormat($format, $functionName, $value) {
-		foreach ($value as &$val) {
-			foreach ($this->formatters as $formatter) {
-				if (is_callable([$formatter, $functionName])) {
-					$val = call_user_func_array([$formatter, $functionName], array_merge([$val], $format));
-				}
-			}
-		}
-		return $value;
-	}
-
 	private function createHook($newRules, $rule) {
 		$hook = new Rule($newRules, $rule->getPseudoMatcher(), $this->data);
 		foreach ($rule->getProperties() as $obj) $hook->registerProperties($obj);
@@ -117,7 +93,7 @@ class BasicProperties {
 			$newRules = $rule->getRules();
 			//Don't run repeat on the clones element or it will loop forever
 			unset($newRules['repeat']);
-						
+
 			$this->createHook($newRules, $rule)->run($clone);
 		}
 		//Flag the original element for removal

@@ -92,11 +92,14 @@ class Builder {
 	}
 
 	private function getBasicProperties($data, $locale, &$headers) {
-		$basicProperties = new Hook\BasicProperties($data, $headers);
-		$basicProperties->registerFormatter(new Formatter\Number($locale));
-		$basicProperties->registerFormatter(new Formatter\Date($locale));
-		$basicProperties->registerFormatter(new Formatter\StringFormatter());
-		foreach ($this->formatters as $formatter) $basicProperties->registerFormatter($formatter);
+		$formatter = new Hook\Formatter();
+		$formatter->register(new Formatter\Number($locale));
+		$formatter->register(new Formatter\Date($locale));
+		$formatter->register(new Formatter\StringFormatter());
+		
+		foreach ($this->formatters as $format) $formatter->register($format);
+
+		$basicProperties = new Hook\BasicProperties($data, $headers, $formatter);		
 
 		return isset($this->userCache) ? new Hook\Cache($basicProperties, $this->userCache) : $basicProperties;
 	}
