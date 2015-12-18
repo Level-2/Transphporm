@@ -72,7 +72,12 @@ But where are the processing instructions? Transphporm follows CSS's lead and al
 
 At it's most basic, Transphporm works by suppling a stylesheet and XML as strings.
 
-The stylesheet can supply content to a targetted element. For example, this stylesheet:
+Transphporm allows you to insert content into any element on a page. Traditional template engines force you to place markers in the markup which will then be replaced (essentially using str_replace) within the content. 
+
+Transphporm takes a different approach and allows you to insert content into any element on the page using a CSS-like syntax. You don't need to provide special markers in the template, the template is plain old HTML without any special syntax. The elements on the page can then be targetted using CSS style syntax,
+
+
+ For example, this stylesheet:
 
 
 ```php
@@ -111,6 +116,10 @@ $template = new \Transphporm\Builder('template.xml', 'stylesheet.tss');
 
 
 ```
+
+This allows an unprecedented level of flexibility. Rather than having to consider which parts of the content may be dynamic and adding things like `{{user.name}}` in the template at the correct position, these concerns can be ignored when designing the template and some static content inserted in its place. Transphporm can then replace any content on the page. This allows you to-reuse a template. Sometimes you might replace some content, other times you might use the default from the template!
+
+
 
 
 # Installation

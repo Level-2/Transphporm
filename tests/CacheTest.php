@@ -134,8 +134,6 @@ class CacheTest extends PHPUnit_Framework_TestCase {
 		$date = new \DateTime();
 		$date->modify('+11 minutes');
 
-
-					
 		$template = new \Transphporm\Builder($xml, $tss);
 		$template->setCache($cache);
 		$template->setTime($date->format('U'));
