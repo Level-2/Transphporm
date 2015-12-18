@@ -74,7 +74,7 @@ At it's most basic, Transphporm works by suppling a stylesheet and XML as string
 
 Transphporm allows you to insert content into any element on a page. Traditional template engines force you to place markers in the markup which will then be replaced (essentially using str_replace) within the content. 
 
-Transphporm takes a different approach and allows you to insert content into any element on the page using a CSS-like syntax. You don't need to provide special markers in the template, the template is plain old HTML without any special syntax. The elements on the page can then be targetted using CSS style syntax,
+Transphporm takes a different approach and allows you to insert content into any element on the page using a CSS-like syntax. You don't need to provide special markers in the template, the template is plain old HTML without any special syntax. The elements on the page can then be targeted using CSS style syntax,
 
 
  For example, this stylesheet:
