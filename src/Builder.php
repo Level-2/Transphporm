@@ -32,10 +32,7 @@ class Builder {
 		$locale = $this->getLocale();
 		$data = new Hook\DataFunction(new \SplObjectStorage(), $data, $locale, $this->baseDir);
 		$headers = [];
-		$this->registerProperty('content', $this->getContentProperty($data, $locale, $headers));
-		$this->registerProperty('repeat', new Property\Repeat($data));
-		$this->registerProperty('display', new Property\Display);
-		$this->registerProperty('bind', new Property\Bind($data));
+		$this->registerBasicProperties($data, $locale, $headers);
 
 		$cachedOutput = $this->loadTemplate();
 		//To be a valid XML document it must have a root element, automatically wrap it in <template> to ensure it does
@@ -51,6 +48,21 @@ class Builder {
 		$result['body'] = $this->doPostProcessing($template)->output($document);
 
 		return (object) $result;
+	}
+
+	//Register the basic properties, content, repeat, display and bind
+	private function registerBasicProperties($data, $locale, &$headers) {
+		$formatter = new Hook\Formatter();
+		$formatter->register(new Formatter\Number($locale));
+		$formatter->register(new Formatter\Date($locale));
+		$formatter->register(new Formatter\StringFormatter());
+		
+		foreach ($this->formatters as $format) $formatter->register($format);
+
+		$this->registerProperty('content', new Property\Content($data, $headers, $formatter));
+		$this->registerProperty('repeat', new Property\Repeat($data));
+		$this->registerProperty('display', new Property\Display);
+		$this->registerProperty('bind', new Property\Bind($data));
 	}
 
 	//Add a postprocessing hook. This cleans up anything transphporm has added to the markup which needs to be removed
@@ -91,19 +103,6 @@ class Builder {
 			else return $rules;
 		}
 		else return (new Sheet($this->tss, $this->baseDir, $template->getPrefix()))->parse();
-	}
-
-	private function getContentProperty($data, $locale, &$headers) {
-		$formatter = new Hook\Formatter();
-		$formatter->register(new Formatter\Number($locale));
-		$formatter->register(new Formatter\Date($locale));
-		$formatter->register(new Formatter\StringFormatter());
-		
-		foreach ($this->formatters as $format) $formatter->register($format);
-
-		$basicProperties = new Property\Content($data, $headers, $formatter);
-
-		return $basicProperties;
 	}
 
 	public function setCache(\ArrayAccess $cache) {
