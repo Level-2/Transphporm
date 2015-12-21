@@ -36,7 +36,7 @@ class Builder {
 
 		$cachedOutput = $this->loadTemplate();
 		//To be a valid XML document it must have a root element, automatically wrap it in <template> to ensure it does
-		$template = new Template($this->isValidDoc($cachedOutput['body']) ? $cachedOutput['body'] : '<template>' . $cachedOutput['body'] . '</template>' );
+		$template = new Template($this->isValidDoc($cachedOutput['body']) ? str_ireplace('<!doctype', '<!DOCTYPE', $cachedOutput['body']) : '<template>' . $cachedOutput['body'] . '</template>' );
 
 		//Allow $time to be set via arguments to spoof time passage during tests
 		foreach ($this->getRules($template) as $rule) {
