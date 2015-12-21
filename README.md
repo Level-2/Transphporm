@@ -121,15 +121,15 @@ This allows an unprecedented level of flexibility. Rather than having to conside
 
 # 5 Reasons to use Transphporm
 
-1. *Write content to any element*. With traditional template engines the designer needs to place marker in the template e.g. `{{name}}` everywhere that content needs to be injected into the template. With Transphporm, the designer doesn't need to worry about whether specific content will be replaced (effectively with `str_replace`), instead Transphporm allows the developer to write content to any HTML element on the page, and the designer to focus on design rather than worrying about what content might be added.
+1. **Write content to any element**. With traditional template engines the designer needs to place marker in the template e.g. `{{name}}` everywhere that content needs to be injected into the template. With Transphporm, the designer doesn't need to worry about whether specific content will be replaced (effectively with `str_replace`), instead Transphporm allows the developer to write content to any HTML element on the page, and the designer to focus on design rather than worrying about what content might be added.
 
-2. *Anything can be a partial*. Traditional template engines force you to put each partial in its own file, this is bad for the designer because they cannot quickly an easily see how the partial looks inside the complete layout. With Transphporm, the designer can work with complete HTML files and the developer can extract any element from any file as a partial.
+2. **Anything can be a partial**. Traditional template engines force you to put each partial in its own file, this is bad for the designer because they cannot quickly an easily see how the partial looks inside the complete layout. With Transphporm, the designer can work with complete HTML files and the developer can extract any element from any file as a partial.
 
-3. *Resuable display logic*. Because display logic is placed in its own external file, you can use the same display logic with as many XML files as you like. This is the difference between external CSS files and `style=` attributes inside your HTML.
+3. **Resuable display logic**. Because display logic is placed in its own external file, you can use the same display logic with as many XML files as you like. This is the difference between external CSS files and `style=` attributes inside your HTML.
 
-4. *Render your template on the client or the server*. The TSS format is not barely abstracted PHP code like Traditional template engines, it's a custom format with no reliance on a PHP. Because of this, you can take an XML file and a TSS file and render it on the server using [Transphporm](https://github.com/Level-2/Transphporm) or inside the browser using the JavaScript implementation [Tranjsform](https://github.com/Level-2/Tranjsform).
+4. **Render your template on the client or the server**. The TSS format is not barely abstracted PHP code like Traditional template engines, it's a custom format with no reliance on a PHP. Because of this, you can take an XML file and a TSS file and render it on the server using [Transphporm](https://github.com/Level-2/Transphporm) or inside the browser using the JavaScript implementation [Tranjsform](https://github.com/Level-2/Tranjsform).
 
-5. *If you've used CSS, Transphporm is easy to learn*. Transphporm closely follows CSS syntax and uses some of the same vocabulary. If you have even a basic understanding of CSS, you'll be able to learn to use Transphporm with ease!
+5. **If you've used CSS, Transphporm is easy to learn**. Transphporm closely follows CSS syntax and uses some of the same vocabulary. If you have even a basic understanding of CSS, you'll be able to learn to use Transphporm with ease!
 
 Transphporm gives both designers and developers an unprecedented level of flexibility that just isn't possible with traditional template engines.
 
