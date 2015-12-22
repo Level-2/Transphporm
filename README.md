@@ -977,6 +977,59 @@ Output:
 
 ```
 
+# Caching
+
+Transphporm has two types of caching, both of which need to be enabled:
+
+1. Caching TSS and XML files. This prevents them being parsed each time the template is rendered. It is worthwhile enabling this even if you do not intend on using `update-frequency` (see below)
+
+2. `update-frequency` This is a property which allows you to update an element at a specified interval.
+
+To enable caching, you must create (or use) a caching class that implements PHP's inbuilt `\ArrayAccess` interface. For example [Level-2/SimpleCache](https://github.com/Level-2/SimpleCache) then assign an instance to the builder:
+
+```php
+$cache = new \SimpleCache\SimpleCache('/tmp');
+
+$template = new \Transphporm\Builder($xml, $tss);
+$template->setCache($cache);
+
+echo $template->output($data)->body;
+```
+
+Doing this will automatically enable file-caching. Once a cache has been assigned, TSS files will only be parsed whenever they are updated. This saves parsing the TSS file each time your page loads and is worthwile even if you are not using `update-frequency`
+
+
+### update-frequency
+
+`update-frequency` is a TSS directive that describes how frequently a give TSS rule should run. Behind the scenes, Transphporm will save the final output each time a template is rendered and make changes to it based on `update-frequency`. For example:
+
+```tss
+
+ul li {repeat: data(users); update-frequency: 10m}
+
+```
+
+This will only run the TSS rule every 10 minutes. The way this works behind the scenes is:
+
+- The rendred template is stored in the cache
+- Next time the page loads the the previously rendered template is loaded
+- If the timer has expired, the repeat/content/etc directives are run again on the cached version of the template and the template is updated
+
+This allows different parts of the page to be updated at different speeds.
+
+## Caching in MVC
+
+If you are using MVC ([And not PAC, which most frameworks do](http://r.je/views-are-not-templates.html)) and you are passing your model into your view, if your model is passed in as the `data` argument and has a `getUsers` function, Transphporm can call this and only execute the query when the template is updated
+
+```tss
+
+ul li {repeat: data(getUsers); update-frequency: 10m}
+```
+
+
+Most frameowrks do not pass models into views, however for those that do this allows a two level cache: The query is only run when the view is updated based on the view's timeout.
+
+
 # Building a whole page
 
 Transphporm uses a top-down approach to construct pages. Most frameworks require writing a layout template and then pulling content into it. It becomes very difficult to make changes to the layout on a per-page basis. (At minimum you need to add some code to the layout HTML). Transphporm uses a top-down approach rather than the popular bottom-up approach where the child template is inserted into the layout at a specific point. 
