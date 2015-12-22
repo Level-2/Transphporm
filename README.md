@@ -121,9 +121,9 @@ This allows an unprecedented level of flexibility. Rather than having to conside
 
 # 5 Reasons to use Transphporm
 
-1. **Write content to any element**. With traditional template engines the designer needs to place marker in the template e.g. `{{name}}` everywhere that content needs to be injected into the template. With Transphporm, the designer doesn't need to worry about whether specific content will be replaced (effectively with `str_replace`), instead Transphporm allows the developer to write content to any HTML element on the page, and the designer to focus on design rather than worrying about what content might be added.
+1. **[Write content to any element](https://github.com/Level-2/Transphporm/wiki/Basic-Usage:-Inserting-content)**. With traditional template engines the designer needs to place marker in the template e.g. `{{name}}` everywhere that content needs to be injected into the template. With Transphporm, the designer doesn't need to worry about whether specific content will be replaced (effectively with `str_replace`), instead Transphporm allows the developer to write content to any HTML element on the page, and the designer to focus on design rather than worrying about what content might be added.
 
-2. **Anything can be a partial**. Traditional template engines force you to put each partial in its own file, this is bad for the designer because they cannot quickly an easily see how the partial looks inside the complete layout. With Transphporm, the designer can work with complete HTML files and the developer can extract any element from any file as a partial.
+2. **[Anything can be a partial](https://github.com/Level-2/Transphporm/wiki/Template-Partials)**. Traditional template engines force you to put each partial in its own file, this is bad for the designer because they cannot quickly an easily see how the partial looks inside the complete layout. With Transphporm, the designer can work with complete HTML files and the developer can extract any element from any file as a partial.
 
 3. **Resuable display logic**. Because display logic is placed in its own external file, you can use the same display logic with as many XML files as you like. This is the difference between external CSS files and `style=` attributes inside your HTML.
 
@@ -237,6 +237,8 @@ Output:
 <h1>Title: My Title!</h1>
 ```
 
+For more information in inserting content see the wiki pages [Basic usage: Inserting Content](https://github.com/Level-2/Transphporm/wiki/Basic-Usage:-Inserting-content) and [Basic Usage: External Data](https://github.com/Level-2/Transphporm/wiki/Basic-Usage:-Working-with-external-data) 
+
 ### Loops
 
 Going back to the user list example, consider the following data structure:
@@ -341,6 +343,7 @@ Which will output:
 
 ```
 
+For more information on loops see the [Wiki page Basic usage: Loops](https://github.com/Level-2/Transphporm/wiki/Basic-Usage:-Loops)
 
 # Hiding Blocks
 
@@ -389,186 +392,39 @@ Output:
 
 ```
 
-N.b. this is very useful with the iteration value pseudo element
+N.b. this is very useful with the iteration value pseudo element. For more examples of conditonal logic see the [Wiki page on Basic usage: Conditional logic](https://github.com/Level-2/Transphporm/wiki/Basic-Usage:-Conditional-Logic)
 
 # CSS Selectors
 
 Transphporm supports the following CSS selectors:
 
+`tagName`
+`#id`
+`.className`
+`tagName.className`
+`direct > descendant` 
+`[attribute]`
+`[attribute=value]` 
+`[attribute!=value]`
+
+And any of these can be chained:
+
+`main .post > .author[data-admin=true]` will match  any elemnt with the class name `author` which has the `data-admin` varibleset to true, and is directly inside an element with the class name post that is inside the `<main>` elemnt.
+
+For a full list of supported selectors and example of each one, see the [Wiki page on Basic Usage: CSS Selectors](https://github.com/Level-2/Transphporm/wiki/Basic-Usage:-CSS-Selectors)
 
 
 # Pseudo Elements
 
-Transphporm also supports several pseudo elements.
+Transphporm also supports several pseudo elements:
 
-`:before` and `:after`  which allows appending/prepending content to what is already there rather than overwriting it:
+`:before` and `:after` which allows writing content to the beggining or end of a node.
 
-### Before
+`:nth-child(n)`
+`:nth-child(odd)`
+`:nth-child(even)`
 
-```php
-$data = new stdclass;
-
-$data->title = 'My Title!';
-$data->description = 'Description of the page...';
-
-
-$xml = '
-	<h1>Example Title</h1>
-	';
-
-$tss = '
-	h1:before {content: "BEFORE ";}
-';
-
-$template = new \Transphporm\Builder($xml, $tss);
-
-echo $template->output($data)->body;
-
-```
-
-Output:
-
-
-```
-<h1>BEFORE Example Title</h1>
-
-```
-
-### After
-
-
-```php
-$data = new stdclass;
-
-$data->title = 'My Title!';
-$data->description = 'Description of the page...';
-
-
-$xml = '
-	<h1>Example Title</h1>
-	';
-
-$tss = '
-	h1:after {content: " AFTER";}
-';
-
-$template = new \Transphporm\Builder($xml, $tss)
-
-echo $template->output($data)->body;
-
-```
-
-Output:
-
-
-```
-<h1>Example Title AFTER</h1>
-
-```
-
-
-
-
-## :nth-child();
-
-Straight from CSS, Transphporm also supports `nth-child(NUM)`. As well as `nth-child(odd)` and `nth-child(even)`
-
-
-```php
-$xml = '
-		<ul>
-			<li>One</li>
-			<li>Two</li>
-			<li>Three</li>
-			<li>Four</li>
-		</ul>
-';
-
-$tss = 'ul li:nth-child(2) {content: "REPLACED"}';
-
-$template = new \Transphporm\Builder($template, $tss);
-
-echo $template->output()->body;
-```
-
-Output: 
-
-
-```php
-		<ul>
-			<li>One</li>
-			<li>REPLACED</li>
-			<li>Three</li>
-			<li>Four</li>
-		</ul>
-
-```
-
-
-### Even
-
-
-```php
-$xml = '
-		<ul>
-			<li>One</li>
-			<li>Two</li>
-			<li>Three</li>
-			<li>Four</li>
-		</ul>
-';
-
-$tss = 'ul li:nth-child(even) {content: "REPLACED"}';
-
-$template = new \Transphporm\Builder($template, $tss);
-echo $template->output()->body;
-```
-
-Output: 
-
-
-```php
-		<ul>
-			<li>One</li>
-			<li>REPLACED</li>
-			<li>Three</li>
-			<li>REPLACED</li>
-		</ul>
-
-```
-
-
-### Odd
-
-```php
-$xml = '
-		<ul>
-			<li>One</li>
-			<li>Two</li>
-			<li>Three</li>
-			<li>Four</li>
-		</ul>
-';
-
-$tss = 'ul li:nth-child(even) {content: "REPLACED"}';
-
-$template = new \Transphporm\Builder($template, $tss);
-echo $template->output()->body;
-```
-
-Output: 
-
-
-```php
-		<ul>
-			<li>REPLACED</li>
-			<li>Two</li>
-			<li>REPLACED</li>
-			<li>Four</li>
-		</ul>
-
-```
-
+For examples of each of these, please see the [Wiki page Basic Usage: Pseudo Elements](https://github.com/Level-2/Transphporm/wiki/Basic-Usage:-Pseudo-elements)
 
 ## Iteration values
 
