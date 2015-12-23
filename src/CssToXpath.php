@@ -38,8 +38,9 @@ class CssToXpath {
 		foreach ($comparators as $comparator) {
 			if (strpos($attr, $comparator) !== false) {
 				$parts = explode($comparator, $attr);
-
-				foreach ($parts as &$part) $part = implode('', $this->valueParser->parse($part));
+				$parts = array_map(function($val) {
+					return implode($this->valueParser->parse($val));
+				}, $parts);
 				if (isset($parts[1])) $parts[1] = '"' . $parts[1] . '"';
 				return implode($comparator, $parts);
 			}
