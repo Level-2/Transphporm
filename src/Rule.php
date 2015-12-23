@@ -10,8 +10,8 @@ class Rule {
 
 	const S = 1;
 	const M = 60;
-	const H = self::M*60;
-	const D = self::H*24;
+	const H = 3600;
+	const D = 86400;
 
 
 	public function __construct($query, $pseudo, $depth, $index, array $properties = []) {
