@@ -5,7 +5,7 @@
  * @license         http://www.opensource.org/licenses/bsd-license.php  BSD License *
  * @version         1.0                                                             */
 namespace Transphporm\Hook;
-/* Handles data() and iteration() functions in the CDS */
+/* Handles data() and iteration() function calls from the stylesheet */
 class DataFunction {
 	private $dataStorage;
 	private $data;
@@ -31,6 +31,7 @@ class DataFunction {
 	private function isObjectArray(array $data) {
 		return count($data) === 1 && isset($data[0]) && is_object($data[0]);
 	}
+
 	public function iteration($val, $element) {
 		$data = $this->getData($element, 'iteration');
 		$value = $this->traverse($val, $data);
@@ -43,7 +44,7 @@ class DataFunction {
 	}
 
 	/** Returns the data that has been bound to $element, or, if no data is bound to $element climb the DOM tree to find the data bound to a parent node*/
-	private function getData(\DomElement $element, $type = 'data') {
+	private function getData(\DomElement $element = null, $type = 'data') {
 		while ($element) {
 			if (isset($this->dataStorage[$element]) && isset($this->dataStorage[$element][$type])) return $this->dataStorage[$element][$type];
 			$element = $element->parentNode;
@@ -51,7 +52,7 @@ class DataFunction {
 		return $this->data;
 	}
 
-	public function data($val, $element) {
+	public function data($val, \DomElement $element = null) {
 		$data = $this->getData($element);
 		$value = $this->traverse($val, $data);
 		return $value;			
@@ -79,7 +80,7 @@ class DataFunction {
 	}
 
 	private function templateSubsection($css, $doc, $element) {
-		$xpathStr = (new \Transphporm\CssToXpath($css))->getXpath();
+		$xpathStr = (new \Transphporm\CssToXpath($css, new \Transphporm\ValueParser($this)))->getXpath();
 		$xpath = new \DomXpath($doc);
 		$nodes = $xpath->query($xpathStr);
 		$result = [];

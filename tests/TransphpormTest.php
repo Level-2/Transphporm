@@ -1225,7 +1225,24 @@ class TransphpormTest extends PHPUnit_Framework_TestCase {
 
 		$this->assertEquals($this->stripTabs($output), $this->stripTabs('<div><p>foo</p></div>'));
 	}
-}
 
+	public function testSelectAttributeFromData() {
+		$data = ['test' => 'bar'];
+
+		$xml = '<div>
+			<span foo="bar">Foo</span>
+		</div>';
+
+		$tss = 'span[foo=data(test)] {content: "replaced"; }';
+
+		$template = new \Transphporm\Builder($xml, $tss);
+		
+		$output = $template->output($data)->body;
+
+		$this->assertEquals($this->stripTabs($output), $this->stripTabs('<div>
+			<span foo="bar">replaced</span>
+		</div>'));
+	}
+}
 
 

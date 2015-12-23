@@ -31,6 +31,7 @@ class Builder {
 	public function output($data = null, $document = false) {
 		$locale = $this->getLocale();
 		$data = new Hook\DataFunction(new \SplObjectStorage(), $data, $locale, $this->baseDir);
+		$valueParser = new ValueParser($data);
 		$headers = [];
 		$this->registerBasicProperties($data, $locale, $headers);
 
@@ -39,8 +40,8 @@ class Builder {
 		$template = new Template($this->isValidDoc($cachedOutput['body']) ? str_ireplace('<!doctype', '<!DOCTYPE', $cachedOutput['body']) : '<template>' . $cachedOutput['body'] . '</template>' );
 
 		//Allow $time to be set via arguments to spoof time passage during tests
-		foreach ($this->getRules($template) as $rule) {
-			if ($rule->shouldRun($this->time)) $this->executeTssRule($rule, $template, $data);			
+		foreach ($this->getRules($template, $valueParser) as $rule) {
+			if ($rule->shouldRun($this->time)) $this->executeTssRule($rule, $template, $data, $valueParser);			
 		}
 		
 		$result = ['body' => $template->output($document), 'headers' => array_merge($cachedOutput['headers'], $headers)];
@@ -72,9 +73,9 @@ class Builder {
 	}
 
 	//Process a TSS rule e.g. `ul li {content: "foo"; format: bar}
-	private function executeTssRule($rule, $template, $data) {
+	private function executeTssRule($rule, $template, $data, $valueParser) {
 		$rule->touch();
-		$hook = new Hook\Rule($rule->properties, new Hook\PseudoMatcher($rule->pseudo, $data), $data);
+		$hook = new Hook\Rule($rule->properties, new Hook\PseudoMatcher($rule->pseudo, $data), $valueParser);
 		foreach ($this->registeredProperties as $name => $property) $hook->registerProperty($name, $property);
 		$template->addHook($rule->query, $hook);
 	}
@@ -90,7 +91,7 @@ class Builder {
 
 	//Load the TSS rules either from a file or as a string
 	//N.b. only files can be cached
-	private function getRules($template) {		
+	private function getRules($template, $valueParser) {		
 		if (is_file($this->tss)) {
 			$this->baseDir = dirname(realpath($this->tss)) . DIRECTORY_SEPARATOR;
 			//The cache for the key: the filename and template prefix
@@ -99,10 +100,10 @@ class Builder {
 			$key = $this->tss . $template->getPrefix() . $this->baseDir;
 			//Try to load the cached rules, if not set in the cache (or expired) parse the supplied sheet
 			$rules = $this->cache->load($key, filemtime($this->tss));
-			if (!$rules) return $this->cache->write($key, (new Sheet(file_get_contents($this->tss), $this->baseDir, $template->getPrefix()))->parse());
+			if (!$rules) return $this->cache->write($key, (new Sheet(file_get_contents($this->tss), $this->baseDir, $valueParser, $template->getPrefix()))->parse());
 			else return $rules;
 		}
-		else return (new Sheet($this->tss, $this->baseDir, $template->getPrefix()))->parse();
+		else return (new Sheet($this->tss, $this->baseDir, $valueParser, $template->getPrefix()))->parse();
 	}
 
 	public function setCache(\ArrayAccess $cache) {

@@ -10,16 +10,18 @@ class CssToXpath {
 	private $translators = [];
 	private $css;
 	private $depth;
+	private $valueParser;
 
-	public function __construct($css, $prefix = '') {
+	public function __construct($css, ValueParser $valueParser, $prefix = '') {
 		$this->css = str_replace([' >', '> '],['>', '>'], trim($css));
+		$this->valueParser = $valueParser;
 		$this->translators = [
 			' ' => function($string) use ($prefix) { return '//' . $prefix . $string;	},
 			'' => function($string) use ($prefix) { return '/' . $prefix . $string;	},
 			'>' => function($string) use ($prefix) { return '/' . $prefix  . $string; },
 			'#' => function($string) { return '[@id=\'' . $string . '\']'; },
 			'.' => function($string) { return '[contains(concat(\' \', normalize-space(@class), \' \'), \' ' . $string . ' \')]'; }, 
-			'[' => function($string) { return '[@' . $string . ']';	},
+			'[' => function($string) { return '[@' . $this->parseAttr($string) . ']';	},
 			']' => function() {	return ''; }
 		];
 	}
@@ -29,6 +31,21 @@ class CssToXpath {
 		$selector->type = '';
 		$selector->string = '';
 		return $selector;
+	}
+
+	private function parseAttr($attr) {
+		$comparators = ['!=', '='];
+		foreach ($comparators as $comparator) {
+			if (strpos($attr, $comparator) !== false) {
+				$parts = explode($comparator, $attr);
+
+				foreach ($parts as &$part) $part = implode('', $this->valueParser->parse($part));
+				if (isset($parts[1])) $parts[1] = '"' . $parts[1] . '"';
+				return implode($comparator, $parts);
+			}
+		}
+
+		return $attr;
 	}
 
 	//split the css into indivudal functions
@@ -58,6 +75,7 @@ class CssToXpath {
 		}
 
 		$xpath = str_replace('/[', '/*[', $xpath);
+
 		return $xpath;
 	}
 

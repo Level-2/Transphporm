@@ -36,7 +36,7 @@ class Repeat implements \Transphporm\Property {
 	}
 
 	private function createHook($newRules, $rule) {
-		$hook = new \Transphporm\Hook\Rule($newRules, $rule->getPseudoMatcher(), $this->data);
+		$hook = new \Transphporm\Hook\Rule($newRules, $rule->getPseudoMatcher(), new \Transphporm\ValueParser($this->data));
 		foreach ($rule->getProperties() as $name => $property) $hook->registerProperty($name, $property);
 		return $hook;
 	}
