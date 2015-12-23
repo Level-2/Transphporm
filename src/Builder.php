@@ -31,17 +31,16 @@ class Builder {
 	public function output($data = null, $document = false) {
 		$locale = $this->getLocale();
 		$data = new Hook\DataFunction(new \SplObjectStorage(), $data, $locale, $this->baseDir);
-		$valueParser = new ValueParser($data);
 		$headers = [];
-		$this->registerBasicProperties($data, $locale, $headers);
+		
+		$propertyBuilder = new PropertyBuilder($this);
+		$propertyBuilder->registerBasicProperties($data, $locale, $headers, $this->formatters);
 
 		$cachedOutput = $this->loadTemplate();
 		//To be a valid XML document it must have a root element, automatically wrap it in <template> to ensure it does
 		$template = new Template($this->isValidDoc($cachedOutput['body']) ? str_ireplace('<!doctype', '<!DOCTYPE', $cachedOutput['body']) : '<template>' . $cachedOutput['body'] . '</template>' );
 
-		foreach ($this->getRules($template, $valueParser) as $rule) {
-			if ($rule->shouldRun($this->time)) $this->executeTssRule($rule, $template, $data, $valueParser);			
-		}
+		$this->processRules($template, $data);
 		
 		$result = ['body' => $template->output($document), 'headers' => array_merge($cachedOutput['headers'], $headers)];
 		$this->cache->write($this->template, $result);		
@@ -50,19 +49,11 @@ class Builder {
 		return (object) $result;
 	}
 
-	//Register the basic properties, content, repeat, display and bind
-	private function registerBasicProperties($data, $locale, &$headers) {
-		$formatter = new Hook\Formatter();
-		$formatter->register(new Formatter\Number($locale));
-		$formatter->register(new Formatter\Date($locale));
-		$formatter->register(new Formatter\StringFormatter());
-		
-		foreach ($this->formatters as $format) $formatter->register($format);
-
-		$this->registerProperty('content', new Property\Content($data, $headers, $formatter));
-		$this->registerProperty('repeat', new Property\Repeat($data));
-		$this->registerProperty('display', new Property\Display);
-		$this->registerProperty('bind', new Property\Bind($data));
+	private function processRules($template, $data) {
+		$valueParser = new ValueParser($data);
+		foreach ($this->getRules($template, $valueParser) as $rule) {
+			if ($rule->shouldRun($this->time)) $this->executeTssRule($rule, $template, $data, $valueParser);			
+		}
 	}
 
 	//Add a postprocessing hook. This cleans up anything transphporm has added to the markup which needs to be removed
