@@ -5,7 +5,6 @@
     "license": "BSD-2-Clause",
     "homepage": "https://github.com/Level-2/Transphporm",
     "keywords": ["template system"],
-    "minimum-stability": "dev",
     "authors": [
     	{
     		"name": "Tom Butler",

@@ -3,7 +3,7 @@
  * @author          Tom Butler tom@r.je                                             *
  * @copyright       2015 Tom Butler <tom@r.je> | https://r.je/                      *
  * @license         http://www.opensource.org/licenses/bsd-license.php  BSD License *
- * @version         0.9                                                             */
+ * @version         1.0                                                             */
 namespace Transphporm;
 /** Builds a Transphorm instance from the 3 constituent parts. XML template string, TSS string and data */
 class Builder {
