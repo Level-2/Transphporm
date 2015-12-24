@@ -10,10 +10,11 @@ class CssToXpath {
 	private $translators = [];
 	private $css;
 	private $depth;
-	private static $valueParser;
+	private static $instances = [];
 
 	public function __construct($css, Value $valueParser, $prefix = '') {
-		self::$valueParser = $valueParser;
+		$hash = $this->registerInstance();
+		$this->valueParser = $valueParser;
 		$this->css = str_replace([' >', '> '],['>', '>'], trim($css));
 		$this->translators = [
 			' ' => function($string) use ($prefix) { return '//' . $prefix . $string;	},
@@ -21,9 +22,19 @@ class CssToXpath {
 			'>' => function($string) use ($prefix) { return '/' . $prefix  . $string; },
 			'#' => function($string) { return '[@id=\'' . $string . '\']'; },
 			'.' => function($string) { return '[contains(concat(\' \', normalize-space(@class), \' \'), \' ' . $string . ' \')]'; }, 
-			'[' => function($string, $xpath) { return '[' .'php:function(\'\Transphporm\Parser\CssToXpath::processAttr\', \'' . $string . '\', .)' . ']';	},
+			'[' => function($string, $xpath) use($hash) { return '[' .'php:function(\'\Transphporm\Parser\CssToXpath::processAttr\', \'' . $string . '\', ., "' . $hash . '")' . ']';	},
 			']' => function() {	return ''; }
 		];
+	}
+
+	public function __destruct() {
+		unset(self::$instances[spl_object_hash($this)]);
+	}
+
+	private function registerInstance() {
+		$hash = spl_object_hash($this);
+		self::$instances[$hash] = $this;
+		return $hash;
 	}
 
 	private function createSelector() {
@@ -34,9 +45,9 @@ class CssToXpath {
 	}
 
 	//XPath only allows registering of static functions... this is a hacky workaround for that
-	public static function processAttr($attr, $element) {
+	public static function processAttr($attr, $element, $hash) {
 		$comparators = ['!=', '='];
-		$valueParser = self::$valueParser;
+		$valueParser = self::$instances[$hash]->valueParser;
 		foreach ($comparators as $comparator) {
 			if (strpos($attr, $comparator) !== false) {
 				$parts = explode($comparator, $attr);
