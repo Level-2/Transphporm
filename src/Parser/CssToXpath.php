@@ -10,8 +10,10 @@ class CssToXpath {
 	private $translators = [];
 	private $css;
 	private $depth;
+	private static $valueParser;
 
 	public function __construct($css, Value $valueParser, $prefix = '') {
+		self::$valueParser = $valueParser;
 		$this->css = str_replace([' >', '> '],['>', '>'], trim($css));
 		$this->translators = [
 			' ' => function($string) use ($prefix) { return '//' . $prefix . $string;	},
@@ -33,9 +35,8 @@ class CssToXpath {
 
 	//XPath only allows registering of static functions... this is a hacky workaround for that
 	public static function processAttr($attr, $element) {
-		$valueParser = new Value(\Transphporm\Hook\DataFunction::$latest);
-
 		$comparators = ['!=', '='];
+		$valueParser = self::$valueParser;
 		foreach ($comparators as $comparator) {
 			if (strpos($attr, $comparator) !== false) {
 				$parts = explode($comparator, $attr);
