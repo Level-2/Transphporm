@@ -6,13 +6,13 @@
  * @version         1.0                                                             */
 namespace Transphporm\Hook;
 /** Hooks into the template system, gets assigned as `ul li` or similar and `run()` is called with any elements that match */
-class Rule implements \Transphporm\Hook {
+class PropertyHook implements \Transphporm\Hook {
 	private $rules;
 	private $valueParser;
 	private $pseudoMatcher;
 	private $properties = [];
 
-	public function __construct(array $rules, PseudoMatcher $pseudoMatcher, \Transphporm\ValueParser $valueParser) {
+	public function __construct(array $rules, PseudoMatcher $pseudoMatcher, \Transphporm\Parser\Value $valueParser) {
 		$this->rules = $rules;
 		$this->valueParser = $valueParser;
 		$this->pseudoMatcher = $pseudoMatcher;

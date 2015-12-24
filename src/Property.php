@@ -6,5 +6,5 @@
  * @version         1.0                                                             */
 namespace Transphporm;
 interface Property {
-	public function run($value, \DomElement $element, Hook\Rule $rule);
+	public function run($value, \DomElement $element, Hook\PropertyHook $property);
 }

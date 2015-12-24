@@ -12,7 +12,7 @@ class Repeat implements \Transphporm\Property {
 		$this->data = $data;
 	}
 
-	public function run($value, \DomElement $element, \Transphporm\Hook\Rule $rule)  {
+	public function run($value, \DomElement $element, \Transphporm\Hook\PropertyHook $rule)  {
 		if ($element->getAttribute('transphporm') === 'added') return $element->parentNode->removeChild($element);
 
 		foreach ($value as $key => $iteration) {
@@ -36,7 +36,7 @@ class Repeat implements \Transphporm\Property {
 	}
 
 	private function createHook($newRules, $rule) {
-		$hook = new \Transphporm\Hook\Rule($newRules, $rule->getPseudoMatcher(), new \Transphporm\ValueParser($this->data));
+		$hook = new \Transphporm\Hook\PropertyHook($newRules, $rule->getPseudoMatcher(), new \Transphporm\Parser\Value($this->data));
 		foreach ($rule->getProperties() as $name => $property) $hook->registerProperty($name, $property);
 		return $hook;
 	}

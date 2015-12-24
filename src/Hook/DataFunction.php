@@ -80,7 +80,7 @@ class DataFunction {
 	}
 
 	private function templateSubsection($css, $doc, $element) {
-		$xpathStr = (new \Transphporm\CssToXpath($css, new \Transphporm\ValueParser($this)))->getXpath();
+		$xpathStr = (new \Transphporm\Parser\CssToXpath($css, new \Transphporm\Parser\Value($this)))->getXpath();
 		$xpath = new \DomXpath($doc);
 		$nodes = $xpath->query($xpathStr);
 		$result = [];

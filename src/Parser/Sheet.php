@@ -4,7 +4,7 @@
  * @copyright       2015 Tom Butler <tom@r.je> | https://r.je/                      *
  * @license         http://www.opensource.org/licenses/bsd-license.php  BSD License *
  * @version         1.0                                                             */
-namespace Transphporm;
+namespace Transphporm\Parser;
 /** Parses a .tss file into individual rules, each rule has a query e,g, `ul li` and a set of rules e.g. `display: none; bind: iteration(id);` */
 class Sheet {
 	private $tss;
@@ -12,7 +12,7 @@ class Sheet {
 	private $prefix;
 	private $valueParser;
 
-	public function __construct($tss, $baseDir, ValueParser $valueParser, $prefix = '') {
+	public function __construct($tss, $baseDir, Value $valueParser, $prefix = '') {
 		$this->tss = $this->stripComments($tss);
 		$this->baseDir = $baseDir;
 		$this->prefix = $prefix;
@@ -40,7 +40,7 @@ class Sheet {
 
 	private function CssToRule($selector, $index) {
 		$xPath = new CssToXpath($selector, $this->valueParser, $this->prefix);
-		$rule = new Rule($xPath->getXpath(), $xPath->getPseudo(), $xPath->getDepth(), $index++);
+		$rule = new \Transphporm\Rule($xPath->getXpath(), $xPath->getPseudo(), $xPath->getDepth(), $index++);
 		return $rule;
 	}
 
@@ -95,7 +95,7 @@ class Sheet {
 	}
 
 	private function getProperties($str) {
-		$stringExtractor = new \Transphporm\StringExtractor($str);
+		$stringExtractor = new StringExtractor($str);
 		$rules = explode(';', $stringExtractor);
 		$return = [];
 

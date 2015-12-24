@@ -5,6 +5,7 @@
  * @license         http://www.opensource.org/licenses/bsd-license.php  BSD License *
  * @version         1.0                                                             */
 namespace Transphporm\Hook;
+/** Handles format: foo bar properties in the stylesheet */
 class Formatter {
 	private $formatters = [];
 
@@ -14,7 +15,7 @@ class Formatter {
 
 	public function format($value, $rules) {
 		if (!isset($rules['format'])) return $value;
-		$format = new \Transphporm\StringExtractor($rules['format']);
+		$format = new \Transphporm\Parser\StringExtractor($rules['format']);
 		$options = explode(' ', $format);
 		$functionName = array_shift($options);
 		foreach ($options as &$f) $f = trim($format->rebuild($f), '"');

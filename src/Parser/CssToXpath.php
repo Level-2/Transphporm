@@ -4,7 +4,7 @@
  * @copyright       2015 Tom Butler <tom@r.je> | https://r.je/                      *
  * @license         http://www.opensource.org/licenses/bsd-license.php  BSD License *
  * @version         1.0                                                             */
-namespace Transphporm;
+namespace Transphporm\Parser;
 class CssToXpath {
 	private $specialChars = [' ', '.', '>', '~', '#', ':', '[', ']'];
 	private $translators = [];
@@ -12,7 +12,7 @@ class CssToXpath {
 	private $depth;
 	private $valueParser;
 
-	public function __construct($css, ValueParser $valueParser, $prefix = '') {
+	public function __construct($css, Value $valueParser, $prefix = '') {
 		$this->css = str_replace([' >', '> '],['>', '>'], trim($css));
 		$this->valueParser = $valueParser;
 		$this->translators = [

@@ -50,7 +50,7 @@ class Builder {
 	}
 
 	private function processRules($template, $data) {
-		$valueParser = new ValueParser($data);
+		$valueParser = new Parser\Value($data);
 		foreach ($this->getRules($template, $valueParser) as $rule) {
 			if ($rule->shouldRun($this->time)) $this->executeTssRule($rule, $template, $data, $valueParser);			
 		}
@@ -65,7 +65,7 @@ class Builder {
 	//Process a TSS rule e.g. `ul li {content: "foo"; format: bar}
 	private function executeTssRule($rule, $template, $data, $valueParser) {
 		$rule->touch();
-		$hook = new Hook\Rule($rule->properties, new Hook\PseudoMatcher($rule->pseudo, $data), $valueParser);
+		$hook = new Hook\PropertyHook($rule->properties, new Hook\PseudoMatcher($rule->pseudo, $data), $valueParser);
 		foreach ($this->registeredProperties as $name => $property) $hook->registerProperty($name, $property);
 		$template->addHook($rule->query, $hook);
 	}
@@ -90,10 +90,10 @@ class Builder {
 			$key = $this->tss . $template->getPrefix() . $this->baseDir;
 			//Try to load the cached rules, if not set in the cache (or expired) parse the supplied sheet
 			$rules = $this->cache->load($key, filemtime($this->tss));
-			if (!$rules) return $this->cache->write($key, (new Sheet(file_get_contents($this->tss), $this->baseDir, $valueParser, $template->getPrefix()))->parse());
+			if (!$rules) return $this->cache->write($key, (new Parser\Sheet(file_get_contents($this->tss), $this->baseDir, $valueParser, $template->getPrefix()))->parse());
 			else return $rules;
 		}
-		else return (new Sheet($this->tss, $this->baseDir, $valueParser, $template->getPrefix()))->parse();
+		else return (new Parser\Sheet($this->tss, $this->baseDir, $valueParser, $template->getPrefix()))->parse();
 	}
 
 	public function setCache(\ArrayAccess $cache) {

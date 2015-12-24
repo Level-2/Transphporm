@@ -17,7 +17,7 @@ class Content implements \Transphporm\Property {
 		$this->formatter = $formatter;
 	}
 
-	public function run($value, \DomElement $element, \Transphporm\Hook\Rule $rule) {
+	public function run($value, \DomElement $element, \Transphporm\Hook\PropertyHook $rule) {
 		if ($element->getAttribute('transphporm') === 'remove') return;
 				
 		$value = $this->formatter->format($value, $rule->getRules());

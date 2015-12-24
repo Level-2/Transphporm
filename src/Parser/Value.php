@@ -4,12 +4,12 @@
  * @copyright       2015 Tom Butler <tom@r.je> | https://r.je/                      *
  * @license         http://www.opensource.org/licenses/bsd-license.php  BSD License *
  * @version         1.0                                                             */
-namespace Transphporm;
+namespace Transphporm\Parser;
 /** Parses "string" and function(args) e.g. data(foo) or iteration(bar) */ 
-class ValueParser {
+class Value {
 	private $dataFunction;
 
-	public function __construct(Hook\DataFunction $dataFunction) {
+	public function __construct(\Transphporm\Hook\DataFunction $dataFunction) {
 		$this->dataFunction = $dataFunction;
 	}
 

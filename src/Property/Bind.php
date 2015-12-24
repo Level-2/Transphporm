@@ -12,7 +12,7 @@ class Bind implements \Transphporm\Property {
 		$this->data = $data;
 	}
 
-	public function run($value, \DomElement $element, \Transphporm\Hook\Rule $rule)  {
+	public function run($value, \DomElement $element, \Transphporm\Hook\PropertyHook $rule)  {
 		$this->data->bind($element, $value);
 	}
 }
