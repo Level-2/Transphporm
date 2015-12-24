@@ -8,7 +8,8 @@ namespace Transphporm\Property;
 class Content implements \Transphporm\Property {
 	private $data;
 	private $headers;
-	private $formatter; 
+	private $formatter;
+
 
 	public function __construct($data, &$headers, \Transphporm\Hook\Formatter $formatter) {
 		$this->data = $data;
@@ -17,6 +18,8 @@ class Content implements \Transphporm\Property {
 	}
 
 	public function run($value, \DomElement $element, \Transphporm\Hook\Rule $rule) {
+		if ($element->getAttribute('transphporm') === 'remove') return;
+				
 		$value = $this->formatter->format($value, $rule->getRules());
 		if (!$this->processPseudo($value, $element, $rule)) {
 			//Remove the current contents
@@ -37,6 +40,7 @@ class Content implements \Transphporm\Property {
 
 	private function pseudoAttr($value, $element, $rule) {
 		if ($attr = $rule->getPseudoMatcher()->attr()) {
+			//var_dump($value);
 			$element->setAttribute($attr, implode('', $value));
 			return true;
 		}

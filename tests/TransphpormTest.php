@@ -1243,6 +1243,9 @@ class TransphpormTest extends PHPUnit_Framework_TestCase {
 			<span foo="bar">replaced</span>
 		</div>'));
 	}
+
+
+
 }
 
 

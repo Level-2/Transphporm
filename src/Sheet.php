@@ -45,7 +45,10 @@ class Sheet {
 	}
 
 	private function writeRule($rules, $selector, $newRule) {
-		if (isset($rules[$selector])) $newRule->properties = array_merge($rules[$selector], $newRule->properties);
+		if (isset($rules[$selector])) {
+			$newRule->properties = array_merge($rules[$selector]->properties, $newRule->properties);
+		}
+
 		$rules[$selector] = $newRule;
 		
 		return $rules;
