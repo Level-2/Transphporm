@@ -1245,6 +1245,30 @@ class TransphpormTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	public function testSelectAttributeFromData2() {
+		$xml = '<select name="foo">
+		<option value="test">Test</option>
+		<option value="test2">Test 2</option>
+		</select>';
+
+		$data = ['foo' => 'test2'];
+
+		$tss = '
+select { bind: data(attr(name)); }
+select option[value=data()]:attr(selected) { content: "selected"; }
+		';
+
+		$template = new \Transphporm\Builder($xml, $tss);
+		
+		$output = $template->output($data)->body;
+
+		$this->assertEquals($this->stripTabs($output), $this->stripTabs('<select name="foo">
+		<option value="test">Test</option>
+		<option value="test2" selected="selected">Test 2</option>
+
+		</select>'));
+	}
+
 
 }
 
