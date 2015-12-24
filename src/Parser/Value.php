@@ -38,7 +38,7 @@ class Value {
 		
 	}
 
-	public function parse($function, \DomElement $element = null) {
+	public function parse($function, \DomElement $element) {
 		$result = [];
 		if ($function && in_array($function[0], ['\'', '"'])) {
 			$finalPos = $this->findMatchingPos($function, $function[0]);

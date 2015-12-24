@@ -10,18 +10,16 @@ class CssToXpath {
 	private $translators = [];
 	private $css;
 	private $depth;
-	private $valueParser;
 
 	public function __construct($css, Value $valueParser, $prefix = '') {
 		$this->css = str_replace([' >', '> '],['>', '>'], trim($css));
-		$this->valueParser = $valueParser;
 		$this->translators = [
 			' ' => function($string) use ($prefix) { return '//' . $prefix . $string;	},
 			'' => function($string) use ($prefix) { return '/' . $prefix . $string;	},
 			'>' => function($string) use ($prefix) { return '/' . $prefix  . $string; },
 			'#' => function($string) { return '[@id=\'' . $string . '\']'; },
 			'.' => function($string) { return '[contains(concat(\' \', normalize-space(@class), \' \'), \' ' . $string . ' \')]'; }, 
-			'[' => function($string) { return '[@' . $this->parseAttr($string) . ']';	},
+			'[' => function($string, $xpath) { return '[' .'php:function(\'\Transphporm\Parser\CssToXpath::processAttr\', \'' . $string . '\', .)' . ']';	},
 			']' => function() {	return ''; }
 		];
 	}
@@ -33,19 +31,22 @@ class CssToXpath {
 		return $selector;
 	}
 
-	private function parseAttr($attr) {
+	//XPath only allows registering of static functions... this is a hacky workaround for that
+	public static function processAttr($attr, $element) {
+		$valueParser = new Value(\Transphporm\Hook\DataFunction::$latest);
+
 		$comparators = ['!=', '='];
 		foreach ($comparators as $comparator) {
 			if (strpos($attr, $comparator) !== false) {
 				$parts = explode($comparator, $attr);
-				$parts = array_map(function($val) {
-					return implode($this->valueParser->parse($val));
+				$parts = array_map(function($val) use ($valueParser, $element) {
+					return $valueParser->parse($val, $element[0])[0];
 				}, $parts);
-				if (isset($parts[1])) $parts[1] = '"' . $parts[1] . '"';
-				return implode($comparator, $parts);
+				
+				if ($comparator == '=') return $element[0]->getAttribute($parts[0]) == $parts[1];
+				else if ($comparator == '!=') return $element[0]->getAttribute($parts[0]) != $parts[1];
 			}
 		}
-
 		return $attr;
 	}
 
@@ -72,7 +73,7 @@ class CssToXpath {
 		$this->depth = count($selectors);
 		$xpath = '/';
 		foreach ($selectors as $selector) {
-			if (isset($this->translators[$selector->type])) $xpath .= $this->translators[$selector->type]($selector->string);
+			if (isset($this->translators[$selector->type])) $xpath .= $this->translators[$selector->type]($selector->string, $xpath);
 		}
 
 		$xpath = str_replace('/[', '/*[', $xpath);

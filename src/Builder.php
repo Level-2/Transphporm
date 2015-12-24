@@ -16,6 +16,7 @@ class Builder {
 	private $cache;
 	private $time;
 
+
 	public function __construct($template, $tss = '') {
 		$this->template = $template;
 		$this->tss = $tss;

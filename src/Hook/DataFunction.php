@@ -11,12 +11,16 @@ class DataFunction {
 	private $data;
 	private $locale;
 	private $baseDir;
+	public static $latest;
 	
 	public function __construct(\SplObjectStorage $objectStorage, $data, $locale, $baseDir) {
 		$this->dataStorage = $objectStorage;
 		$this->data = $data;
 		$this->locale = $locale;
 		$this->baseDir = $baseDir;
+		//The function http://php.net/manual/en/domxpath.registerphpfunctions.php is required later, which cannot reference
+		//instances. This will need at least one static method/variable. Bit hacky but the only way to use it
+		self::$latest = $this;
 	}
 
 	/** Binds data to an element */

@@ -1251,7 +1251,7 @@ class TransphpormTest extends PHPUnit_Framework_TestCase {
 		<option value="test2">Test 2</option>
 		</select>';
 
-		$data = ['foo' => 'test2'];
+		$data = ['x' => 'y', 'z'=> 'bar', 'foo' => 'test2'];
 
 		$tss = '
 select { bind: data(attr(name)); }
@@ -1268,6 +1268,7 @@ select option[value=data()]:attr(selected) { content: "selected"; }
 
 		</select>'));
 	}
+
 
 
 

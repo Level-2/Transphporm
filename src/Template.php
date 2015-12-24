@@ -18,6 +18,8 @@ class Template {
 
 		$this->document->loadXML($doc);
 		$this->xpath = new \DomXPath($this->document);
+		$this->xpath->registerNamespace('php', 'http://php.net/xpath');
+		$this->xpath->registerPhpFunctions();
 
 		if ($this->document->documentElement->namespaceURI !== null) {
 			$this->xpath->registerNamespace('nsprefix', $this->document->documentElement->namespaceURI);
