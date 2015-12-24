@@ -44,11 +44,15 @@ class CssToXpath {
 					return $valueParser->parse($val, $element[0])[0];
 				}, $parts);
 				
-				if ($comparator == '=') return $element[0]->getAttribute($parts[0]) == $parts[1];
-				else if ($comparator == '!=') return $element[0]->getAttribute($parts[0]) != $parts[1];
+				return self::compare($comparator, $element[0]->getAttribute($parts[0]), $parts[1]);
 			}
 		}
 		return $attr;
+	}
+
+	private static function compare($comparator, $a, $b) {
+		if ($comparator == '=') return $a == $b;
+		else if ($comparator == '!=') return $a != $b;
 	}
 
 	//split the css into indivudal functions
