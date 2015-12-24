@@ -10,7 +10,9 @@ class CssToXpath {
 	private $translators = [];
 	private $css;
 	private $depth;
+	private $valueParser;
 	private static $instances = [];
+
 
 	public function __construct($css, Value $valueParser, $prefix = '') {
 		$hash = $this->registerInstance();
@@ -22,7 +24,7 @@ class CssToXpath {
 			'>' => function($string) use ($prefix) { return '/' . $prefix  . $string; },
 			'#' => function($string) { return '[@id=\'' . $string . '\']'; },
 			'.' => function($string) { return '[contains(concat(\' \', normalize-space(@class), \' \'), \' ' . $string . ' \')]'; }, 
-			'[' => function($string, $xpath) use($hash) { return '[' .'php:function(\'\Transphporm\Parser\CssToXpath::processAttr\', \'' . $string . '\', ., "' . $hash . '")' . ']';	},
+			'[' => function($string) use ($hash) { return '[' .'php:function(\'\Transphporm\Parser\CssToXpath::processAttr\', \'' . $string . '\', ., "' . $hash . '")' . ']';	},
 			']' => function() {	return ''; }
 		];
 	}
