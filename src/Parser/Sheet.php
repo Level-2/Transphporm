@@ -19,21 +19,21 @@ class Sheet {
 		$this->valueParser = $valueParser;
 	}
 
-	public function parse($pos = 0, $rules = []) {
+	public function parse($pos = 0, $rules = [], $indexStart = 0) {
 		while ($next = strpos($this->tss, '{', $pos)) {
-			if ($processing = $this->processingInstructions($this->tss, $pos, $next)) {
+			if ($processing = $this->processingInstructions($this->tss, $pos, $next, count($rules)+$indexStart)) {
 				$pos = $processing['endPos']+1;
-				$rules = array_merge($processing['rules'], $rules);
+				$rules = array_merge($rules, $processing['rules']);
 			}
 
 			$selector = trim(substr($this->tss, $pos, $next-$pos));
-			$rule = $this->cssToRule($selector, count($rules));	
+			$rule = $this->cssToRule($selector, count($rules)+$indexStart);	
 			$pos =  strpos($this->tss, '}', $next)+1;
 			$rule->properties = $this->getProperties(trim(substr($this->tss, $next+1, $pos-2-$next)));	
 			$rules = $this->writeRule($rules, $selector, $rule);
 		}
 		//there may be processing instructions at the end
-		if ($processing = $this->processingInstructions($this->tss, $pos, strlen($this->tss))) $rules = array_merge($processing['rules'], $rules);
+		if ($processing = $this->processingInstructions($this->tss, $pos, strlen($this->tss), count($rules)+$indexStart)) $rules = array_merge($rules, $processing['rules']);
 		usort($rules, [$this, 'sortRules']);
 		return $rules;
 	}
@@ -54,7 +54,7 @@ class Sheet {
 		return $rules;
 	}
 
-	private function processingInstructions($tss, $pos, $next) {
+	private function processingInstructions($tss, $pos, $next, $indexStart) {
 		$rules = [];
 		while (($atPos = strpos($tss, '@', $pos)) !== false) {
 			if ($atPos  <= (int) $next) {
@@ -62,7 +62,7 @@ class Sheet {
 				$funcName = substr($tss, $atPos+1, $spacePos-$atPos-1);
 				$pos = strpos($tss, ';', $spacePos);
 				$args = substr($tss, $spacePos+1, $pos-$spacePos-1);
-				$rules = array_merge($rules, $this->$funcName($args));
+				$rules = array_merge($rules, $this->$funcName($args, $indexStart));
 			}
 			else {
 				break;	
@@ -72,9 +72,9 @@ class Sheet {
 		return empty($rules) ? false : ['endPos' => $pos, 'rules' => $rules];
 	}
 
-	private function import($args) {
+	private function import($args, $indexStart) {
 		$sheet = new Sheet(file_get_contents($this->baseDir . trim($args, '\'" ')), $this->baseDir, $this->valueParser, $this->prefix);
-		return $sheet->parse();
+		return $sheet->parse(0, [], $indexStart);
 	}
 
 	private function sortRules($a, $b) {
