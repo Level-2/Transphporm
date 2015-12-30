@@ -40,7 +40,6 @@ class Content implements \Transphporm\Property {
 
 	private function pseudoAttr($value, $element, $rule) {
 		if ($attr = $rule->getPseudoMatcher()->attr()) {
-			//var_dump($value);
 			$element->setAttribute($attr, implode('', $value));
 			return true;
 		}
@@ -55,8 +54,19 @@ class Content implements \Transphporm\Property {
 
 	private function getNode($node, $document) {
 		foreach ($node as $n) {
-			if ($n instanceof \DomNode) yield $document->importNode($n, true);
-			else yield $document->createTextNode($n);
+			if ($n instanceof \DomElement) {
+				$new = $document->importNode($n, true);
+				$new->setAttribute('transphporm', 'added');
+			}
+			else {
+				if ($n instanceof \DomText) $n = $n->nodeValue;
+				if ($n == '') continue;
+
+				$new = $document->createElement('text');
+				$new->appendChild($document->createTextNode($n));
+				$new->setAttribute('transphporm', 'text');
+			}
+			yield $new;
 		}
 	}
 
@@ -78,27 +88,26 @@ class Content implements \Transphporm\Property {
 		 }		 
 	}
 
-	private function appendToIfNode($element, $content, $appendTo) {
-		if (isset($content[0]) && $content[0] instanceof \DomNode) {
-			foreach ($content as $node) {
-				$node = $element->ownerDocument->importNode($node, true);
-				$appendTo->appendChild($node);
-			}
-			return true;
+	private function removeAdded($e) {
+		$remove = [];
+		while ($e = $e->previousSibling && $e->getAttribute('transphporm') != null && $e->getAttribute('transphporm') != 'remove') {
+			$remove[] = $e;
 		}
-		return false;
+		foreach ($remove as $r) $r->parentNode->removeChild($r);
 	}
 
 	private function replaceContent($element, $content) {
-		if (!$this->appendToIfNode($element, $content, $element->parentNode)) {
-			$element->parentNode->appendChild($element->ownerDocument->createElement('span', implode('', $content)));
+		//If this rule was cached, the elements that were added last time need to be removed prior to running the rule again.
+		$this->removeAdded($element);
+		foreach ($this->getNode($content, $element->ownerDocument) as $node) {
+			$element->parentNode->insertBefore($node, $element);
 		}		
 		$element->setAttribute('transphporm', 'remove');
 	}
 
 	private function appendContent($element, $content) {
-		if (!$this->appendToIfNode($element, $content, $element)) {
-			$element->appendChild($element->ownerDocument->createTextNode(implode('', $content)));
+		foreach ($this->getNode($content, $element->ownerDocument) as $node) {
+			$element->appendChild($node);
 		}
 	}
 

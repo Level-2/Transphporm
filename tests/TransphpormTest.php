@@ -1206,7 +1206,7 @@ class TransphpormTest extends PHPUnit_Framework_TestCase {
 
 		$output = $template->output()->body;
 
-		$this->assertEquals($this->stripTabs($output), $this->stripTabs('<div><span>replaced</span></div>'));
+		$this->assertEquals($this->stripTabs($output), $this->stripTabs('<div>replaced</div>'));
 	}
 
 	public function testContentModeReplaceBlock() {
@@ -1304,7 +1304,6 @@ select option[value=data()]:attr(selected) { content: "selected"; }
 		$this->assertEquals('<div><p>foo</p><span>Test</span></div>', $this->stripTabs($template->output()->body));
 
 	}
-
 
 }
 
