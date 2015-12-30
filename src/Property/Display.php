@@ -7,7 +7,8 @@
 namespace Transphporm\Property;
 class Display implements \Transphporm\Property {
 	public function run($value, \DomElement $element, \Transphporm\Hook\PropertyHook $rule) {
-		if (strtolower($value[0]) === 'none') $element->setAttribute('transphporm', 'remove');
+		if ($attr = $rule->getPseudoMatcher()->attr()) $element->removeAttribute($attr);
+		else if (strtolower($value[0]) === 'none') $element->setAttribute('transphporm', 'remove');
 		else $element->setAttribute('transphporm', 'show');
 	}
 }

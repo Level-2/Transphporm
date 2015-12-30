@@ -1270,6 +1270,25 @@ select option[value=data()]:attr(selected) { content: "selected"; }
 	}
 
 
+	public function testAttrDisplayNone() {
+		$xml = '<div>
+			<span class="bar">test</span>
+			<span id="foo">baz</span>
+		</div>';
+
+
+		$tss = 'span:attr(class) {display: none; }';
+
+		$template = new \Transphporm\Builder($xml, $tss);
+		
+		$output = $template->output()->body;
+		
+
+		$this->assertEquals($this->stripTabs($output), $this->stripTabs('<div>
+			<span>test</span>
+			<span id="foo">baz</span>
+		</div>'));
+	}
 
 
 }
