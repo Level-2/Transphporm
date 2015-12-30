@@ -60,8 +60,6 @@ class Content implements \Transphporm\Property {
 			}
 			else {
 				if ($n instanceof \DomText) $n = $n->nodeValue;
-				if ($n == '') continue;
-
 				$new = $document->createElement('text');
 				$new->appendChild($document->createTextNode($n));
 				$new->setAttribute('transphporm', 'text');
@@ -90,7 +88,7 @@ class Content implements \Transphporm\Property {
 
 	private function removeAdded($e) {
 		$remove = [];
-		while ($e = $e->previousSibling && $e->getAttribute('transphporm') != null && $e->getAttribute('transphporm') != 'remove') {
+		while ($e = $e->previousSibling && !in_array($e->getAttribute('transphporm'), [null, 'remove'])) {
 			$remove[] = $e;
 		}
 		foreach ($remove as $r) $r->parentNode->removeChild($r);
@@ -110,7 +108,7 @@ class Content implements \Transphporm\Property {
 			$element->appendChild($node);
 		}
 	}
-
+	
 	private function removeAllChildren($element) {
 		while ($element->hasChildNodes()) $element->removeChild($element->firstChild);
 	}

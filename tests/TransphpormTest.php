@@ -1304,7 +1304,4 @@ select option[value=data()]:attr(selected) { content: "selected"; }
 		$this->assertEquals('<div><p>foo</p><span>Test</span></div>', $this->stripTabs($template->output()->body));
 
 	}
-
 }
-
-
