@@ -1290,6 +1290,21 @@ select option[value=data()]:attr(selected) { content: "selected"; }
 		</div>'));
 	}
 
+	public function testBeforeTemplate() {
+		$xml = '<div>
+			<span>Test</span>
+		</div>';
+
+
+		$includeFile = __DIR__ . DIRECTORY_SEPARATOR . 'include.xml';
+
+		$tss = "div:before {content: template($includeFile); }";
+		$template = new \Transphporm\Builder($xml, $tss);
+
+		$this->assertEquals('<div><p>foo</p><span>Test</span></div>', $this->stripTabs($template->output()->body));
+
+	}
+
 
 }
 

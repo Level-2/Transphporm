@@ -53,16 +53,27 @@ class Content implements \Transphporm\Property {
 		}
 	}
 
+	private function getNode($node, $document) {
+		foreach ($node as $n) {
+			if ($n instanceof \DomNode) yield $document->importNode($n, true);
+			else yield $document->createTextNode($n);
+		}
+	}
+
 	private function pseudoBefore($value, $element, $rule) {
 		if (in_array('before', $rule->getPseudoMatcher()->getPseudo())) {
-			$element->firstChild->nodeValue = implode('', $value) . $element->firstChild->nodeValue;
+			foreach ($this->getNode($value, $element->ownerDocument) as $node) {
+				$element->insertBefore($node, $element->firstChild);	
+			}
 			return true;
 		}
 	}
 
 	private function pseudoAfter($value, $element, $rule) {
 		 if (in_array('after', $rule->getPseudoMatcher()->getPseudo())) {
-		 	$element->firstChild->nodeValue .= implode('', $value);
+		 	foreach ($this->getNode($value, $element->ownerDocument) as $node) {
+		 		$element->appendChild($node);
+			}
 		 	return true;
 		 }		 
 	}
