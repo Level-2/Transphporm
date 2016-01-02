@@ -17,9 +17,12 @@ class PseudoMatcher {
 
 	public function matches($element) {
 		$matches = true;
+		$functions = ['attribute', 'nth', 'not'];
 
 		foreach ($this->pseudo as $pseudo) {			
-			$matches = $matches && $this->attribute($pseudo, $element) && $this->nth($pseudo, $element);			
+			foreach ($functions as $func) {
+				$matches = $matches && $this->$func($pseudo, $element);
+			}
 		}		
 		return $matches;
 	}
@@ -50,12 +53,9 @@ class PseudoMatcher {
 		list ($field, $value) = explode('=', $criteria);
 
 		$operator = $this->getOperator($field);
+		$lookupValue = $this->dataFunction->$name([trim($field, $operator)], $element);
 
-		$field = trim($field, $operator);		
-		$value = $this->parseValue(trim($value, '"'));
-
-		$lookupValue = $this->dataFunction->$name([$field], $element);
-		return $this->processOperator($operator, $lookupValue, $value);
+		return $this->processOperator($operator, $lookupValue, $this->parseValue(trim($value, '"')));
 	}
 
 	//Currently only not is supported, but this is separated out to support others in future
@@ -85,6 +85,24 @@ class PseudoMatcher {
 			if (is_callable([$this, $criteria])) return $this->$criteria($num);
 			else return $num == $criteria;
 			
+		}
+		return true;
+	}
+
+	private function not($pseudo, $element) {
+		if (strpos($pseudo, 'not') === 0) {
+			$valueParser = new \Transphporm\Parser\Value($this->dataFunction);
+			$css = explode(',', $this->getBetween($pseudo, '(', ')'));
+
+			foreach ($css as $selector) {
+				$cssToXpath = new \Transphporm\Parser\CssToXpath($selector, $valueParser);
+				$xpathString = $cssToXpath->getXpath();	
+				$xpath = new \DomXpath($element->ownerDocument);
+				
+				foreach ($xpath->query($xpathString) as $matchedElement) {
+					if ($element->isSameNode($matchedElement)) return false;
+				}
+			}
 		}
 		return true;
 	}

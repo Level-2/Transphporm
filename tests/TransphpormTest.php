@@ -1365,7 +1365,7 @@ select option[value=data()]:attr(selected) { content: "selected"; }
 			<div class="two"></div>
 			<div class="three">
 			</div>
-		'));;
+		'));
 
 	}
 
@@ -1390,8 +1390,33 @@ select option[value=data()]:attr(selected) { content: "selected"; }
 			<div class="one">foo</div>
 			<div class="two"></div>
 			<div class="three">foo</div>
-		'));;
+		'));
 
 
+	}
+
+	public function testNot() {
+		$xml = '
+		<div class="one">
+
+		</div>
+		<div class="two">
+
+		</div>
+		<div class="three">
+		</div>
+		';
+
+		$tss = 'div:not(.two) {content: "foo"; }';
+
+
+		$template = new \Transphporm\Builder($xml, $tss);
+
+		$this->assertEquals($this->stripTabs($template->output()->body), $this->stripTabs('
+			<div class="one">foo</div>
+			<div class="two"></div>
+			<div class="three">foo</div>
+		'));
+		
 	}
 }
