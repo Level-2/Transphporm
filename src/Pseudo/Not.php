@@ -17,15 +17,20 @@ class Not implements \Transphporm\Pseudo {
 			$valueParser = new \Transphporm\Parser\Value($this->dataFunction);
 			$bracketMatcher = new \Transphporm\Parser\BracketMatcher($pseudo);
 			$css = explode(',', $bracketMatcher->match('(', ')'));
+			$xpath = new \DomXpath($element->ownerDocument);
+			return $this->notElement($css, $valueParser, $xpath, $element);
+		}
+		return true;
+	}
 
-			foreach ($css as $selector) {
-				$cssToXpath = new \Transphporm\Parser\CssToXpath($selector, $valueParser);
-				$xpathString = $cssToXpath->getXpath();	
-				$xpath = new \DomXpath($element->ownerDocument);
-				
-				foreach ($xpath->query($xpathString) as $matchedElement) {
-					if ($element->isSameNode($matchedElement)) return false;
-				}
+	private function notElement($css, $valueParser, $xpath, $element) {
+		foreach ($css as $selector) {
+			$cssToXpath = new \Transphporm\Parser\CssToXpath($selector, $valueParser);
+			$xpathString = $cssToXpath->getXpath();					
+			//Find all nodes matched by the expressions in the brackets :not(EXPR)
+			foreach ($xpath->query($xpathString) as $matchedElement) {
+				//Check to see whether this node was matched by the not query
+				if ($element->isSameNode($matchedElement)) return false;
 			}
 		}
 		return true;

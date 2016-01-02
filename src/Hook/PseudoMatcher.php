@@ -54,7 +54,7 @@ class PseudoMatcher {
 		if ($square === false) $square = 999;
 
 		if ($parenthesis < $square) return ['(', ')'];
-		else if ($parenthesis > $square) return ['[', ']'];
+		return ['[', ']'];
 	}
 	
 	public function getPseudo() {
