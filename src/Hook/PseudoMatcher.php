@@ -24,24 +24,33 @@ class PseudoMatcher {
 		return $matches;
 	}
 
+	private function betweenBrackets($string, $openChr, $closingChr, $start = 0) {
+		$open = strpos($string, $openChr, $start);
+		$close = strpos($string, $closingChr, $open);
 
+		$cPos = $open+1;
+		while (($cPos = strpos($string, $openChr, $cPos+1)) !== false && $cPos < $close) $close = strpos($string, $closingChr, $close+1);
+
+		return substr($string, $open+1, $close-$open-1);
+	}
+	
 	private function attribute($pseudo, $element) {
-		$pos = strpos($pseudo, '[');
-		if ($pos === false) return true;
-		$end = strpos($pseudo, ']', $pos);
-
-		$name = substr($pseudo, 0, $pos);
-
 		if (strpos($pseudo, '=') === false) return true;
 
-		$criteria = substr($pseudo, $pos+1, $end-$pos-1);
+		$pos = strpos($pseudo, '[');
+		if ($pos === false) return true;
+		
+		$name = substr($pseudo, 0, $pos);
+		$criteria = $this->betweenBrackets($pseudo, '[', ']');
+		
 		list ($field, $value) = explode('=', $criteria);
 
 		$operator = $this->getOperator($field);
+
 		$field = trim($field, $operator);		
 		$value = $this->parseValue(trim($value, '"'));
-		$lookupValue = $this->dataFunction->$name([$field], $element);
 
+		$lookupValue = $this->dataFunction->$name([$field], $element);
 		$matched = $lookupValue == $value;
 		return $operator === '!' ? !$matched : $matched;		
 	}

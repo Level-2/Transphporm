@@ -34,7 +34,7 @@ class DataFunction {
 
 	public function iteration($val, $element) {
 		$data = $this->getData($element, 'iteration');
-		$value = $this->traverse($val, $data);
+		$value = $this->traverse($val, $data, $element);
 		return $value;
 	}
 
@@ -54,16 +54,18 @@ class DataFunction {
 
 	public function data($val, \DomElement $element = null) {
 		$data = $this->getData($element);
-		$value = $this->traverse($val, $data);
+		$value = $this->traverse($val, $data, $element);
 		return $value;			
 	}
 
-	private function traverse($name, $data) {
+	private function traverse($name, $data, $element) {
 		$name[0] = str_replace(['[', ']'], ['.', ''], $name[0]);
 		$parts = explode('.', $name[0]);
 		$obj = $data;
+		$valueParser = new \Transphporm\Parser\Value($this);
 		foreach ($parts as $part) {
 			if ($part === '') continue;
+			$part = $valueParser->parse($part, $element)[0];
 			if (is_callable([$obj, $part])) $obj = call_user_func([$obj, $part]); 
 			else $obj = $this->ifNull($obj, $part);
 		}

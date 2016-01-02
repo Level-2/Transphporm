@@ -1304,4 +1304,68 @@ select option[value=data()]:attr(selected) { content: "selected"; }
 		$this->assertEquals('<div><p>foo</p><span>Test</span></div>', $this->stripTabs($template->output()->body));
 
 	}
+
+	public function testFilterDataArray() {
+		$data = [
+			'anArray' => [
+				'one' => 'foo',
+				'two' => 'bar'
+			]
+		];
+
+		$xml = '
+		<div class="one">
+
+		</div>
+		<div class="two">
+
+		</div>
+		<div class="three">
+		</div>
+		';
+
+		$tss = 'div:data[anArray[attr(class)]] {content: data(anArray[attr(class)]) }';
+
+		$template = new \Transphporm\Builder($xml, $tss);
+
+		$this->assertEquals($this->stripTabs($template->output($data)->body), $this->stripTabs('
+			<div class="one">foo</div>
+			<div class="two">bar</div>
+			<div class="three">
+			</div>
+		'));;
+
+	}
+
+	public function testFilterDataArrayWithEquals() {
+		$data = [
+			'anArray' => [
+				'one' => 'foo',
+				'two' => 'bar'
+			]
+		];
+
+		$xml = '
+		<div class="one">
+
+		</div>
+		<div class="two">
+
+		</div>
+		<div class="three">
+		</div>
+		';
+
+		$tss = 'div:data[anArray[attr(class)]="foo"] {content: data(anArray[attr(class)]) }';
+
+		$template = new \Transphporm\Builder($xml, $tss);
+
+		$this->assertEquals($this->stripTabs($template->output($data)->body), $this->stripTabs('
+			<div class="one">foo</div>
+			<div class="two"></div>
+			<div class="three">
+			</div>
+		'));;
+
+	}
 }

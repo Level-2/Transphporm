@@ -35,7 +35,6 @@ class Value {
 			return ['name' => $name, 'params' => $params, 'endPoint' => $close];
 		}
 		else return ['name' => null, 'params' => $function, 'endPoint' => strlen($function)];
-		
 	}
 
 	public function parse($function, \DomElement $element) {
