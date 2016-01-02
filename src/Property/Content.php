@@ -17,15 +17,15 @@ class Content implements \Transphporm\Property {
 		$this->formatter = $formatter;
 	}
 
-	public function run($value, \DomElement $element, \Transphporm\Hook\PropertyHook $rule) {
+	public function run($value, \DomElement $element, array $rules, \Transphporm\Hook\PseudoMatcher $pseudoMatcher, array $properties = []) {
 		if ($element->getAttribute('transphporm') === 'remove') return;
-				
-		$value = $this->formatter->format($value, $rule->getRules());
-		if (!$this->processPseudo($value, $element, $rule)) {
+	
+		$value = $this->formatter->format($value, $rules);
+		if (!$this->processPseudo($value, $element, $pseudoMatcher)) {
 			//Remove the current contents
 			$this->removeAllChildren($element);
 			//Now make a text node
-			if ($this->getContentMode($rule->getRules()) === 'replace') $this->replaceContent($element, $value);
+			if ($this->getContentMode($rules) === 'replace') $this->replaceContent($element, $value);
 			else $this->appendContent($element, $value);
 		}
 	}
@@ -34,24 +34,17 @@ class Content implements \Transphporm\Property {
 		return (isset($rules['content-mode'])) ? $rules['content-mode'] : 'append';
 	}
 
-	private function processPseudo($value, $element, $rule) {
-		return $this->pseudoAttr($value, $element, $rule) || $this->pseudoHeader($value, $element, $rule) || $this->pseudoBefore($value, $element, $rule) || $this->pseudoAfter($value, $element, $rule);
-	}
-
-	private function pseudoAttr($value, $element, $rule) {
-		if ($attr = $rule->getPseudoMatcher()->attr()) {
-			$element->setAttribute($attr, implode('', $value));
-			return true;
+	private function processPseudo($value, $element, $pseudoMatcher) {
+		$pseudoContent = ['attr', 'header', 'before', 'after'];
+		foreach ($pseudoContent as $pseudo) {
+			if ($pseudoMatcher->hasFunction($pseudo)) {
+				$this->$pseudo($value, $pseudoMatcher->getFuncArgs($pseudo), $element);
+				return true;
+			}
 		}
+		return false;
 	}
-
-	private function pseudoHeader($value, $element, $rule) {
-		if ($header = $rule->getPseudoMatcher()->header($element)) {
-			$this->headers[] = [$header, implode('', $value)];
-			return true;
-		}
-	}
-
+	
 	private function getNode($node, $document) {
 		foreach ($node as $n) {
 			if ($n instanceof \DomElement) {
@@ -68,22 +61,26 @@ class Content implements \Transphporm\Property {
 		}
 	}
 
-	private function pseudoBefore($value, $element, $rule) {
-		if (in_array('before', $rule->getPseudoMatcher()->getPseudo())) {
-			foreach ($this->getNode($value, $element->ownerDocument) as $node) {
-				$element->insertBefore($node, $element->firstChild);	
-			}
-			return true;
-		}
+	/** Functions for writing to pseudo elements, attr, before, after, header */
+	private function attr($value, $pseudoArgs, $element) {
+		$element->setAttribute($pseudoArgs, implode('', $value));
 	}
 
-	private function pseudoAfter($value, $element, $rule) {
-		 if (in_array('after', $rule->getPseudoMatcher()->getPseudo())) {
-		 	foreach ($this->getNode($value, $element->ownerDocument) as $node) {
+	private function header($value, $pseudoArgs, $element) {
+		$this->headers[] = [$pseudoArgs, implode('', $value)];
+	}
+
+	private function before($value, $pseudoArgs, $element) {
+		foreach ($this->getNode($value, $element->ownerDocument) as $node) {
+			$element->insertBefore($node, $element->firstChild);	
+		}
+		return true;
+	}
+
+	private function after($value, $pseudoArgs, $element) {
+		 foreach ($this->getNode($value, $element->ownerDocument) as $node) {
 		 		$element->appendChild($node);
-			}
-		 	return true;
-		 }		 
+		}			 
 	}
 
 	private function removeAdded($e) {

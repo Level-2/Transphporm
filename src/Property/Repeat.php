@@ -12,7 +12,7 @@ class Repeat implements \Transphporm\Property {
 		$this->data = $data;
 	}
 
-	public function run($value, \DomElement $element, \Transphporm\Hook\PropertyHook $rule)  {
+	public function run($value, \DomElement $element, array $rules, \Transphporm\Hook\PseudoMatcher $pseudoMatcher, array $properties = []) {
 		if ($element->getAttribute('transphporm') === 'added') return $element->parentNode->removeChild($element);
 
 		foreach ($value as $key => $iteration) {
@@ -24,20 +24,19 @@ class Repeat implements \Transphporm\Property {
 			$element->parentNode->insertBefore($clone, $element);
 
 			//Re-run the hook on the new element, but use the iterated data
-			$newRules = $rule->getRules();
 			//Don't run repeat on the clones element or it will loop forever
-			unset($newRules['repeat']);
+			unset($rules['repeat']);
 
-			$this->createHook($newRules, $rule)->run($clone);
+			$this->createHook($rules, $pseudoMatcher, $properties)->run($clone);
 		}
 		//Flag the original element for removal
 		$element->setAttribute('transphporm', 'remove');
 		return false;
 	}
 
-	private function createHook($newRules, $rule) {
-		$hook = new \Transphporm\Hook\PropertyHook($newRules, $rule->getPseudoMatcher(), new \Transphporm\Parser\Value($this->data));
-		foreach ($rule->getProperties() as $name => $property) $hook->registerProperty($name, $property);
+	private function createHook($newRules, $pseudoMatcher, $properties) {
+		$hook = new \Transphporm\Hook\PropertyHook($newRules, $pseudoMatcher, new \Transphporm\Parser\Value($this->data));
+		foreach ($properties as $name => $property) $hook->registerProperty($name, $property);
 		return $hook;
 	}
 }

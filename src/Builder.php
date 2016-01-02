@@ -66,7 +66,12 @@ class Builder {
 	//Process a TSS rule e.g. `ul li {content: "foo"; format: bar}
 	private function executeTssRule($rule, $template, $data, $valueParser) {
 		$rule->touch();
-		$hook = new Hook\PropertyHook($rule->properties, new Hook\PseudoMatcher($rule->pseudo, $data), $valueParser);
+		$pseudoMatcher = new Hook\PseudoMatcher($rule->pseudo);
+		$pseudoMatcher->registerFunction(new \Transphporm\Pseudo\Attribute($data));
+		$pseudoMatcher->registerFunction(new \Transphporm\Pseudo\Nth());
+		$pseudoMatcher->registerFunction(new \Transphporm\Pseudo\Not($data));
+		
+		$hook = new Hook\PropertyHook($rule->properties, $pseudoMatcher, $valueParser);
 		foreach ($this->registeredProperties as $name => $property) $hook->registerProperty($name, $property);
 		$template->addHook($rule->query, $hook);
 	}
