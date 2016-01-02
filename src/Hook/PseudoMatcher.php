@@ -35,14 +35,18 @@ class PseudoMatcher {
 	}
 	
 	private function attribute($pseudo, $element) {
-		if (strpos($pseudo, '=') === false) return true;
-
 		$pos = strpos($pseudo, '[');
 		if ($pos === false) return true;
 		
 		$name = substr($pseudo, 0, $pos);
+		if (!is_callable([$this->dataFunction, $name])) return true;
+
 		$criteria = $this->betweenBrackets($pseudo, '[', ']');
-		
+
+		if (strpos($pseudo, '=') === false) {
+			$lookupValue = $this->dataFunction->$name([$criteria], $element);
+			return $lookupValue !== null;
+		}
 		list ($field, $value) = explode('=', $criteria);
 
 		$operator = $this->getOperator($field);

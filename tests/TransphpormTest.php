@@ -1324,13 +1324,13 @@ select option[value=data()]:attr(selected) { content: "selected"; }
 		</div>
 		';
 
-		$tss = 'div:data[anArray[attr(class)]] {content: data(anArray[attr(class)]) }';
+		$tss = 'div:data[anArray[attr(class)]] {content: "set" }';
 
 		$template = new \Transphporm\Builder($xml, $tss);
 
 		$this->assertEquals($this->stripTabs($template->output($data)->body), $this->stripTabs('
-			<div class="one">foo</div>
-			<div class="two">bar</div>
+			<div class="one">set</div>
+			<div class="two">set</div>
 			<div class="three">
 			</div>
 		'));;
