@@ -28,10 +28,8 @@ class Sheet {
 
 			$selector = trim(substr($this->tss, $pos, $next-$pos));
 			$pos =  strpos($this->tss, '}', $next)+1;
-			foreach ($this->cssToRules($selector, count($rules)+$indexStart) as  $selector => $rule) {
-				$rule->properties = $this->getProperties(trim(substr($this->tss, $next+1, $pos-2-$next)));	
-				$rules = $this->writeRule($rules, $selector, $rule);					
-			}
+			$newRules = $this->cssToRules($selector, count($rules)+$indexStart, $this->getProperties(trim(substr($this->tss, $next+1, $pos-2-$next))));
+			$rules = $this->writeRule($rules, $newRules);
 		}
 		//there may be processing instructions at the end
 		if ($processing = $this->processingInstructions($this->tss, $pos, strlen($this->tss), count($rules)+$indexStart)) $rules = array_merge($rules, $processing['rules']);
@@ -39,22 +37,24 @@ class Sheet {
 		return $rules;
 	}
 
-	private function CssToRules($selector, $index) {
+	private function CssToRules($selector, $index, $properties) {
 		$parts = explode(',', $selector);
 		$rules = [];
 		foreach ($parts as $part) {
 			$xPath = new CssToXpath($part, $this->valueParser, $this->prefix);
 			$rules[$part] = new \Transphporm\Rule($xPath->getXpath(), $xPath->getPseudo(), $xPath->getDepth(), $index++);
+			$rules[$part]->properties = $properties;
 		}		
 		return $rules;
 	}
 
-	private function writeRule($rules, $selector, $newRule) {
-		if (isset($rules[$selector])) {
-			$newRule->properties = array_merge($rules[$selector]->properties, $newRule->properties);
-		}
-
-		$rules[$selector] = $newRule;
+	private function writeRule($rules, $newRules) {
+		foreach ($newRules as $selector => $newRule) {
+			if (isset($rules[$selector])) {
+				$newRule->properties = array_merge($rules[$selector]->properties, $newRule->properties);
+			}
+			$rules[$selector] = $newRule;
+		}	
 		
 		return $rules;
 	}

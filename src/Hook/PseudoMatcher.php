@@ -55,8 +55,13 @@ class PseudoMatcher {
 		$value = $this->parseValue(trim($value, '"'));
 
 		$lookupValue = $this->dataFunction->$name([$field], $element);
+		return $this->processOperator($operator, $lookupValue, $value);
+	}
+
+	//Currently only not is supported, but this is separated out to support others in future
+	private function processOperator($operator, $lookupValue, $value) {
 		$matched = $lookupValue == $value;
-		return $operator === '!' ? !$matched : $matched;		
+		return $operator === '!' ? !$matched : $matched;
 	}
 
 	private function parseValue($value) {
