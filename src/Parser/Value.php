@@ -23,16 +23,11 @@ class Value {
 	private function parseFunction($function) {
 		$open = strpos($function, '(');
 		if ($open) {
-			$close = strpos($function, ')', $open);
-
-			//Count the number of fresh opening ( before $close
-			$cPos = $open+1;
-			while (($cPos = strpos($function, '(', $cPos+1)) !== false && $cPos < $close) $close = strpos($function, ')', $close+1);
-
 			$name = substr($function, 0, $open);
-
-			$params = substr($function, $open+1, $close-$open-1);
-			return ['name' => $name, 'params' => $params, 'endPoint' => $close];
+			$bracketMatcher = new BracketMatcher($function);
+			$params = $bracketMatcher->match('(', ')');
+			
+			return ['name' => $name, 'params' => $params, 'endPoint' => $bracketMatcher->getClosePos()];
 		}
 		else return ['name' => null, 'params' => $function, 'endPoint' => strlen($function)];
 	}
