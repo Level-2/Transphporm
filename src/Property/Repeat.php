@@ -19,7 +19,7 @@ class Repeat implements \Transphporm\Property {
 		foreach ($value as $key => $iteration) {
 			$clone = $element->cloneNode(true);
 			//Mark all but one of the nodes as having been added by transphporm, when the hook is run again, these are removed
-			if ($count > 0) $clone->setAttribute('transphporm', 'added');
+			if ($count++ > 0) $clone->setAttribute('transphporm', 'added');
 			$this->data->bind($clone, $iteration, 'iteration');
 			$this->data->bind($clone, $key, 'key');
 			$element->parentNode->insertBefore($clone, $element);
@@ -27,9 +27,7 @@ class Repeat implements \Transphporm\Property {
 			//Re-run the hook on the new element, but use the iterated data
 			//Don't run repeat on the clones element or it will loop forever
 			unset($rules['repeat']);
-
 			$this->createHook($rules, $pseudoMatcher, $properties)->run($clone);
-			$count++;
 		}
 		//Remove the original element
 		$element->parentNode->removeChild($element);
