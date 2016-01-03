@@ -9,10 +9,9 @@ namespace Transphporm\Hook;
 class DataFunction {
 	private $dataStorage;
 	private $data;
-	private $locale;
 	private $baseDir;
 
-	public function __construct(\SplObjectStorage $objectStorage, $data, $locale, $baseDir) {
+	public function __construct(\SplObjectStorage $objectStorage, $data, $baseDir) {
 		$this->dataStorage = $objectStorage;
 		$this->data = $data;
 		$this->locale = $locale;
@@ -96,7 +95,6 @@ class DataFunction {
 
 	public function template($val, $element) {
 		$newTemplate = new \Transphporm\Builder($this->baseDir . $val[0]);
-		$newTemplate->setLocale($this->locale);
 
 		$doc = $newTemplate->output([], true)->body;
 
