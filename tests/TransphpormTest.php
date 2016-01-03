@@ -796,12 +796,11 @@ class TransphpormTest extends PHPUnit_Framework_TestCase {
 	public function testFormatNumber() {
 		$template = '
 			<div>Test</div>
-		';
-
+		';;
 		$tss = 'div {content: "1.234567"; format: decimal 2;}';
 
 		$template = new \Transphporm\Builder($template, $tss);
-
+		
 		$this->assertEquals('<div>1.23</div>', $this->stripTabs($template->output()->body));
 
 
@@ -815,7 +814,7 @@ class TransphpormTest extends PHPUnit_Framework_TestCase {
 		$tss = 'div {content: "1.234567"; format: currency;}';
 
 		$template = new \Transphporm\Builder($template, $tss);
-
+		
 		$this->assertEquals('<div>£1.23</div>', $this->stripTabs($template->output()->body));
 
 
@@ -832,8 +831,8 @@ class TransphpormTest extends PHPUnit_Framework_TestCase {
 		$template = new \Transphporm\Builder($template, $tss);
 		$locale = json_decode(file_get_contents('src/Formatter/Locale/enGB.json'), true);
 		$locale['currency_position'] = 'after';
-		$template->setLocale($locale);
-
+		$template->loadModule(new \Transphporm\Module\Format($locale));
+		
 		$this->assertEquals('<div>1.23£</div>', $this->stripTabs($template->output()->body));
 	}
 
@@ -845,7 +844,7 @@ class TransphpormTest extends PHPUnit_Framework_TestCase {
 		$tss = 'div {content: "test"; format: uppercase}';
 
 		$template = new \Transphporm\Builder($template, $tss);
-
+		$template->loadModule(new \Transphporm\Module\Format);
 		$this->assertEquals('<div>TEST</div>', $this->stripTabs($template->output()->body));
 
 
@@ -860,7 +859,7 @@ class TransphpormTest extends PHPUnit_Framework_TestCase {
 		$tss = 'div {content: "test"; format: lowercase}';
 
 		$template = new \Transphporm\Builder($template, $tss);
-
+		$template->loadModule(new \Transphporm\Module\Format);
 		$this->assertEquals('<div>test</div>', $this->stripTabs($template->output()->body));
 
 
@@ -875,7 +874,7 @@ class TransphpormTest extends PHPUnit_Framework_TestCase {
 
 		$template = new \Transphporm\Builder($template, $tss);	
 		require_once 'tests/ReverseFormatter.php';
-		$template->registerFormatter(new ReverseFormatter);
+		$template->loadModule(new ReverseFormatterModule);
 
 		$this->assertEquals('<div>tset</div>', $this->stripTabs($template->output()->body));
 

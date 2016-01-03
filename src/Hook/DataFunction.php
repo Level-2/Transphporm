@@ -14,7 +14,6 @@ class DataFunction {
 	public function __construct(\SplObjectStorage $objectStorage, $data, $baseDir) {
 		$this->dataStorage = $objectStorage;
 		$this->data = $data;
-		$this->locale = $locale;
 		$this->baseDir = $baseDir;
 	}
 

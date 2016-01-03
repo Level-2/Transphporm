@@ -9,3 +9,9 @@ class ReverseFormatter {
 		return strrev($str);
 	}
 }
+
+class ReverseFormatterModule implements \Transphporm\Module {
+	public function load(\Transphporm\FeatureSet $featureSet) {
+		$featureSet->registerFormatter(new ReverseFormatter);
+	}
+}
