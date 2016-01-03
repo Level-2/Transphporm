@@ -1419,4 +1419,37 @@ select option[value=data()]:attr(selected) { content: "selected"; }
 		'));
 		
 	}
+
+
+	public function testKeyChild() {
+		$xml = '<ul>
+            <li>
+            <span></span>
+            <a>Edit</a></li>
+        </ul>';
+
+
+        $data = ['array' => [
+        'one' => 'foo',
+        'two' => 'bar']
+        ];
+            
+
+          $tss = 'ul li {repeat: data(array); }
+ul li span {
+  content: iteration();
+}
+       ul li a { content: key() }
+        ';
+        
+
+        $template = new \Transphporm\Builder($xml, $tss);
+        $this->assertEquals($this->stripTabs($template->output($data)->body), $this->stripTabs('<ul>
+            <li>
+            <span>foo</span>
+            <a>one</a></li><li>
+            <span>bar</span>
+            <a>two</a></li>
+        </ul>'));
+	}
 }

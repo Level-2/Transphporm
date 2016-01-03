@@ -15,10 +15,11 @@ class Repeat implements \Transphporm\Property {
 	public function run($value, \DomElement $element, array $rules, \Transphporm\Hook\PseudoMatcher $pseudoMatcher, array $properties = []) {
 		if ($element->getAttribute('transphporm') === 'added') return $element->parentNode->removeChild($element);
 
+		$count = 0;
 		foreach ($value as $key => $iteration) {
 			$clone = $element->cloneNode(true);
-			//Mark this node as having been added by transphporm
-			$clone->setAttribute('transphporm', 'added');
+			//Mark all but one of the nodes as having been added by transphporm, when the hook is run again, these are removed
+			if ($count > 0) $clone->setAttribute('transphporm', 'added');
 			$this->data->bind($clone, $iteration, 'iteration');
 			$this->data->bind($clone, $key, 'key');
 			$element->parentNode->insertBefore($clone, $element);
@@ -28,9 +29,10 @@ class Repeat implements \Transphporm\Property {
 			unset($rules['repeat']);
 
 			$this->createHook($rules, $pseudoMatcher, $properties)->run($clone);
+			$count++;
 		}
-		//Flag the original element for removal
-		$element->setAttribute('transphporm', 'remove');
+		//Remove the original element
+		$element->parentNode->removeChild($element);
 		return false;
 	}
 

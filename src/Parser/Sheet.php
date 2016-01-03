@@ -13,7 +13,8 @@ class Sheet {
 	private $valueParser;
 
 	public function __construct($tss, $baseDir, Value $valueParser, $prefix = '') {
-		$this->tss = $this->stripComments($tss);
+		$this->tss = $this->stripComments($tss, '/*', '*/');
+		$this->tss = $this->stripComments($this->tss, '//', "\n");
 		$this->baseDir = $baseDir;
 		$this->prefix = $prefix;
 		$this->valueParser = $valueParser;
@@ -89,10 +90,10 @@ class Sheet {
 		return ($a->depth < $b->depth) ? -1 : 1;
 	}
 
-	private function stripComments($str) {
+	private function stripComments($str, $open, $close) {
 		$pos = 0;
-		while (($pos = strpos($str, '/*', $pos)) !== false) {
-			$end = strpos($str, '*/', $pos);
+		while (($pos = strpos($str, $open, $pos)) !== false) {
+			$end = strpos($str, $close, $pos);
 			$str = substr_replace($str, '', $pos, $end-$pos+2);
 		}
 
