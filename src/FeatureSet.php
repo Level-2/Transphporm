@@ -3,7 +3,10 @@ namespace Transphporm;
 class FeatureSet {
 	private $properties = [];
 	private $pseudo = [];
-
+	private $data; 
+	private $headers;
+	private $formatter; 
+	
 	public function __construct(Hook\DataFunction $data, Hook\Formatter $formatter, &$headers) {
 		$this->data = $data;
 		$this->formatter = $formatter;
