@@ -45,7 +45,6 @@ class Builder {
 		$featureSet = new FeatureSet($data, new Hook\Formatter(), $headers);
 
 		foreach ($this->modules as $module) $module->load($featureSet);
-		//$locale = $this->getLocale();
 		
 		$cachedOutput = $this->loadTemplate();
 		//To be a valid XML document it must have a root element, automatically wrap it in <template> to ensure it does
@@ -76,11 +75,9 @@ class Builder {
 	//Process a TSS rule e.g. `ul li {content: "foo"; format: bar}
 	private function executeTssRule($rule, $template, $valueParser, $featureSet) {
 		$rule->touch();
-		$pseudoMatcher = new Hook\PseudoMatcher($rule->pseudo);
 		$pseudoMatcher = $featureSet->createPseudoMatcher($rule->pseudo);
 
 		$hook = new Hook\PropertyHook($rule->properties, $pseudoMatcher, $valueParser);
-		// foreach ($this->featureSetas $name => $property) $hook->registerProperty($name, $property);
 		$featureSet->loadProperties($hook);
 		$template->addHook($rule->query, $hook);
 	}
