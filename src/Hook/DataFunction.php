@@ -68,7 +68,7 @@ class DataFunction {
 			$funcResult = $this->processNestedFunc($part, $obj, $valueParser, $element);
 			
 			if ($funcResult !== false) $obj = $funcResult;
-			else if (is_callable([$obj, $part])) $obj = call_user_func([$obj, $part]); 
+			else if (method_exists($obj, $part)) $obj = call_user_func([$obj, $part]); 
 			else $obj = $this->ifNull($obj, $part);
 		}
 		return $obj;
