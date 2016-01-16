@@ -65,20 +65,21 @@ class DataFunction {
 		foreach ($parts as $part) {
 			if ($part === '') continue;
 			$part = $valueParser->parse($part, $element)[0];
-			$funcResult = $this->processNestedFunc($part, $obj, $valueParser, $element);
+			$funcResult = $this->traverseObj($part, $obj, $valueParser, $element);
 			
 			if ($funcResult !== false) $obj = $funcResult;
-			else if (method_exists($obj, $part)) $obj = call_user_func([$obj, $part]); 
+			
 			else $obj = $this->ifNull($obj, $part);
 		}
 		return $obj;
 	}
 
-	private function processNestedFunc($part, $obj, $valueParser, $element) {
+	private function traverseObj($part, $obj, $valueParser, $element) {
 		if (strpos($part, '(') !== false) {
 			$subObjParser = new \Transphporm\Parser\Value($obj, $valueParser, false);
 			return $subObjParser->parse($part, $element);
 		}
+		else if (method_exists($obj, $part)) return call_user_func([$obj, $part]); 
 		else return false;
 	}
 
