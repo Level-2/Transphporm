@@ -8,9 +8,13 @@ namespace Transphporm\Parser;
 /** Parses "string" and function(args) e.g. data(foo) or iteration(bar) */ 
 class Value {
 	private $dataFunction;
+	private $callParamsAsArray;
+	private $parent;
 
-	public function __construct(\Transphporm\Hook\DataFunction $dataFunction) {
+	public function __construct($dataFunction, Value $parent = null, $callParamsAsArray = true) {
 		$this->dataFunction = $dataFunction;
+		$this->callParamsAsArray = $callParamsAsArray;
+		$this->parent = $parent;
 	}
 
 	private function extractQuotedString($marker, $str) {
@@ -42,13 +46,21 @@ class Value {
 			$func = $this->parseFunction($function);
 			$finalPos = $func['endPoint'];			
 
-			if (($data = $this->callFunc($func['name'], $func['params'], $element)) !== false) {
-				$result = $this->appendToArray($result, $data);
-			} 
+			if (($data = $this->getFunctionValue($func['name'], $func['params'], $element)) !== false) $result = $this->appendToArray($result, $data);
 			else $result[] = trim($function);
 		}
 		$remaining = trim(substr($function, $finalPos+1));
 		return $this->parseNextValue($remaining, $result, $element);
+	}
+
+	private function getFunctionValue($name, $params, $element) {
+		if (($data = $this->callFunc($name, $params, $element)) !== false) {
+			return $data;
+		}
+		else if ($this->parent != null && ($data = $this->parent->callFunc($name, $params, $element)) !== false) {
+			return $data;
+		}
+		else return false;
 	}
 
 	private function appendToArray($array, $value) {
@@ -58,10 +70,23 @@ class Value {
 	}
 
 	private function callFunc($name, $params, $element) {
-		if ($name && is_callable([$this->dataFunction, $name])) {
-			return $this->dataFunction->$name($this->parse($params, $element), $element);	
+		if ($name && $this->isCallable($this->dataFunction, $name)) {
+			if ($this->callParamsAsArray) return $this->dataFunction->$name($this->parse($params, $element), $element);	
+			else {
+				return $this->callFuncOnObject($this->dataFunction, $name, $this->parse($params, $element));
+			}
 		}
 		return false;
+	}
+
+	//is_callable does not detect closures on properties, only methods defined in the class!
+	private function isCallable($obj, $func) {
+		return (isset($obj->$func) && is_callable($obj->$func)) || is_callable([$obj, $func]);
+	}
+
+	private function callFuncOnObject($obj, $func, $params) {
+		if (isset($obj->$func) && is_callable($obj->$func)) return call_user_func_array($obj->$func, $params);
+		else return call_user_func_array($obj, $params);
 	}
 
 	private function parseNextValue($remaining, $result, $element) {

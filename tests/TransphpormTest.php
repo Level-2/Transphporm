@@ -1451,4 +1451,44 @@ ul li span {
             <a>two</a></li>
         </ul>'));
 	}
+
+	public function testFunctionCall() {
+		
+		$xml = '<div></div>';
+
+		$obj = new stdClass;
+		$obj->foo = function($bar) {
+			return $bar;
+		};
+
+		$tss = 'div {content: data(foo("test")); }';
+
+		$template = new \Transphporm\Builder($xml, $tss);
+
+		$this->assertEquals($this->stripTabs($template->output($obj)->body), $this->stripTabs('<div>test</div>'));		
+
+
+	}
+
+	public function testFunctionCallWithDataArg() {
+		
+		$xml = '<div></div>';
+
+		$obj = new stdClass;
+		$obj->foo = function($bar) {
+			return $bar;
+		};
+		$obj->x = 'Y';
+
+		$tss = 'div {content: data(foo(data(x)))); }';
+
+		$template = new \Transphporm\Builder($xml, $tss);
+
+		$this->assertEquals($this->stripTabs($template->output($obj)->body), $this->stripTabs('<div>Y</div>'));		
+
+
+	}
+
+
+
 }
