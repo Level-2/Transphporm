@@ -53,7 +53,7 @@ class DataFunction {
 	public function data($val, \DomElement $element = null) {
 		$data = $this->getData($element);
 		$value = $this->traverse($val, $data, $element);
-		return $value;			
+		return $value;
 	}
 
 	private function traverse($name, $data, $element) {

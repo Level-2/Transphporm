@@ -19,7 +19,7 @@ class StringExtractor {
 		$pos = 0;
 		$num = 0;
 		$strings = [];
-		while (($pos = strpos($str, '"', $pos+1)) !== false) {
+		while (isset($str[$pos]) && ($pos = strpos($str, '"', $pos+1)) !== false) {
 			$end = strpos($str, '"', $pos+1);
 			while ($str[$end-1] == '\\') $end = strpos($str, '"', $end+1);
 			$strings['$+STR' . ++$num] = substr($str, $pos, $end-$pos+1);

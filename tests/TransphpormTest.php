@@ -1490,5 +1490,18 @@ ul li span {
 	}
 
 
+	public function testRuleOneComment() {
+		$xml = '<div></div>';
+
+		$tss = 'div {
+			//Foo
+		 }';
+
+		 $template = new \Transphporm\Builder($xml, $tss);
+
+		 $this->assertEquals('<div></div>', $template->output()->body);
+	}
+
+
 
 }
