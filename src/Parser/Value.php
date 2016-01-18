@@ -86,7 +86,7 @@ class Value {
 
 	private function callFuncOnObject($obj, $func, $params) {
 		if (isset($obj->$func) && is_callable($obj->$func)) return call_user_func_array($obj->$func, $params);
-		else return call_user_func_array($obj, $params);
+		else return call_user_func_array([$obj, $func], $params);
 	}
 
 	private function parseNextValue($remaining, $result, $element) {

@@ -1490,6 +1490,22 @@ ul li span {
 	}
 
 
+	public function testFunctionCallWithDataArg2() {
+		
+		$xml = '<div></div>';
+
+		$obj = new Foo();
+
+		$tss = 'div {content: data(getBar(\'test\')); }';
+
+		$template = new \Transphporm\Builder($xml, $tss);
+
+		$this->assertEquals($this->stripTabs($template->output($obj)->body), $this->stripTabs('<div>test</div>'));		
+
+
+	}
+
+
 	public function testRuleOneComment() {
 		$xml = '<div></div>';
 
@@ -1504,4 +1520,11 @@ ul li span {
 
 
 
+}
+
+
+class Foo {
+	public function getBar($bar) {
+		return $bar;
+	}
 }
