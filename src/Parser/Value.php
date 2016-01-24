@@ -37,6 +37,19 @@ class Value {
 	}
 
 	public function parse($function, \DomElement $element) {
+		$stringExtractor = new StringExtractor($function);
+		$parts = explode('+', $stringExtractor);
+
+		$result = [];
+		foreach ($parts as $part) {
+			$part = $stringExtractor->rebuild($part);
+			$result = array_merge($result, $this->parseString(trim($part), $element));
+		}
+
+		return $result;	
+	}
+
+	private function parseString($function, $element) {
 		$result = [];
 		if ($function && in_array($function[0], ['\'', '"'])) {
 			$finalPos = $this->findMatchingPos($function, $function[0]);

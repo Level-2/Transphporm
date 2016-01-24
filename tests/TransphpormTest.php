@@ -8,6 +8,7 @@ use Transphporm\Builder;
 class TransphpormTest extends PHPUnit_Framework_TestCase {
 
 	public function testContentSimple() {
+		ini_set('max_execution_time', '10');
 		$template = '
 				<ul><li>TEST1</li></ul>
 		';
@@ -1518,6 +1519,18 @@ ul li span {
 		 $this->assertEquals('<div></div>', $template->output()->body);
 	}
 
+
+	public function testPlusConcat() {
+		$xml = '<div></div>';
+
+		$tss = 'div {
+			content: "foo" + "bar";
+		 }';
+
+		 $template = new \Transphporm\Builder($xml, $tss);
+
+		 $this->assertEquals('<div>foobar</div>', $template->output()->body);
+	}
 
 
 }
