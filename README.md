@@ -6,7 +6,7 @@
 [![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/TomBZombie/CDS?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 
-Transphporm is fresh look at templating in PHP. Let's face it, [Templating in PHP sucks](http://www.workingsoftware.com.au/page/Your_templating_engine_sucks_and_everything_you_have_ever_written_is_spaghetti_code_yes_you) it involves code like this:
+Transphporm is fresh look at templating in PHP. Let's face it, [Templating in PHP sucks](http://www.workingsoftware.com.au/page/Your_templating_engine_sucks_and_everything_you_have_ever_written_is_spaghetti_code_yes_you) because it involves code like this:
 
 
 ```php
@@ -41,17 +41,17 @@ or
 
 ```
 
-Why does this suck? It mixes the logic with the template. There are processing instructions mixed inside the template, in the case of the middle example, it's just barely abstracted PHP code. Whoever is writing the template is also in charge of writing the display logic and understanding the data structures that have been supplied.
+Why does this suck? It mixes the logic with the template. There are processing instructions mixed inside the template. In the case of the middle example, it's just barely abstracted PHP code. Whoever is writing the template is also in charge of writing the display logic and understanding the data structures that have been supplied.
 
 Template systems like this still mix logic and markup, the one thing they're trying to avoid.
 
-This is equivalent to `<h1 style="font-weight:bold">Title</h1>`, it mixes two very different concerns. 
+This is equivalent to `<h1 style="font-weight:bold">Title</h1>`,  as it mixes two very different concerns. 
 
 ## Transphporm is different
 
 ### Project Goals
 
-1. To completely separate the markup from the processing logic (No if statements or loops in the template!)
+1. To completely separate the markup from the processing logic. (No if statements or loops in the template!)
 2. To follow CSS concepts and grammar as closely as possible. This makes it incredibly easy to learn for anyone who already understands CSS.
 
 
@@ -66,14 +66,14 @@ With Transphporm, the designer just supplies some raw XML that contains some dum
 
 It's pure HTML without any processing instructions. Transphporm then takes the XML and renders it with some data.
 
-But where are the processing instructions? Transphporm follows CSS's lead and all this processing logic is stored externally in "Transformation Style Sheets", a completely separate file that contains entirely reusable processing instructions.
+But where are the processing instructions? Transphporm follows CSS's lead.  All of the processing logic is stored externally in "Transformation Style Sheets", a completely separate file that contains entirely reusable processing instructions.
 
 
-At it's most basic, Transphporm works by suppling a stylesheet and XML as strings.
+At its most basic, Transphporm works by supplying a stylesheet and XML as strings.
 
 Transphporm allows you to insert content into any element on a page. Traditional template engines force you to place markers in the markup which will then be replaced (essentially using str_replace) within the content. 
 
-Transphporm takes a different approach and allows you to insert content into any element on the page using a CSS-like syntax. You don't need to provide special markers in the template, the template is plain old HTML without any special syntax. The elements on the page can then be targeted using CSS style syntax,
+Transphporm takes a different approach and allows you to insert content into any element on the page using a CSS-like syntax. You don't need to provide special markers in the template; the template is plain old HTML without any special syntax. The elements on the page can then be targeted using CSS style syntax.
 
 
  For example, this stylesheet:
@@ -107,7 +107,7 @@ The output will be:
 <h1>Replaced Title</h1>
 ```
 
-The arguments for Transphporm\Builder can either be xml and tss strings, or file names to load.
+The arguments for Transphporm\Builder can either be XML and *TSS* strings, or file names to load.
 
 ```php
 //Load files instead of strings, the base path is the current working directory (getcwd())
@@ -120,13 +120,13 @@ This allows an unprecedented level of flexibility. Rather than having to conside
 
 # 5 Reasons to use Transphporm
 
-1. **[Write content to any element](https://github.com/Level-2/Transphporm/wiki/Basic-Usage:-Inserting-content)**. With traditional template engines the designer needs to place marker in the template e.g. `{{name}}` everywhere that content needs to be injected into the template. With Transphporm, the designer doesn't need to worry about whether specific content will be replaced (effectively with `str_replace`), instead Transphporm allows the developer to write content to any HTML element on the page, and the designer to focus on design rather than worrying about what content might be added.
+1. **[Write content to any element](https://github.com/Level-2/Transphporm/wiki/Basic-Usage:-Inserting-content)**. With traditional template engines the designer needs to place marker in the template e.g. `{{name}}` everywhere that content needs to be injected into the template. With Transphporm, the designer doesn't need to worry about whether specific content will be replaced (effectively with `str_replace`). Instead Transphporm allows the developer to write content to any HTML element on the page, and the designer to focus on design rather than worrying about what content might be added.
 
-2. **[Anything can be a partial](https://github.com/Level-2/Transphporm/wiki/Template-Partials)**. Traditional template engines force you to put each partial in its own file, this is bad for the designer because they cannot quickly an easily see how the partial looks inside the complete layout. With Transphporm, the designer can work with complete HTML files and the developer can extract any element from any file as a partial.
+2. **[Anything can be a partial](https://github.com/Level-2/Transphporm/wiki/Template-Partials)**. Traditional template engines force you to put each partial in its own file. This is bad for the designer because they cannot quickly an easily see how the partial looks inside the complete layout. With Transphporm, the designer can work with complete HTML files and the developer can extract any element from any file as a partial.
 
 3. **Resuable display logic**. Because display logic is placed in its own external file, you can use the same display logic with as many XML files as you like. This is the difference between external CSS files and `style=` attributes inside your HTML.
 
-4. **Render your template on the client or the server**. The TSS format is not barely abstracted PHP code like Traditional template engines, it's a custom format with no reliance on a PHP. Because of this, you can take an XML file and a TSS file and render it on the server using [Transphporm](https://github.com/Level-2/Transphporm) or inside the browser using the JavaScript implementation [Tranjsform](https://github.com/Level-2/Tranjsform).
+4. **Render your template on the client or the server**. The TSS format is not barely-abstracted PHP code like traditional template engines; it's a custom format with no reliance on PHP. Because of this, you can take an XML file and a TSS file and render it on the server using [Transphporm](https://github.com/Level-2/Transphporm) or inside the browser using the JavaScript implementation [Tranjsform](https://github.com/Level-2/Tranjsform).
 
 5. **If you've used CSS, Transphporm is easy to learn**. Transphporm closely follows CSS syntax and uses some of the same vocabulary. If you have even a basic understanding of CSS, you'll be able to learn to use Transphporm with ease!
 
@@ -134,7 +134,7 @@ Transphporm gives both designers and developers an unprecedented level of flexib
 
 # Installation
 
-The preferred method of installing Transphprom is via composer. However, if you don't want to use composer you can manually install Transphporm:
+The preferred method of installing Transphprom is via Composer. However, if you don't want to use Composer you can manually install Transphporm:
 
 1. Download and extract Transphporm into your project
 2. Use a PSR-0 compliant autoloader such as [Axel](https://github.com/Level-2/Axel)
@@ -150,7 +150,7 @@ $axel->addModule(new \Axel\Module\PSR0('./path/to/Transphporm/src', '\\Transphpo
 
 ### Data
 
-It's not usually possible to specify the content in a static file like a stylesheet. The `tss` format also allows referencing external data. This data is supplied using to the template builder's `output` method and can be referened in the stylesheet using the `data()` function. This can be though of like the `url()` function in CSS, in that it references an external resource.
+It's not usually possible to specify the content in a static file like a stylesheet. The `tss` format also allows referencing external data. This data is supplied to the template builder's `output` method and can be referened in the stylesheet using the `data()` function. This can be thought of like the `url()` function in CSS, in that it references an external resource.
 
 ```php
 
@@ -236,7 +236,7 @@ Output:
 <h1>Title: My Title!</h1>
 ```
 
-For more information in inserting content see the wiki pages [Basic usage: Inserting Content](https://github.com/Level-2/Transphporm/wiki/Basic-Usage:-Inserting-content) and [Basic Usage: External Data](https://github.com/Level-2/Transphporm/wiki/Basic-Usage:-Working-with-external-data) 
+For more information on inserting content see the wiki pages [Basic usage: Inserting Content](https://github.com/Level-2/Transphporm/wiki/Basic-Usage:-Inserting-content) and [Basic Usage: External Data](https://github.com/Level-2/Transphporm/wiki/Basic-Usage:-Working-with-external-data) 
 
 ### Loops
 
@@ -346,11 +346,11 @@ For more information on loops see the [Wiki page Basic usage: Loops](https://git
 
 # Hiding Blocks
 
-Lifted straight from css grammar, Transphporm supports `display: none` which will actually remove the element from the document entirely:
+Lifted straight from CSS grammar, Transphporm supports `display: none` which will actually remove the element from the document entirely:
+
 
 ```php
 
-```php
 $xml = '<ul>
 	<li>
 		<h3>Name</h3>
@@ -391,7 +391,7 @@ Output:
 
 ```
 
-N.b. this is very useful with the iteration value pseudo element. For more examples of conditonal logic see the [Wiki page on Basic usage: Conditional logic](https://github.com/Level-2/Transphporm/wiki/Basic-Usage:-Conditional-Logic)
+N.b. this is very useful with the iteration value pseudo element. For more examples of conditonal logic see the [Wiki page on Basic usage: Conditional logic](https://github.com/Level-2/Transphporm/wiki/Basic-Usage:-Conditional-Logic).
 
 # CSS Selectors
 
@@ -408,22 +408,22 @@ Transphporm supports the following CSS selectors:
 
 And any of these can be chained:
 
-`main .post > .author[data-admin=true]` will match  any elemnt with the class name `author` which has the `data-admin` varibleset to true, and is directly inside an element with the class name post that is inside the `<main>` elemnt.
+`main .post > .author[data-admin=true]` will match  any elemnt with the class name `author` which has the `data-admin` varible set to true, and is directly inside an element with the class name post that is inside the `<main>` element.
 
-For a full list of supported selectors and example of each one, see the [Wiki page on Basic Usage: CSS Selectors](https://github.com/Level-2/Transphporm/wiki/Basic-Usage:-CSS-Selectors)
+For a full list of supported selectors and example of each one, see the [Wiki page on Basic Usage: CSS Selectors](https://github.com/Level-2/Transphporm/wiki/Basic-Usage:-CSS-Selectors).
 
 
 # Pseudo Elements
 
 Transphporm also supports several pseudo elements:
 
-`:before` and `:after` which allows writing content to the beggining or end of a node.
+`:before` and `:after` which allows writing content to the beginning or end of a node.
 
 `:nth-child(n)`
 `:nth-child(odd)`
 `:nth-child(even)`
 
-For examples of each of these, please see the [Wiki page Basic Usage: Pseudo Elements](https://github.com/Level-2/Transphporm/wiki/Basic-Usage:-Pseudo-elements)
+For examples of each of these, please see the [Wiki page Basic Usage: Pseudo Elements](https://github.com/Level-2/Transphporm/wiki/Basic-Usage:-Pseudo-elements).
 
 ## Iteration values
 
@@ -436,7 +436,7 @@ The format is:
 element:iteration[name=value] {}
 ```
 
-Which will select any element who's iteration content's `name` attribute is equal to `value`
+Which will select any element whose iteration content's `name` attribute is equal to `value`
 
 The following code will hide any user whose type is 'Admin'.
 
@@ -562,7 +562,7 @@ echo $template->output($data)->body;
 
 ```
 
-Notice this uses multiple values for the `content` property to concatenate the full URL with mailto
+Notice this uses multiple values for the `content` property to concatenate the full URL with `mailto`.
 
 Output:
 
@@ -665,8 +665,8 @@ foreach ($template->output()->headers as $header) {
 
 In most cases, you will want to conditionally display a header. For example:
 
-- Redirect on success
-- Send a 404 header when a record could not be found
+- Redirect on success.
+- Send a 404 header when a record could not be found.
 
 
 To do this, you can use conditional data lookups:
@@ -720,13 +720,13 @@ foreach ($template->output()->headers as $header) {
 
 ### Transphporm does not send any headers
 
-Transphporm does not send any output to the browser by default. This is for maximum flexibility, you must still manually send the headers and echo the body.
+Transphporm does not send any output to the browser by default. This is for maximum flexibility. You still must manually send the headers and echo the body.
 
 
 
 ## Formatting data
 
-Transphporm supports formatting of data as it's output. The syntax for formatting is this:
+Transphporm supports formatting of data as its output. The syntax for formatting is this:
 
 
 ```css
@@ -942,7 +942,7 @@ The strings are specified in the locale.
 
 ## Importing other files
 
-Like CSS, transphporm supports `@import` for importing other tss files:
+Like CSS, transphporm supports `@import` for importing other TSS files:
 
 
 `imported.tss` 
@@ -980,11 +980,11 @@ Output:
 
 Transphporm has two types of caching, both of which need to be enabled:
 
-1. Caching TSS and XML files. This prevents them being parsed each time the template is rendered. It is worthwhile enabling this even if you do not intend on using `update-frequency` (see below)
+1. Caching TSS and XML files. This prevents them being parsed each time the template is rendered. It is worthwhile enabling this even if you do not intend on using `update-frequency` (see below).
 
 2. `update-frequency` This is a property which allows you to update an element at a specified interval.
 
-To enable caching, you must create (or use) a caching class that implements PHP's inbuilt `\ArrayAccess` interface. For example [Level-2/SimpleCache](https://github.com/Level-2/SimpleCache) then assign an instance to the builder:
+To enable caching, you must create (or use) a caching class that implements PHP's inbuilt `\ArrayAccess` interface, for example [Level-2/SimpleCache](https://github.com/Level-2/SimpleCache).  Then assign an instance to the builder:
 
 ```php
 $cache = new \SimpleCache\SimpleCache('/tmp');
@@ -995,12 +995,12 @@ $template->setCache($cache);
 echo $template->output($data)->body;
 ```
 
-Doing this will automatically enable file-caching. Once a cache has been assigned, TSS files will only be parsed whenever they are updated. This saves parsing the TSS file each time your page loads and is worthwile even if you are not using `update-frequency`
+Doing this will automatically enable file-caching. Once a cache has been assigned, TSS files will only be parsed whenever they are updated. This saves parsing the TSS file each time your page loads and is worthwile even if you are not using `update-frequency`.
 
 
 ### update-frequency
 
-`update-frequency` is a TSS directive that describes how frequently a give TSS rule should run. Behind the scenes, Transphporm will save the final output each time a template is rendered and make changes to it based on `update-frequency`. For example:
+`update-frequency` is a TSS directive that describes how frequently a given TSS rule should run. Behind the scenes, Transphporm will save the final output each time a template is rendered and make changes to it based on `update-frequency`. For example:
 
 ```tss
 
@@ -1010,15 +1010,15 @@ ul li {repeat: data(users); update-frequency: 10m}
 
 This will only run the TSS rule every 10 minutes. The way this works behind the scenes is:
 
-- The rendred template is stored in the cache
-- Next time the page loads the the previously rendered template is loaded
-- If the timer has expired, the repeat/content/etc directives are run again on the cached version of the template and the template is updated
+- The rendred template is stored in the cache.
+- Next time the page loads the the previously rendered template is loaded.
+- If the timer has expired, the repeat/content/etc directives are run again on the cached version of the template and the template is updated.
 
 This allows different parts of the page to be updated at different speeds.
 
 ## Caching in MVC
 
-If you are using MVC ([And not PAC, which most frameworks do](http://r.je/views-are-not-templates.html)) and you are passing your model into your view, if your model is passed in as the `data` argument and has a `getUsers` function, Transphporm can call this and only execute the query when the template is updated
+If you are using MVC ([And not PAC, which most frameworks do](http://r.je/views-are-not-templates.html)) and you are passing your model into your view, if your model is passed in as the `data` argument and has a `getUsers` function, Transphporm can call this and only execute the query when the template is updated.
 
 ```tss
 
@@ -1026,14 +1026,14 @@ ul li {repeat: data(getUsers); update-frequency: 10m}
 ```
 
 
-Most frameowrks do not pass models into views, however for those that do this allows a two level cache: The query is only run when the view is updated based on the view's timeout.
+Most frameowrks do not pass models into views, however for those that do this allows a two level cache. The query is only run when the view is updated based on the view's timeout.
 
 
 # Building a whole page
 
 Transphporm uses a top-down approach to construct pages. Most frameworks require writing a layout template and then pulling content into it. It becomes very difficult to make changes to the layout on a per-page basis. (At minimum you need to add some code to the layout HTML). Transphporm uses a top-down approach rather than the popular bottom-up approach where the child template is inserted into the layout at a specific point. 
 
-You still have two files, one for the layout and one for the content, but the TSS is applied to the *layout* which means the TSS can change anything in the layout you want (adding script tags, adding CSS, changing the page title and meta tags, etc)
+You still have two files, one for the layout and one for the content, but the TSS is applied to the *layout* which means the TSS can change anything in the layout you want (adding script tags, adding CSS, changing the page title and meta tags, etc).
 
 `layout.xml`
 
@@ -1179,7 +1179,7 @@ $template->output(['title' => 'About Me', 'page' => 'about.xml'])->body;
 ```
 
 
-This allows a top down approach. Most frameworks work on a bottom up approach where you build the layout, then build the content and put the output of one in the other. The presents a problem: How do you set the title per page? Or perhaps include a different sidebar on each page? Frameworks tend to do this using what are essentially global variables to store the page title and any layout options. TSS builds the entire page in one go, so any page can alter any part of the layout.
+This allows a top down approach. Most frameworks work on a bottom up approach where you build the layout, then build the content and put the output of one in the other. This presents a problem: How do you set the title per page? Or perhaps include a different sidebar on each page? Frameworks tend to do this using what are essentially global variables to store the page title and any layout options. TSS builds the entire page in one go, so any page can alter any part of the layout.
 
 
 
