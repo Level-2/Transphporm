@@ -18,8 +18,9 @@ class Content implements \Transphporm\Property {
 	}
 
 	public function run($value, \DomElement $element, array $rules, \Transphporm\Hook\PseudoMatcher $pseudoMatcher, array $properties = []) {
-		if ($this->shouldRun($element) == false) return;
-			
+		if ($this->isIncludedTemplate($element)) return;
+		if ($element->getAttribute('transphporm') === 'remove') return;
+	
 		$value = $this->formatter->format($value, $rules);
 		if (!$this->processPseudo($value, $element, $pseudoMatcher)) {
 			//Remove the current contents
@@ -30,15 +31,13 @@ class Content implements \Transphporm\Property {
 		}
 	}
 
-	private function shouldRun($element) {
-		if ($element->getAttribute('transphporm') === 'remove') return false;
-
-		while (!($element instanceof \DomDocument) && $element->parentNode) {
-			if ($element->getAttribute('transphporm') == 'includedtemplate') return false;
-			$element = $element->parentNode;
+	private function isIncludedTemplate($element) {
+		do {
+			if ($element instanceof \DomDocument) return false;
+			if ($element->getAttribute('transphporm') == 'includedtemplate') return true;
 		}
-
-		return true;
+		while ($element = $element->parentNode);
+		return false;
 	}
 	private function getContentMode($rules) {
 		return (isset($rules['content-mode'])) ? $rules['content-mode'] : 'append';
@@ -59,7 +58,8 @@ class Content implements \Transphporm\Property {
 		foreach ($node as $n) {
 			if ($n instanceof \DomElement) {
 				$new = $document->importNode($n, true);
-				$new->setAttribute('transphporm', 'added');
+				//Removing this might cause problems with caching... 
+				//$new->setAttribute('transphporm', 'added');
 			}
 			else {
 				if ($n instanceof \DomText) $n = $n->nodeValue;
