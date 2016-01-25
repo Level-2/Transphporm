@@ -14,7 +14,7 @@ class Format implements \Transphporm\Module {
 
 	private function getLocale() {
 		if (is_array($this->locale)) return $this->locale;
-		else if (strlen($this->locale) > 0) return json_decode(file_get_contents(__DIR__ . DIRECTORY_SEPARATOR . '../' . $this->locale . '.json'), true);
+		else if (strlen($this->locale) > 0) return json_decode(file_get_contents(__DIR__ . DIRECTORY_SEPARATOR . '../Formatter' . DIRECTORY_SEPARATOR . 'Locale' . DIRECTORY_SEPARATOR . $this->locale . '.json'), true);
 		else return json_decode(file_get_contents(__DIR__ . DIRECTORY_SEPARATOR . '../Formatter' . DIRECTORY_SEPARATOR . 'Locale' . DIRECTORY_SEPARATOR . 'enGB.json'), true);
 	}
 
