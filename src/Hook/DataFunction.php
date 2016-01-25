@@ -11,14 +11,15 @@ class DataFunction {
 	private $data;
 	private $baseDir;
 
-	public function __construct(\SplObjectStorage $objectStorage, $data, $baseDir) {
+	public function __construct(\SplObjectStorage $objectStorage, $data, $baseDir, $tss) {
 		$this->dataStorage = $objectStorage;
 		$this->data = $data;
 		$this->baseDir = $baseDir;
+		$this->tss = $tss;
 	}
 
 	/** Binds data to an element */
-	public function bind(\DomElement $element, $data, $type = 'data') {
+	public function bind(\DomNode $element, $data, $type = 'data') {
 		//This is a bit of a hack to workaround #24, might need a better way of doing this if it causes a problem
 		if (is_array($data) && $this->isObjectArray($data)) $data = $data[0];
 		$content = isset($this->dataStorage[$element]) ? $this->dataStorage[$element] : [];
@@ -42,7 +43,7 @@ class DataFunction {
 	}
 
 	/** Returns the data that has been bound to $element, or, if no data is bound to $element climb the DOM tree to find the data bound to a parent node*/
-	private function getData(\DomElement $element = null, $type = 'data') {
+	public function getData(\DomElement $element = null, $type = 'data') {
 		while ($element) {
 			if (isset($this->dataStorage[$element]) && isset($this->dataStorage[$element][$type])) return $this->dataStorage[$element][$type];
 			$element = $element->parentNode;
@@ -106,18 +107,23 @@ class DataFunction {
 	}
 
 	public function template($val, $element) {
-		$newTemplate = new \Transphporm\Builder($this->baseDir . $val[0]);
+		$newTemplate = new \Transphporm\Builder($this->baseDir . $val[0], $this->tss);
+		$data = $this->getData($element);
 
-		$doc = $newTemplate->output([], true)->body;
+		$doc = $newTemplate->output($data, true)->body;
 
 		if (isset($val[1])) return $this->templateSubsection($val[1], $doc, $element);
 		
 		$newNode = $element->ownerDocument->importNode($doc->documentElement, true);
-
+	//	$this->bind($newNode, $data);
 		$result = [];
 
 		if ($newNode->tagName === 'template') {
-			foreach ($newNode->childNodes as $node) $result[] = $node->cloneNode(true);
+			foreach ($newNode->childNodes as $node) {
+				$clone = $node->cloneNode(true);
+				if ($clone instanceof \DomElement) $clone->setAttribute('transphporm', 'includedtemplate');
+				$result[] = $clone;
+			}
 		}		
 		//else $result[] = $newNode;
 

@@ -22,12 +22,17 @@ class StringExtractor {
 		while (isset($str[$pos]) && ($pos = strpos($str, '"', $pos)) !== false) {
 			$end = strpos($str, '"', $pos+1);
 			if (!$end) break;
-			while ($str[$end-1] == '\\') $end = strpos($str, '"', $end+1);
+			$end = $this->getNextPosEscaped($str, '\\', '"', $end);
 			$strings['$___STR' . ++$num] = substr($str, $pos, $end-$pos+1);
 			$str = substr_replace($str, '$___STR' . $num, $pos, $end-$pos+1);
 		}
 
 		return [$str, $strings];
+	}
+
+	private function getNextPosEscaped($str, $escape, $chr, $start) {
+		while ($str[$start-1] == $escape) $start = strpos($str, $chr, $start+1);
+		return $start;
 	}
 
 	public function rebuild($str) {
