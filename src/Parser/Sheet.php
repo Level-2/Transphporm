@@ -94,6 +94,7 @@ class Sheet {
 		$pos = 0;
 		while (($pos = strpos($str, $open, $pos)) !== false) {
 			$end = strpos($str, $close, $pos);
+			if ($end === false) break;
 			$str = substr_replace($str, '', $pos, $end-$pos+2);
 		}
 

@@ -1519,6 +1519,20 @@ ul li span {
 		 $this->assertEquals('<div></div>', $template->output()->body);
 	}
 
+	public function testCommentAtEnd() {
+		$xml = '<div></div>';
+
+		$tss = 'div {
+			
+		 }
+
+
+		 //Foo';
+
+		 $template = new \Transphporm\Builder($xml, $tss);
+
+		 $this->assertEquals('<div></div>', $template->output()->body);
+	}
 
 	public function testPlusConcat() {
 		$xml = '<div></div>';
