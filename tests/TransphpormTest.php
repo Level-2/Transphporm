@@ -1502,8 +1502,47 @@ ul li span {
 		$template = new \Transphporm\Builder($xml, $tss);
 
 		$this->assertEquals($this->stripTabs($template->output($obj)->body), $this->stripTabs('<div>test</div>'));		
+	}
 
 
+	public function testFunctionCallWithMultipleArgs() {
+		
+		$xml = '<div></div>';
+
+		$obj = new Foo();
+
+		$tss = 'div {content: data(add(2, 3)); }';
+
+		$template = new \Transphporm\Builder($xml, $tss);
+
+		$this->assertEquals($this->stripTabs($template->output($obj)->body), $this->stripTabs('<div>5</div>'));		
+	}
+
+
+	public function testFunctionCallAsConditonal() {
+		
+		$xml = '<div></div>';
+
+		$obj = new Foo();
+
+		$tss = 'div:data[returnTrue()=true] {content: "test" }';
+
+		$template = new \Transphporm\Builder($xml, $tss);
+
+		$this->assertEquals($this->stripTabs($template->output($obj)->body), $this->stripTabs('<div>test</div>'));		
+	}
+
+	public function testFunctionCallAsConditonal2() {
+		
+		$xml = '<div></div>';
+
+		$obj = new Foo();
+
+		$tss = 'div:data[returnFalse()=false] {content: "test" }';
+
+		$template = new \Transphporm\Builder($xml, $tss);
+
+		$this->assertEquals($this->stripTabs($template->output($obj)->body), $this->stripTabs('<div>test</div>'));		
 	}
 
 
@@ -1553,5 +1592,17 @@ ul li span {
 class Foo {
 	public function getBar($bar) {
 		return $bar;
+	}
+
+	public function returnFalse() {
+		return false;
+	}
+
+	public function returnTrue() {
+		return true;
+	}
+
+	public function add($a, $b) {
+		return $a+$b;
 	}
 }
