@@ -67,7 +67,7 @@ class DataFunction {
 			if ($part === '') continue;
 			$part = $valueParser->parse($part, $element)[0];
 			$funcResult = $this->traverseObj($part, $obj, $valueParser, $element);
-			
+
 			if ($funcResult !== false) $obj = $funcResult;
 			
 			else $obj = $this->ifNull($obj, $part);
@@ -78,7 +78,7 @@ class DataFunction {
 	private function traverseObj($part, $obj, $valueParser, $element) {
 		if (strpos($part, '(') !== false) {
 			$subObjParser = new \Transphporm\Parser\Value($obj, $valueParser, false);
-			return $subObjParser->parse($part, $element);
+			return $subObjParser->parse($part, $element)[0];
 		}
 		else if (method_exists($obj, $part)) return call_user_func([$obj, $part]); 
 		else return false;
@@ -115,7 +115,6 @@ class DataFunction {
 		if (isset($val[1])) return $this->templateSubsection($val[1], $doc, $element);
 		
 		$newNode = $element->ownerDocument->importNode($doc->documentElement, true);
-	//	$this->bind($newNode, $data);
 		$result = [];
 
 		if ($newNode->tagName === 'template') {

@@ -30,7 +30,6 @@ class Attribute implements \Transphporm\Pseudo {
 
 		$operator = $this->getOperator($field);
 		$lookupValue = $this->dataFunction->$name([trim($field, $operator)], $element);
-
 		return $this->processOperator($operator, $lookupValue, $this->parseValue(trim($value, '"')));
 	}
 

@@ -10,6 +10,7 @@ class Value {
 	private $dataFunction;
 	private $callParamsAsArray;
 	private $parent;
+	const IS_NOT_FUNCTION = 'isNotFunction';
 
 	public function __construct($dataFunction, Value $parent = null, $callParamsAsArray = true) {
 		$this->dataFunction = $dataFunction;
@@ -59,7 +60,7 @@ class Value {
 			$func = $this->parseFunction($function);
 			$finalPos = $func['endPoint'];			
 
-			if (($data = $this->getFunctionValue($func['name'], $func['params'], $element)) !== false) $result = $this->appendToArray($result, $data);
+			if (($data = $this->getFunctionValue($func['name'], $func['params'], $element)) !== self::IS_NOT_FUNCTION) $result = $this->appendToArray($result, $data);
 			else $result[] = trim($function);
 		}
 		$remaining = trim(substr($function, $finalPos+1));
@@ -67,13 +68,13 @@ class Value {
 	}
 
 	private function getFunctionValue($name, $params, $element) {
-		if (($data = $this->callFunc($name, $params, $element)) !== false) {
+		if (($data = $this->callFunc($name, $params, $element)) !== self::IS_NOT_FUNCTION) {
 			return $data;
 		}
-		else if ($this->parent != null && ($data = $this->parent->callFunc($name, $params, $element)) !== false) {
+		else if ($this->parent != null && ($data = $this->parent->callFunc($name, $params, $element)) !== self::IS_NOT_FUNCTION) {
 			return $data;
 		}
-		else return false;
+		else return self::IS_NOT_FUNCTION;
 	}
 
 	private function appendToArray($array, $value) {
@@ -89,7 +90,7 @@ class Value {
 				return $this->callFuncOnObject($this->dataFunction, $name, $this->parse($params, $element));
 			}
 		}
-		return false;
+		return self::IS_NOT_FUNCTION;
 	}
 
 	//is_callable does not detect closures on properties, only methods defined in the class!
