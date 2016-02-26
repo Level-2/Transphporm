@@ -61,7 +61,9 @@ class Builder {
 
 	private function processRules($template, $data, $featureSet) {
 		$valueParser = new Parser\Value($data);
-		foreach ($this->getRules($template, $valueParser) as $rule) {
+		$rules = $this->getRules($template, $valueParser);
+		$data->setBaseDir($this->baseDir);
+		foreach ($rules as $rule) {
 			if ($rule->shouldRun($this->time)) $this->executeTssRule($rule, $template, $valueParser, $featureSet);
 		}
 	}

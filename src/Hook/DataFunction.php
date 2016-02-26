@@ -18,6 +18,10 @@ class DataFunction {
 		$this->tss = $tss;
 	}
 
+	public function setBaseDir($dir) {
+		$this->baseDir = $baseDir;
+	}
+	
 	/** Binds data to an element */
 	public function bind(\DomNode $element, $data, $type = 'data') {
 		//This is a bit of a hack to workaround #24, might need a better way of doing this if it causes a problem
