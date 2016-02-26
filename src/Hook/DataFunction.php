@@ -19,9 +19,9 @@ class DataFunction {
 	}
 
 	public function setBaseDir($dir) {
-		$this->baseDir = $baseDir;
+		$this->baseDir = $dir;
 	}
-	
+
 	/** Binds data to an element */
 	public function bind(\DomNode $element, $data, $type = 'data') {
 		//This is a bit of a hack to workaround #24, might need a better way of doing this if it causes a problem
@@ -114,7 +114,7 @@ class DataFunction {
 		$newTemplate = new \Transphporm\Builder($this->baseDir . $val[0], $this->tss);
 		$data = $this->getData($element);
 
-		$doc = $newTemplate->output($data, true)->body;
+		$doc = $newTemplate->output([], true)->body;
 
 		if (isset($val[1])) return $this->templateSubsection($val[1], $doc, $element);
 		
