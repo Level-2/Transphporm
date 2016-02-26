@@ -12,7 +12,9 @@ class Nth implements \Transphporm\Pseudo {
 			$bracketMatcher = new \Transphporm\Parser\BracketMatcher($pseudo);
 			$criteria = $bracketMatcher->match('(', ')');
 		
-			$bracketMatcher = new \Transphporm\Parser\BracketMatcher($element->getNodePath());
+			$node_path = explode('/', $element->getNodePath());
+
+			$bracketMatcher = new \Transphporm\Parser\BracketMatcher(array_pop($node_path));
 			$num = $bracketMatcher->match('[', ']');
 			
 			if (is_callable([$this, $criteria])) return $this->$criteria($num);
