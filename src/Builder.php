@@ -9,18 +9,23 @@ namespace Transphporm;
 class Builder {
 	private $template;
 	private $tss;
-	private $registeredProperties = [];
-	private $formatters = [];
-	private $locale;
 	private $baseDir;
 	private $cache;
 	private $time;
+	private $modules = [];
+	private $defaultModules = [
+		'\\Transphporm\\Module\\Basics',
+		'\\Transphporm\\Module\\Pseudo',
+		'\\Transphporm\\Module\\Format'
+	];
 
-
-	public function __construct($template, $tss = '') {
+	public function __construct($template, $tss = '', $modules = null) {
 		$this->template = $template;
 		$this->tss = $tss;
 		$this->cache = new Cache(new \ArrayObject());
+
+		$modules = is_array($modules) ? $modules : $this->defaultModules;
+		foreach ($modules as $module) $this->loadModule(new $module);
 	}
 
 	//Allow setting the time used by Transphporm for caching. This is for testing purposes
@@ -29,19 +34,23 @@ class Builder {
 		$this->time = $time;
 	}
 
+	public function loadModule(Module $module) {
+		$this->modules[get_class($module)] = $module;
+	}
+
 	public function output($data = null, $document = false) {
-		$locale = $this->getLocale();
-		$data = new Hook\DataFunction(new \SplObjectStorage(), $data, $locale, $this->baseDir);
 		$headers = [];
 		
-		$propertyBuilder = new PropertyBuilder($this);
-		$propertyBuilder->registerBasicProperties($data, $locale, $headers, $this->formatters);
+		$data = new Hook\DataFunction(new \SplObjectStorage(), $data, $this->baseDir, $this->tss);
+		$featureSet = new FeatureSet($data, new Hook\Formatter(), $headers);
 
+		foreach ($this->modules as $module) $module->load($featureSet);
+		
 		$cachedOutput = $this->loadTemplate();
 		//To be a valid XML document it must have a root element, automatically wrap it in <template> to ensure it does
 		$template = new Template($this->isValidDoc($cachedOutput['body']) ? str_ireplace('<!doctype', '<!DOCTYPE', $cachedOutput['body']) : '<template>' . $cachedOutput['body'] . '</template>' );
 
-		$this->processRules($template, $data);
+		$this->processRules($template, $data, $featureSet);
 		
 		$result = ['body' => $template->output($document), 'headers' => array_merge($cachedOutput['headers'], $headers)];
 		$this->cache->write($this->template, $result);		
@@ -50,10 +59,10 @@ class Builder {
 		return (object) $result;
 	}
 
-	private function processRules($template, $data) {
+	private function processRules($template, $data, $featureSet) {
 		$valueParser = new Parser\Value($data);
 		foreach ($this->getRules($template, $valueParser) as $rule) {
-			if ($rule->shouldRun($this->time)) $this->executeTssRule($rule, $template, $data, $valueParser);			
+			if ($rule->shouldRun($this->time)) $this->executeTssRule($rule, $template, $valueParser, $featureSet);
 		}
 	}
 
@@ -64,10 +73,12 @@ class Builder {
 	}
 
 	//Process a TSS rule e.g. `ul li {content: "foo"; format: bar}
-	private function executeTssRule($rule, $template, $data, $valueParser) {
+	private function executeTssRule($rule, $template, $valueParser, $featureSet) {
 		$rule->touch();
-		$hook = new Hook\PropertyHook($rule->properties, new Hook\PseudoMatcher($rule->pseudo, $data), $valueParser);
-		foreach ($this->registeredProperties as $name => $property) $hook->registerProperty($name, $property);
+		$pseudoMatcher = $featureSet->createPseudoMatcher($rule->pseudo);
+
+		$hook = new Hook\PropertyHook($rule->properties, $pseudoMatcher, $valueParser);
+		$featureSet->loadProperties($hook);
 		$template->addHook($rule->query, $hook);
 	}
 
@@ -99,24 +110,6 @@ class Builder {
 
 	public function setCache(\ArrayAccess $cache) {
 		$this->cache = new Cache($cache);
-	}
-
-	private function getLocale() {
-		if (is_array($this->locale)) return $this->locale;
-		else if (strlen($this->locale) > 0) return json_decode(file_get_contents(__DIR__ . DIRECTORY_SEPARATOR . 'Formatter' . DIRECTORY_SEPARATOR . 'Locale' . DIRECTORY_SEPARATOR . $this->locale . '.json'), true);
-		else return json_decode(file_get_contents(__DIR__ . DIRECTORY_SEPARATOR . 'Formatter' . DIRECTORY_SEPARATOR . 'Locale' . DIRECTORY_SEPARATOR . 'enGB.json'), true);
-	}
-
-	public function registerProperty($name, Property $property) {
-		$this->registeredProperties[$name] = $property;
-	}
-
-	public function registerFormatter($formatter) {
-		$this->formatters[] = $formatter;
-	}
-
-	public function setLocale($locale) {
-		$this->locale = $locale;
 	}
 
 	private function isValidDoc($xml) {

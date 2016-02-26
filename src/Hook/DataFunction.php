@@ -9,18 +9,17 @@ namespace Transphporm\Hook;
 class DataFunction {
 	private $dataStorage;
 	private $data;
-	private $locale;
 	private $baseDir;
 
-	public function __construct(\SplObjectStorage $objectStorage, $data, $locale, $baseDir) {
+	public function __construct(\SplObjectStorage $objectStorage, $data, $baseDir, $tss) {
 		$this->dataStorage = $objectStorage;
 		$this->data = $data;
-		$this->locale = $locale;
 		$this->baseDir = $baseDir;
+		$this->tss = $tss;
 	}
 
 	/** Binds data to an element */
-	public function bind(\DomElement $element, $data, $type = 'data') {
+	public function bind(\DomNode $element, $data, $type = 'data') {
 		//This is a bit of a hack to workaround #24, might need a better way of doing this if it causes a problem
 		if (is_array($data) && $this->isObjectArray($data)) $data = $data[0];
 		$content = isset($this->dataStorage[$element]) ? $this->dataStorage[$element] : [];
@@ -34,7 +33,7 @@ class DataFunction {
 
 	public function iteration($val, $element) {
 		$data = $this->getData($element, 'iteration');
-		$value = $this->traverse($val, $data);
+		$value = $this->traverse($val, $data, $element);
 		return $value;
 	}
 
@@ -44,7 +43,7 @@ class DataFunction {
 	}
 
 	/** Returns the data that has been bound to $element, or, if no data is bound to $element climb the DOM tree to find the data bound to a parent node*/
-	private function getData(\DomElement $element = null, $type = 'data') {
+	public function getData(\DomElement $element = null, $type = 'data') {
 		while ($element) {
 			if (isset($this->dataStorage[$element]) && isset($this->dataStorage[$element][$type])) return $this->dataStorage[$element][$type];
 			$element = $element->parentNode;
@@ -54,20 +53,35 @@ class DataFunction {
 
 	public function data($val, \DomElement $element = null) {
 		$data = $this->getData($element);
-		$value = $this->traverse($val, $data);
-		return $value;			
+		$value = $this->traverse($val, $data, $element);
+		return $value;
 	}
 
-	private function traverse($name, $data) {
+	private function traverse($name, $data, $element) {
 		$name[0] = str_replace(['[', ']'], ['.', ''], $name[0]);
 		$parts = explode('.', $name[0]);
 		$obj = $data;
+		$valueParser = new \Transphporm\Parser\Value($this);
+
 		foreach ($parts as $part) {
 			if ($part === '') continue;
-			if (is_callable([$obj, $part])) $obj = call_user_func([$obj, $part]); 
+			$part = $valueParser->parse($part, $element)[0];
+			$funcResult = $this->traverseObj($part, $obj, $valueParser, $element);
+
+			if ($funcResult !== false) $obj = $funcResult;
+			
 			else $obj = $this->ifNull($obj, $part);
 		}
 		return $obj;
+	}
+
+	private function traverseObj($part, $obj, $valueParser, $element) {
+		if (strpos($part, '(') !== false) {
+			$subObjParser = new \Transphporm\Parser\Value($obj, $valueParser, false);
+			return $subObjParser->parse($part, $element)[0];
+		}
+		else if (method_exists($obj, $part)) return call_user_func([$obj, $part]); 
+		else return false;
 	}
 
 	private function ifNull($obj, $key) {
@@ -93,19 +107,22 @@ class DataFunction {
 	}
 
 	public function template($val, $element) {
-		$newTemplate = new \Transphporm\Builder($this->baseDir . $val[0]);
-		$newTemplate->setLocale($this->locale);
+		$newTemplate = new \Transphporm\Builder($this->baseDir . $val[0], $this->tss);
+		$data = $this->getData($element);
 
-		$doc = $newTemplate->output([], true)->body;
+		$doc = $newTemplate->output($data, true)->body;
 
 		if (isset($val[1])) return $this->templateSubsection($val[1], $doc, $element);
 		
 		$newNode = $element->ownerDocument->importNode($doc->documentElement, true);
-
 		$result = [];
 
 		if ($newNode->tagName === 'template') {
-			foreach ($newNode->childNodes as $node) $result[] = $node->cloneNode(true);
+			foreach ($newNode->childNodes as $node) {
+				$clone = $node->cloneNode(true);
+				if ($clone instanceof \DomElement) $clone->setAttribute('transphporm', 'includedtemplate');
+				$result[] = $clone;
+			}
 		}		
 		//else $result[] = $newNode;
 

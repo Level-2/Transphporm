@@ -13,48 +13,54 @@ class Sheet {
 	private $valueParser;
 
 	public function __construct($tss, $baseDir, Value $valueParser, $prefix = '') {
-		$this->tss = $this->stripComments($tss);
+		$this->tss = $this->stripComments($tss, '/*', '*/');
+		$this->tss = $this->stripComments($this->tss, '//', "\n");
 		$this->baseDir = $baseDir;
 		$this->prefix = $prefix;
 		$this->valueParser = $valueParser;
 	}
 
-	public function parse($pos = 0, $rules = []) {
+	public function parse($pos = 0, $rules = [], $indexStart = 0) {
 		while ($next = strpos($this->tss, '{', $pos)) {
-			if ($processing = $this->processingInstructions($this->tss, $pos, $next)) {
+			if ($processing = $this->processingInstructions($this->tss, $pos, $next, count($rules)+$indexStart)) {
 				$pos = $processing['endPos']+1;
-				$rules = array_merge($processing['rules'], $rules);
+				$rules = array_merge($rules, $processing['rules']);
 			}
 
 			$selector = trim(substr($this->tss, $pos, $next-$pos));
-			$rule = $this->cssToRule($selector, count($rules));	
 			$pos =  strpos($this->tss, '}', $next)+1;
-			$rule->properties = $this->getProperties(trim(substr($this->tss, $next+1, $pos-2-$next)));	
-			$rules = $this->writeRule($rules, $selector, $rule);
+			$newRules = $this->cssToRules($selector, count($rules)+$indexStart, $this->getProperties(trim(substr($this->tss, $next+1, $pos-2-$next))));
+			$rules = $this->writeRule($rules, $newRules);
 		}
 		//there may be processing instructions at the end
-		if ($processing = $this->processingInstructions($this->tss, $pos, strlen($this->tss))) $rules = array_merge($processing['rules'], $rules);
+		if ($processing = $this->processingInstructions($this->tss, $pos, strlen($this->tss), count($rules)+$indexStart)) $rules = array_merge($rules, $processing['rules']);
 		usort($rules, [$this, 'sortRules']);
 		return $rules;
 	}
 
-	private function CssToRule($selector, $index) {
-		$xPath = new CssToXpath($selector, $this->valueParser, $this->prefix);
-		$rule = new \Transphporm\Rule($xPath->getXpath(), $xPath->getPseudo(), $xPath->getDepth(), $index++);
-		return $rule;
+	private function CssToRules($selector, $index, $properties) {
+		$parts = explode(',', $selector);
+		$rules = [];
+		foreach ($parts as $part) {
+			$xPath = new CssToXpath($part, $this->valueParser, $this->prefix);
+			$rules[$part] = new \Transphporm\Rule($xPath->getXpath(), $xPath->getPseudo(), $xPath->getDepth(), $index++);
+			$rules[$part]->properties = $properties;
+		}		
+		return $rules;
 	}
 
-	private function writeRule($rules, $selector, $newRule) {
-		if (isset($rules[$selector])) {
-			$newRule->properties = array_merge($rules[$selector]->properties, $newRule->properties);
-		}
-
-		$rules[$selector] = $newRule;
+	private function writeRule($rules, $newRules) {
+		foreach ($newRules as $selector => $newRule) {
+			if (isset($rules[$selector])) {
+				$newRule->properties = array_merge($rules[$selector]->properties, $newRule->properties);
+			}
+			$rules[$selector] = $newRule;
+		}	
 		
 		return $rules;
 	}
 
-	private function processingInstructions($tss, $pos, $next) {
+	private function processingInstructions($tss, $pos, $next, $indexStart) {
 		$rules = [];
 		while (($atPos = strpos($tss, '@', $pos)) !== false) {
 			if ($atPos  <= (int) $next) {
@@ -62,7 +68,7 @@ class Sheet {
 				$funcName = substr($tss, $atPos+1, $spacePos-$atPos-1);
 				$pos = strpos($tss, ';', $spacePos);
 				$args = substr($tss, $spacePos+1, $pos-$spacePos-1);
-				$rules = array_merge($rules, $this->$funcName($args));
+				$rules = array_merge($rules, $this->$funcName($args, $indexStart));
 			}
 			else {
 				break;	
@@ -72,9 +78,9 @@ class Sheet {
 		return empty($rules) ? false : ['endPos' => $pos, 'rules' => $rules];
 	}
 
-	private function import($args) {
+	private function import($args, $indexStart) {
 		$sheet = new Sheet(file_get_contents($this->baseDir . trim($args, '\'" ')), $this->baseDir, $this->valueParser, $this->prefix);
-		return $sheet->parse();
+		return $sheet->parse(0, [], $indexStart);
 	}
 
 	private function sortRules($a, $b) {
@@ -84,10 +90,11 @@ class Sheet {
 		return ($a->depth < $b->depth) ? -1 : 1;
 	}
 
-	private function stripComments($str) {
+	private function stripComments($str, $open, $close) {
 		$pos = 0;
-		while (($pos = strpos($str, '/*', $pos)) !== false) {
-			$end = strpos($str, '*/', $pos);
+		while (($pos = strpos($str, $open, $pos)) !== false) {
+			$end = strpos($str, $close, $pos);
+			if ($end === false) break;
 			$str = substr_replace($str, '', $pos, $end-$pos+2);
 		}
 

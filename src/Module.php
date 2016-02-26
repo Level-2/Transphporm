@@ -5,6 +5,6 @@
  * @license         http://www.opensource.org/licenses/bsd-license.php  BSD License *
  * @version         1.0                                                             */
 namespace Transphporm;
-interface Property {
-	public function run($value, \DomElement $element, array $rules, \Transphporm\Hook\PseudoMatcher $pseudoMatcher, array $properties = []);
+interface Module {
+	public function load(FeatureSet $featureSet);
 }

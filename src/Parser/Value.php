@@ -8,9 +8,14 @@ namespace Transphporm\Parser;
 /** Parses "string" and function(args) e.g. data(foo) or iteration(bar) */ 
 class Value {
 	private $dataFunction;
+	private $callParamsAsArray;
+	private $parent;
+	const IS_NOT_FUNCTION = 'isNotFunction';
 
-	public function __construct(\Transphporm\Hook\DataFunction $dataFunction) {
+	public function __construct($dataFunction, Value $parent = null, $callParamsAsArray = true) {
 		$this->dataFunction = $dataFunction;
+		$this->callParamsAsArray = $callParamsAsArray;
+		$this->parent = $parent;
 	}
 
 	private function extractQuotedString($marker, $str) {
@@ -23,22 +28,29 @@ class Value {
 	private function parseFunction($function) {
 		$open = strpos($function, '(');
 		if ($open) {
-			$close = strpos($function, ')', $open);
-
-			//Count the number of fresh opening ( before $close
-			$cPos = $open+1;
-			while (($cPos = strpos($function, '(', $cPos+1)) !== false && $cPos < $close) $close = strpos($function, ')', $close+1);
-
 			$name = substr($function, 0, $open);
-
-			$params = substr($function, $open+1, $close-$open-1);
-			return ['name' => $name, 'params' => $params, 'endPoint' => $close];
+			$bracketMatcher = new BracketMatcher($function);
+			$params = $bracketMatcher->match('(', ')');
+			
+			return ['name' => $name, 'params' => $params, 'endPoint' => $bracketMatcher->getClosePos()];
 		}
 		else return ['name' => null, 'params' => $function, 'endPoint' => strlen($function)];
-		
 	}
 
 	public function parse($function, \DomElement $element) {
+		$stringExtractor = new StringExtractor($function);
+		$parts = explode('+', $stringExtractor);
+
+		$result = [];
+		foreach ($parts as $part) {
+			$part = $stringExtractor->rebuild($part);
+			$result = array_merge($result, $this->parseString(trim($part), $element));
+		}
+
+		return $result;	
+	}
+
+	private function parseString($function, $element) {
 		$result = [];
 		if ($function && in_array($function[0], ['\'', '"'])) {
 			$finalPos = $this->findMatchingPos($function, $function[0]);
@@ -48,13 +60,21 @@ class Value {
 			$func = $this->parseFunction($function);
 			$finalPos = $func['endPoint'];			
 
-			if (($data = $this->callFunc($func['name'], $func['params'], $element)) !== false) {
-				$result = $this->appendToArray($result, $data);
-			} 
+			if (($data = $this->getFunctionValue($func['name'], $func['params'], $element)) !== self::IS_NOT_FUNCTION) $result = $this->appendToArray($result, $data);
 			else $result[] = trim($function);
 		}
 		$remaining = trim(substr($function, $finalPos+1));
 		return $this->parseNextValue($remaining, $result, $element);
+	}
+
+	private function getFunctionValue($name, $params, $element) {
+		if (($data = $this->callFunc($name, $params, $element)) !== self::IS_NOT_FUNCTION) {
+			return $data;
+		}
+		else if ($this->parent != null && ($data = $this->parent->callFunc($name, $params, $element)) !== self::IS_NOT_FUNCTION) {
+			return $data;
+		}
+		else return self::IS_NOT_FUNCTION;
 	}
 
 	private function appendToArray($array, $value) {
@@ -64,10 +84,29 @@ class Value {
 	}
 
 	private function callFunc($name, $params, $element) {
-		if ($name && is_callable([$this->dataFunction, $name])) {
-			return $this->dataFunction->$name($this->parse($params, $element), $element);	
+		if ($name && $this->isCallable($this->dataFunction, $name)) {
+			if ($this->callParamsAsArray) return $this->dataFunction->$name($this->parse($params, $element), $element);	
+			else {
+				return $this->callFuncOnObject($this->dataFunction, $name, $this->parse($params, $element));
+			}
 		}
-		return false;
+		return self::IS_NOT_FUNCTION;
+	}
+
+	//is_callable does not detect closures on properties, only methods defined in the class!
+	private function isCallable($obj, $func) {
+		return (isset($obj->$func) && is_callable($obj->$func)) || is_callable([$obj, $func]);
+	}
+
+	private function callFuncOnObject($obj, $func, $params) {
+		$args = [];
+		foreach ($params as $param) {
+			$stringExtractor = new StringExtractor($param);
+			$parts = explode(',', $stringExtractor);
+			foreach ($parts as $part) $args[] = $stringExtractor->rebuild($part);
+		}
+		if (isset($obj->$func) && is_callable($obj->$func)) return call_user_func_array($obj->$func, $args);
+		else return call_user_func_array([$obj, $func], $args);
 	}
 
 	private function parseNextValue($remaining, $result, $element) {

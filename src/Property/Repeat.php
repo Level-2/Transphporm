@@ -12,32 +12,31 @@ class Repeat implements \Transphporm\Property {
 		$this->data = $data;
 	}
 
-	public function run($value, \DomElement $element, \Transphporm\Hook\PropertyHook $rule)  {
+	public function run($value, \DomElement $element, array $rules, \Transphporm\Hook\PseudoMatcher $pseudoMatcher, array $properties = []) {
 		if ($element->getAttribute('transphporm') === 'added') return $element->parentNode->removeChild($element);
 
+		$count = 0;
 		foreach ($value as $key => $iteration) {
 			$clone = $element->cloneNode(true);
-			//Mark this node as having been added by transphporm
-			$clone->setAttribute('transphporm', 'added');
+			//Mark all but one of the nodes as having been added by transphporm, when the hook is run again, these are removed
+			if ($count++ > 0) $clone->setAttribute('transphporm', 'added');
 			$this->data->bind($clone, $iteration, 'iteration');
 			$this->data->bind($clone, $key, 'key');
 			$element->parentNode->insertBefore($clone, $element);
 
 			//Re-run the hook on the new element, but use the iterated data
-			$newRules = $rule->getRules();
 			//Don't run repeat on the clones element or it will loop forever
-			unset($newRules['repeat']);
-
-			$this->createHook($newRules, $rule)->run($clone);
+			unset($rules['repeat']);
+			$this->createHook($rules, $pseudoMatcher, $properties)->run($clone);
 		}
-		//Flag the original element for removal
-		$element->setAttribute('transphporm', 'remove');
+		//Remove the original element
+		$element->parentNode->removeChild($element);
 		return false;
 	}
 
-	private function createHook($newRules, $rule) {
-		$hook = new \Transphporm\Hook\PropertyHook($newRules, $rule->getPseudoMatcher(), new \Transphporm\Parser\Value($this->data));
-		foreach ($rule->getProperties() as $name => $property) $hook->registerProperty($name, $property);
+	private function createHook($newRules, $pseudoMatcher, $properties) {
+		$hook = new \Transphporm\Hook\PropertyHook($newRules, $pseudoMatcher, new \Transphporm\Parser\Value($this->data));
+		foreach ($properties as $name => $property) $hook->registerProperty($name, $property);
 		return $hook;
 	}
 }

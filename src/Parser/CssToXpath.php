@@ -29,10 +29,6 @@ class CssToXpath {
 		];
 	}
 
-	public function __destruct() {
-		unset(self::$instances[spl_object_hash($this)]);
-	}
-
 	private function registerInstance() {
 		$hash = spl_object_hash($this);
 		self::$instances[$hash] = $this;

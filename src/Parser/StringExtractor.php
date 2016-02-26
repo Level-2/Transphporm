@@ -19,14 +19,20 @@ class StringExtractor {
 		$pos = 0;
 		$num = 0;
 		$strings = [];
-		while (($pos = strpos($str, '"', $pos+1)) !== false) {
+		while (isset($str[$pos]) && ($pos = strpos($str, '"', $pos)) !== false) {
 			$end = strpos($str, '"', $pos+1);
-			while ($str[$end-1] == '\\') $end = strpos($str, '"', $end+1);
-			$strings['$+STR' . ++$num] = substr($str, $pos, $end-$pos+1);
-			$str = substr_replace($str, '$+STR' . $num, $pos, $end-$pos+1);
+			if (!$end) break;
+			$end = $this->getNextPosEscaped($str, '\\', '"', $end);
+			$strings['$___STR' . ++$num] = substr($str, $pos, $end-$pos+1);
+			$str = substr_replace($str, '$___STR' . $num, $pos, $end-$pos+1);
 		}
 
 		return [$str, $strings];
+	}
+
+	private function getNextPosEscaped($str, $escape, $chr, $start) {
+		while ($str[$start-1] == $escape) $start = strpos($str, $chr, $start+1);
+		return $start;
 	}
 
 	public function rebuild($str) {
