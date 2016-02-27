@@ -4,7 +4,7 @@
 	"currency": "$",
 	"currency_position": "before",
 	"currency_decimals": "2",
-	"date_format": "d/m/Y",
+	"date_format": "m/d/Y",
 	"time_format": "H:i",
 	"timezone": "America/New_York",
 	"offset_strings": {
