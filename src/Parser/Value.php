@@ -105,6 +105,10 @@ class Value {
 			$parts = explode(',', $stringExtractor);
 			foreach ($parts as $part) $args[] = $stringExtractor->rebuild($part);
 		}
+		return $this->callFuncOrClosure($obj, $func, $args);
+	}
+
+	private function callFuncOrClosure($obj, $func, $args) {
 		if (isset($obj->$func) && is_callable($obj->$func)) return call_user_func_array($obj->$func, $args);
 		else return call_user_func_array([$obj, $func], $args);
 	}
