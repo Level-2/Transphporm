@@ -97,14 +97,14 @@ class DataFunction {
 		return $element->getAttribute(trim($val[0]));
 	}
 
-	private function templateSubsection($css, $doc, $element) {
+	private function templateSubsection($css, $doc) {
 		$xpathStr = (new \Transphporm\Parser\CssToXpath($css, new \Transphporm\Parser\Value($this)))->getXpath();
 		$xpath = new \DomXpath($doc);
 		$nodes = $xpath->query($xpathStr);
 		$result = [];
 
 		foreach ($nodes as $node) {
-			$result[] = $element->ownerDocument->importNode($node, true);
+			$result[] = $node;
 		}
 
 		return $result;
@@ -117,7 +117,7 @@ class DataFunction {
 		else $tss = '';
 		//Create a document to mimic the structure of the parent template
 		
-		$newDocument = $this->createDummyTemplateDoc($element, $this->baseDir . $val[0]);		
+		$newDocument = $this->createDummyTemplateDoc($element, $this->baseDir . $val[0], isset($val[1]) ? $val[1] : null);		
 
 		//Build a new template using the $newDocument
 		$newTemplate = new \Transphporm\Builder($newDocument->saveXml(), $tss);
@@ -143,7 +143,7 @@ class DataFunction {
 		return $result;
 	}
 
-	private function createDummyTemplateDoc(\DomElement $element, $templateFile) {		
+	private function createDummyTemplateDoc(\DomElement $element, $templateFile, $subSection = null) {		
 		$newDocument = new \DomDocument;
 		$root = $newDocument->createElement('template');
 		$newDocument->appendChild($root);
@@ -160,18 +160,24 @@ class DataFunction {
 			$root->appendChild($newNode);
 		}
 		while (($el = $el->parentNode)  instanceof \DomElement);	
-		$this->loadTemplate($baseElement, $templateFile);
+		$this->loadTemplate($baseElement, $templateFile, $subSection);
 		return $newDocument;
 	}
 
-	private function loadTemplate($baseElement, $templateFile) {
+	private function loadTemplate($baseElement, $templateFile, $subSection) {
 		$baseElement->setAttribute('transphpormbaselement', 'true');
 		//Load the template XML
 		$templateDoc = new \DomDocument();
 	
 		$templateDoc->loadXml(file_get_contents($templateFile));
 
-		if ($templateDoc->documentElement->tagName == 'template') {
+		if ($subSection !== null) {
+			foreach ($this->templateSubsection($subSection, $templateDoc, $baseElement) as $node) {
+				$node = $baseElement->ownerDocument->importNode($node, true);
+				$baseElement->appendChild($node);		
+			}
+		}
+		else if ($templateDoc->documentElement->tagName == 'template') {
 			foreach ($templateDoc->documentElement->childNodes as $node) {
 				$node = $baseElement->ownerDocument->importNode($node, true);
 				$baseElement->appendChild($node);		
