@@ -2,7 +2,7 @@
 
 
 ul li {repeat: data(children); bind: iteration())}
-ul li:iteration[children]:after {content: template(nav.xml)}
+ul li:iteration[children]:after {content: template(nav.xml); template-recursion: on}
 
 ul li a:attr(href) {content: iteration(target);}
 ul li a {content: iteration(title);}

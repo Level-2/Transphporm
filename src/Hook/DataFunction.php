@@ -111,25 +111,28 @@ class DataFunction {
 	}
 
 
-	public function template($val, \DomElement $element) {
+	public function template($val, \DomElement $element, $rules) {
 		//Check the nesting level... without this it will keep applying TSS to included templates forever in some cases
-		if ($element->getAttribute('tssapplied') === 'true') $this->tss = '';
+		if (isset($rules['template-recursion']) && $rules['template-recursion'] == 'on') $tss = $this->tss;
+		else $tss = '';
 		//Create a document to mimic the structure of the parent template
+		
 		$newDocument = $this->createDummyTemplateDoc($element, $this->baseDir . $val[0]);		
-	
+
 		//Build a new template using the $newDocument
-		$newTemplate = new \Transphporm\Builder($newDocument->saveXml(), $this->tss);
+		$newTemplate = new \Transphporm\Builder($newDocument->saveXml(), $tss);
+
 		$data = $this->getData($element);
 
-		var_dump($newDocument->saveXml());
+	
 		//Output the template as a DomDocument
 		$doc = $newTemplate->output($data, true)->body;
-		var_dump($doc->saveXml());
+
 		//Find the corresponding element in the new document that matches the position of the original $element
 		//and read the contents as the result to import into the parent template
 		$result = [];
 		$xpath = new \DomXpath($doc);
-		$correspondingElement = $xpath->query('//*[@tssapplied]')[0];
+		$correspondingElement = $xpath->query('//*[@transphpormbaselement]')[0];
 		if (!$correspondingElement) $correspondingElement = $doc->documentElement;		
 		foreach ($correspondingElement->childNodes as $child) {
 			$child = $child->cloneNode(true);
@@ -156,8 +159,7 @@ class DataFunction {
 			if ($firstChild) $newNode->appendChild($firstChild);
 			$root->appendChild($newNode);
 		}
-		while (($el = $el->parentNode)  instanceof \DomElement);		
-		$baseElement->setAttribute('tssapplied', 'true');
+		while (($el = $el->parentNode)  instanceof \DomElement);	
 		$this->loadTemplate($baseElement, $templateFile);
 		return $newDocument;
 	}
