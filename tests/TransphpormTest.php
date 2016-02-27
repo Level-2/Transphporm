@@ -1269,7 +1269,40 @@ select option[value=data()]:attr(selected) { content: "selected"; }
 		</select>'));
 	}
 
+	public function testOverrideAfter() {
+			$xml = '<div>
+			<span>Test</span>
+		</div>';
 
+
+		$includeFile = __DIR__ . DIRECTORY_SEPARATOR . 'include.xml';
+
+		$tss = "div:after {content: 'foo' }
+div:after {content: 'bar' }
+		";
+		$template = new \Transphporm\Builder($xml, $tss);
+
+		$this->assertEquals('<div><span>Test</span>bar</div>', $this->stripTabs($template->output()->body));
+
+	}
+
+
+	public function testOverrideBefore() {
+			$xml = '<div>
+			<span>Test</span>
+		</div>';
+
+
+		$includeFile = __DIR__ . DIRECTORY_SEPARATOR . 'include.xml';
+
+		$tss = "div:before {content: 'foo' }
+		div:before {content: 'bar';}
+		";
+		$template = new \Transphporm\Builder($xml, $tss);
+
+		$this->assertEquals('<div>bar<span>Test</span></div>', $this->stripTabs($template->output()->body));
+
+	}
 	public function testAttrDisplayNone() {
 		$xml = '<div>
 			<span class="bar">test</span>
@@ -1585,6 +1618,69 @@ ul li span {
 		 $this->assertEquals('<div>foobar</div>', $template->output()->body);
 	}
 
+
+	public function testNestedData() {
+		        $data = json_decode('{ "children": [
+  {
+    "target":"Parent",
+    "title":"Parent",
+    "children":
+      [
+        {
+          "target":"Child 2",
+          "title":"Child 2",
+          "children":
+            [
+              {
+                 "target":"two.1",
+                 "title":"grandchild 1"
+               },
+               {
+                 "target":"two.2",
+                 "title":"grandchildchild 2"
+               }
+             ]
+          },
+          {
+     "target":"child 1",
+     "title":"child 1"
+  }
+      ]
+  },
+  {
+     "target":"http://facebook.com",
+     "title":"Facebook"
+  }
+]}', true);
+
+	  
+	  $template = new \Transphporm\Builder(__DIR__ . '/nav.xml', __DIR__ . '/nav.tss');
+
+	   $this->assertEquals($this->stripTabs('<ul>
+				<li>
+					<a href="Parent">Parent</a>
+					<ul>
+						<li>
+							<a href="Child 2">Child 2</a>
+							<ul>
+								<li>
+									<a href="two.1">grandchild 1</a>
+								</li>
+								<li>
+									<a href="two.2">grandchildchild 2</a>
+								</li>
+							</ul>
+						</li>
+						<li>
+							<a href="child 1">child 1</a>
+						</li>
+					</ul>
+				</li>
+				<li>
+					<a href="http://facebook.com">Facebook</a>
+				</li>
+	</ul>'), $this->stripTabs($template->output($data)->body));
+	}
 
 }
 

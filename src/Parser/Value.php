@@ -37,20 +37,20 @@ class Value {
 		else return ['name' => null, 'params' => $function, 'endPoint' => strlen($function)];
 	}
 
-	public function parse($function, \DomElement $element) {
+	public function parse($function, \DomElement $element, $rules = []) {
 		$stringExtractor = new StringExtractor($function);
 		$parts = explode('+', $stringExtractor);
 
 		$result = [];
 		foreach ($parts as $part) {
 			$part = $stringExtractor->rebuild($part);
-			$result = array_merge($result, $this->parseString(trim($part), $element));
+			$result = array_merge($result, $this->parseString(trim($part), $element, $rules));
 		}
 
 		return $result;	
 	}
 
-	private function parseString($function, $element) {
+	private function parseString($function, $element, $rules) {
 		$result = [];
 		if ($function && in_array($function[0], ['\'', '"'])) {
 			$finalPos = $this->findMatchingPos($function, $function[0]);
@@ -60,18 +60,18 @@ class Value {
 			$func = $this->parseFunction($function);
 			$finalPos = $func['endPoint'];			
 
-			if (($data = $this->getFunctionValue($func['name'], $func['params'], $element)) !== self::IS_NOT_FUNCTION) $result = $this->appendToArray($result, $data);
+			if (($data = $this->getFunctionValue($func['name'], $func['params'], $element, $rules)) !== self::IS_NOT_FUNCTION) $result = $this->appendToArray($result, $data);
 			else $result[] = trim($function);
 		}
 		$remaining = trim(substr($function, $finalPos+1));
 		return $this->parseNextValue($remaining, $result, $element);
 	}
 
-	private function getFunctionValue($name, $params, $element) {
-		if (($data = $this->callFunc($name, $params, $element)) !== self::IS_NOT_FUNCTION) {
+	private function getFunctionValue($name, $params, $element, $rules) {
+		if (($data = $this->callFunc($name, $params, $element, $rules)) !== self::IS_NOT_FUNCTION) {
 			return $data;
 		}
-		else if ($this->parent != null && ($data = $this->parent->callFunc($name, $params, $element)) !== self::IS_NOT_FUNCTION) {
+		else if ($this->parent != null && ($data = $this->parent->callFunc($name, $params, $element, $rules)) !== self::IS_NOT_FUNCTION) {
 			return $data;
 		}
 		else return self::IS_NOT_FUNCTION;
@@ -83,9 +83,9 @@ class Value {
 		return $array;
 	}
 
-	private function callFunc($name, $params, $element) {
+	private function callFunc($name, $params, $element, $rules) {
 		if ($name && $this->isCallable($this->dataFunction, $name)) {
-			if ($this->callParamsAsArray) return $this->dataFunction->$name($this->parse($params, $element), $element);	
+			if ($this->callParamsAsArray) return $this->dataFunction->$name($this->parse($params, $element), $element, $rules);	
 			else {
 				return $this->callFuncOnObject($this->dataFunction, $name, $this->parse($params, $element));
 			}

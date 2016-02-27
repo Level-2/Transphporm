@@ -1,14 +1,8 @@
 <?xml version="1.0"?>
 <template>
-
 	<ul>
-  		<li>
-    		<a href="">parent</a>
-
-
-    	</li>
-
-    	
-
-    </ul>
+		<li>
+			<a href=""></a>
+		</li>
+	</ul>
 </template>
