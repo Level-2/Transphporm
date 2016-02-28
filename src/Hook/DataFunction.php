@@ -97,6 +97,7 @@ class DataFunction {
 		return $element->getAttribute(trim($val[0]));
 	}
 
+
 	private function templateSubsection($css, $doc, $element) {
 		$xpathStr = (new \Transphporm\Parser\CssToXpath($css, new \Transphporm\Parser\Value($this)))->getXpath();
 		$xpath = new \DomXpath($doc);
@@ -109,19 +110,14 @@ class DataFunction {
 	}
 	
 	public function template($val, $element) {
-		$newTemplate = new \Transphporm\Builder($this->baseDir . $val[0], $this->tss);
-		$data = $this->getData($element);
+		$newTemplate = new \Transphporm\Builder($this->baseDir . $val[0]);
 		$doc = $newTemplate->output([], true)->body;
 		if (isset($val[1])) return $this->templateSubsection($val[1], $doc, $element);
 		
 		$newNode = $element->ownerDocument->importNode($doc->documentElement, true);
 		$result = [];
 		if ($newNode->tagName === 'template') {
-			foreach ($newNode->childNodes as $node) {
-				$clone = $node->cloneNode(true);
-				if ($clone instanceof \DomElement) $clone->setAttribute('transphporm', 'includedtemplate');
-				$result[] = $clone;
-			}
+			foreach ($newNode->childNodes as $node) $result[] = $node->cloneNode(true);
 		}		
 		//else $result[] = $newNode;
 		return $result;
