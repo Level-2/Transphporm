@@ -18,7 +18,8 @@ class Content implements \Transphporm\Property {
 	}
 
 	public function run($value, \DomElement $element, array $rules, \Transphporm\Hook\PseudoMatcher $pseudoMatcher, array $properties = []) {
-		if (!$this->shouldRun($element)) return;
+		if ($this->isIncludedTemplate($element)) return false;
+		if ($element->getAttribute('transphporm') === 'remove') return false;
 	
 		$value = $this->formatter->format($value, $rules);
 		if (!$this->processPseudo($value, $element, $pseudoMatcher)) {
@@ -30,19 +31,14 @@ class Content implements \Transphporm\Property {
 		}
 	}
 
-	private function shouldRun($element) {
-		if ($this->isIncludedTemplate($element)) return false;
-		if ($element->getAttribute('transphporm') === 'remove') return false;
-		return true;
-	}
 	private function isIncludedTemplate($element) {
 		do {
-			if ($element instanceof \DomDocument) return false;
 			if ($element->getAttribute('transphporm') == 'includedtemplate') return true;
 		}
-		while ($element = $element->parentNode);
+		while (($element = $element->parentNode) instanceof \DomElement);
 		return false;
 	}
+
 	private function getContentMode($rules) {
 		return (isset($rules['content-mode'])) ? $rules['content-mode'] : 'append';
 	}
