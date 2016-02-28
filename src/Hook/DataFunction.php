@@ -96,43 +96,8 @@ class DataFunction {
 		return $element->getAttribute(trim($val[0]));
 	}
 
-	private function templateSubsection($css, $doc, $element) {
-		$xpathStr = (new \Transphporm\Parser\CssToXpath($css, new \Transphporm\Parser\Value($this)))->getXpath();
-		$xpath = new \DomXpath($doc);
-		$nodes = $xpath->query($xpathStr);
-		$result = [];
-		foreach ($nodes as $node) {
-			$result[] = $element->ownerDocument->importNode($node, true);
-		}
-		return $result;
-	}
-
-	private function getTss($val) {
-		return isset($val[2]) ? $val[2] : null;
-	}
-
-	private function getClonedElement($node, $tss) {
-		$clone = $node->cloneNode(true);
-		if ($tss !== null && $clone instanceof \DomElement) $clone->setAttribute('transphporm', 'includedtemplate');
-		return $clone;
-	}
-
 	public function template($val, $element) {
-		$tssToApply = $this->getTss($val);
-
-		$newTemplate = new \Transphporm\Builder($this->baseDir . $val[0], $this->baseDir . $tssToApply);
-		$data = $this->getData($element);
-		$doc = $newTemplate->output($data, true)->body;
-		if (!empty($val[1])) return $this->templateSubsection($val[1], $doc, $element);
-		
-		$newNode = $element->ownerDocument->importNode($doc->documentElement, true);
-		$result = [];
-		if ($newNode->tagName === 'template') {
-			foreach ($newNode->childNodes as $node) {
-				$result[] = $this->getClonedElement($node, $tssToApply);
-			}
-		}
-		//else $result[] = $newNode;
-		return $result;
+		$templateFunction = new TemplateFunction($this->baseDir . $val[0], isset($val[1]) ? $val[1] : null, isset($val[2]) ? $this->baseDir . $val[2] : null);		
+		return $templateFunction->getTemplateNodes($this->getData($element));
 	}
 }
