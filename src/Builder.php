@@ -41,7 +41,7 @@ class Builder {
 	public function output($data = null, $document = false) {
 		$headers = [];
 		
-		$data = new Hook\DataFunction(new \SplObjectStorage(), $data, $this->baseDir, $this->tss);
+		$data = new Hook\DataFunction(new \SplObjectStorage(), $data, $this->baseDir);
 		$featureSet = new FeatureSet($data, new Hook\Formatter(), $headers);
 
 		foreach ($this->modules as $module) $module->load($featureSet);

@@ -23,7 +23,7 @@ class PropertyHook implements \Transphporm\Hook {
 		if (!$this->pseudoMatcher->matches($element)) return;
 
 		foreach ($this->rules as $name => $value) {
-			$result = $this->callProperty($name, $element, $this->valueParser->parse(trim($value), $element,$this->rules)) ;
+			$result = $this->callProperty($name, $element, $this->valueParser->parse(trim($value), $element)) ;
 			if ($result === false) break;
 		}
 	}

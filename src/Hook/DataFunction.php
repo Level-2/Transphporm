@@ -11,11 +11,10 @@ class DataFunction {
 	private $data;
 	private $baseDir;
 
-	public function __construct(\SplObjectStorage $objectStorage, $data, $baseDir, $tss) {
+	public function __construct(\SplObjectStorage $objectStorage, $data, $baseDir) {
 		$this->dataStorage = $objectStorage;
 		$this->data = $data;
 		$this->baseDir = $baseDir;
-		$this->tss = $tss;
 	}
 
 	public function setBaseDir($dir) {
@@ -97,7 +96,6 @@ class DataFunction {
 		return $element->getAttribute(trim($val[0]));
 	}
 
-
 	private function templateSubsection($css, $doc, $element) {
 		$xpathStr = (new \Transphporm\Parser\CssToXpath($css, new \Transphporm\Parser\Value($this)))->getXpath();
 		$xpath = new \DomXpath($doc);
@@ -108,19 +106,33 @@ class DataFunction {
 		}
 		return $result;
 	}
-	
+
+	private function getTss($val) {
+		return isset($val[2]) ? $val[2] : null;
+	}
+
+	private function getClonedElement($node, $tss) {
+		$clone = $node->cloneNode(true);
+		if ($tss !== null && $clone instanceof \DomElement) $clone->setAttribute('transphporm', 'includedtemplate');
+		return $clone;
+	}
+
 	public function template($val, $element) {
-		$newTemplate = new \Transphporm\Builder($this->baseDir . $val[0]);
-		$doc = $newTemplate->output([], true)->body;
-		if (isset($val[1])) return $this->templateSubsection($val[1], $doc, $element);
+		$tssToApply = $this->getTss($val);
+
+		$newTemplate = new \Transphporm\Builder($this->baseDir . $val[0], $this->baseDir . $tssToApply);
+		$data = $this->getData($element);
+		$doc = $newTemplate->output($data, true)->body;
+		if (!empty($val[1])) return $this->templateSubsection($val[1], $doc, $element);
 		
 		$newNode = $element->ownerDocument->importNode($doc->documentElement, true);
 		$result = [];
 		if ($newNode->tagName === 'template') {
-			foreach ($newNode->childNodes as $node) $result[] = $node->cloneNode(true);
-		}		
+			foreach ($newNode->childNodes as $node) {
+				$result[] = $this->getClonedElement($node, $tssToApply);
+			}
+		}
 		//else $result[] = $newNode;
 		return $result;
 	}
-
 }
