@@ -97,94 +97,34 @@ class DataFunction {
 		return $element->getAttribute(trim($val[0]));
 	}
 
-	private function templateSubsection($css, $doc) {
+	private function templateSubsection($css, $doc, $element) {
 		$xpathStr = (new \Transphporm\Parser\CssToXpath($css, new \Transphporm\Parser\Value($this)))->getXpath();
 		$xpath = new \DomXpath($doc);
 		$nodes = $xpath->query($xpathStr);
 		$result = [];
-
 		foreach ($nodes as $node) {
-			$result[] = $node;
+			$result[] = $element->ownerDocument->importNode($node, true);
 		}
-
 		return $result;
 	}
-
-
-	public function template($val, \DomElement $element, $rules) {
-		//Check the nesting level... without this it will keep applying TSS to included templates forever in some cases
-		if (isset($rules['template-recursion']) && $rules['template-recursion'] == 'on') $tss = $this->tss;
-		else $tss = '';
-		//Create a document to mimic the structure of the parent template
-		
-		$newDocument = $this->createDummyTemplateDoc($element, $this->baseDir . $val[0], isset($val[1]) ? $val[1] : null);		
-
-		//Build a new template using the $newDocument
-		$newTemplate = new \Transphporm\Builder($newDocument->saveXml(), $tss);
-
+	
+	public function template($val, $element) {
+		$newTemplate = new \Transphporm\Builder($this->baseDir . $val[0], $this->tss);
 		$data = $this->getData($element);
-
-	
-		//Output the template as a DomDocument
-		$doc = $newTemplate->output($data, true)->body;
-
-		//Find the corresponding element in the new document that matches the position of the original $element
-		//and read the contents as the result to import into the parent template
+		$doc = $newTemplate->output([], true)->body;
+		if (isset($val[1])) return $this->templateSubsection($val[1], $doc, $element);
+		
+		$newNode = $element->ownerDocument->importNode($doc->documentElement, true);
 		$result = [];
-		$xpath = new \DomXpath($doc);
-		$correspondingElement = $xpath->query('//*[@transphpormbaselement]')[0];
-		if (!$correspondingElement) $correspondingElement = $doc->documentElement;		
-		foreach ($correspondingElement->childNodes as $child) {
-			$child = $child->cloneNode(true);
-			if ($child instanceof \DomElement) $child->setAttribute('transphporm', 'includedtemplate');
-
-			$result[] = $child;			
+		if ($newNode->tagName === 'template') {
+			foreach ($newNode->childNodes as $node) {
+				$clone = $node->cloneNode(true);
+				if ($clone instanceof \DomElement) $clone->setAttribute('transphporm', 'includedtemplate');
+				$result[] = $clone;
+			}
 		}		
+		//else $result[] = $newNode;
 		return $result;
 	}
-
-	private function createDummyTemplateDoc(\DomElement $element, $templateFile, $subSection = null) {		
-		$newDocument = new \DomDocument;
-		$root = $newDocument->createElement('template');
-		$newDocument->appendChild($root);
-
-		//Loop through all parent nodes of $element and import them into the new document.
-		$el = $element;
-		$baseElement = null;
-		do {
-			$firstChild = $root->firstChild;
-			$el = $el->cloneNode();
-			$newNode = $newDocument->importNode($el);
-			if ($baseElement === null) $baseElement = $newNode;
-			if ($firstChild) $newNode->appendChild($firstChild);
-			$root->appendChild($newNode);
-		}
-		while (($el = $el->parentNode)  instanceof \DomElement);	
-		$this->loadTemplate($baseElement, $templateFile, $subSection);
-		return $newDocument;
-	}
-
-	private function loadTemplate($baseElement, $templateFile, $subSection) {
-		$baseElement->setAttribute('transphpormbaselement', 'true');
-		//Load the template XML
-		$templateDoc = new \DomDocument();
-	
-		$templateDoc->loadXml(file_get_contents($templateFile));
-
-		if ($subSection !== null) {
-			foreach ($this->templateSubsection($subSection, $templateDoc, $baseElement) as $node) {
-				$node = $baseElement->ownerDocument->importNode($node, true);
-				$baseElement->appendChild($node);		
-			}
-		}
-		else if ($templateDoc->documentElement->tagName == 'template') {
-			foreach ($templateDoc->documentElement->childNodes as $node) {
-				$node = $baseElement->ownerDocument->importNode($node, true);
-				$baseElement->appendChild($node);		
-			}
-		}
-	}
-
-
 
 }
