@@ -31,7 +31,7 @@ class Template {
 	/** Loads a HTML or XML document */ 	
 	private function loadDocument($doc) {
 		libxml_use_internal_errors(true);
-			if ($this->document->loadXml($doc) === false) {
+		if ($this->document->loadXml($doc) === false) {
 				$htmlDoc = new \DomDocument;
 				$htmlDoc->loadHtml($doc);
 				

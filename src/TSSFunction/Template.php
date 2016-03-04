@@ -53,7 +53,7 @@ class Template implements \Transphporm\TSSFunction {
 
 	private function getClonedElement($node, $tss) {
 		$clone = $node->cloneNode(true);
-		if ($tss !== null && $clone instanceof \DomElement) $clone->setAttribute('transphporm', 'includedtemplate');
+		if ($tss != null && $clone instanceof \DomElement) $clone->setAttribute('transphporm', 'includedtemplate');
 		return $clone;
 	}
 }
