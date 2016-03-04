@@ -12,6 +12,7 @@ class Config {
 	private $headers;
 	private $formatter; 
 	private $baseDir;
+	private $elementData;
 	
 	public function __construct(Functionset $functionSet, Hook\ElementData $elementData, Hook\Formatter $formatter, &$headers, &$baseDir) {
 		$this->formatter = $formatter;
