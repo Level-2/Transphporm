@@ -19,14 +19,8 @@ class Repeat implements \Transphporm\Property {
 		$max = $this->getMax($values);
 		$count = 0;
 		foreach ($values[0] as $key => $iteration) {
-			$clone = $element->cloneNode(true);
-			//Mark all but one of the nodes as having been added by transphporm, when the hook is run again, these are removed
-			$this->tagElement($clone, $count++);
-			if ($count > $max) break;
-			
-			$this->elementData->bind($clone, $iteration, 'iteration');
-			$this->elementData->bind($clone, $key, 'key');
-			$element->parentNode->insertBefore($clone, $element);
+			if ($count+1 > $max) break;
+			$clone = $this->cloneElement($element, $iteration, $key, $count++);
 			//Re-run the hook on the new element, but use the iterated data
 			//Don't run repeat on the clones element or it will loop forever
 			unset($rules['repeat']);
@@ -37,7 +31,18 @@ class Repeat implements \Transphporm\Property {
 		return false;
 	}
 
+	private function cloneElement($element, $iteration, $key, $count) {
+		$clone = $element->cloneNode(true);	
+		$this->tagElement($clone, $count);
+
+		$this->elementData->bind($clone, $iteration, 'iteration');
+		$this->elementData->bind($clone, $key, 'key');
+		$element->parentNode->insertBefore($clone, $element);
+		return $clone;
+	}
+
 	private function tagElement($element, $count) {
+		//Mark all but one of the nodes as having been added by transphporm, when the hook is run again, these are removed
 		if ($count > 0) $element->setAttribute('transphporm', 'added');
 	}
 
