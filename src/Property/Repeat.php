@@ -22,7 +22,7 @@ class Repeat implements \Transphporm\Property {
 		foreach ($values[0] as $key => $iteration) {
 			$clone = $element->cloneNode(true);
 			//Mark all but one of the nodes as having been added by transphporm, when the hook is run again, these are removed
-			if ($count++ > 0) $clone->setAttribute('transphporm', 'added');
+			$this->tagElement($clone, $count++);
 			if ($count > $max) break;
 			
 			$this->elementData->bind($clone, $iteration, 'iteration');
@@ -39,6 +39,9 @@ class Repeat implements \Transphporm\Property {
 		return false;
 	}
 
+	private function tagElement($element, $count) {
+		if ($count > 0) $element->setAttribute('transphporm', 'added');
+	}
 	private function getMax($values) {
 		return isset($values[1]) ? $values[1][0] : PHP_INT_MAX;
 	}
