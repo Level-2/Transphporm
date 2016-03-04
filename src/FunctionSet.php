@@ -7,9 +7,9 @@
 namespace Transphporm;
 /* Handles data() and iteration() function calls from the stylesheet */
 class FunctionSet {
-	private $dataStorage;
-	private $data;
+	private $elementData;
 	private $baseDir;
+	private $functions = [];
 
 	public function __construct(Hook\ElementData $elementData, &$baseDir) {
 		$this->baseDir = &$baseDir;
