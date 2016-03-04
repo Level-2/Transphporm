@@ -17,10 +17,10 @@ class Content implements \Transphporm\Property {
 		$this->formatter = $formatter;
 	}
 
-	public function run($value, \DomElement $element, array $rules, \Transphporm\Hook\PseudoMatcher $pseudoMatcher, array $properties = []) {
+	public function run(array $values, \DomElement $element, array $rules, \Transphporm\Hook\PseudoMatcher $pseudoMatcher, array $properties = []) {
 		if (!$this->shouldRun($element)) return false;
 			
-		$value = $this->formatter->format($value, $rules);
+		$value = $this->formatter->format($values[0], $rules);
 		if (!$this->processPseudo($value, $element, $pseudoMatcher)) {
 			//Remove the current contents
 			$this->removeAllChildren($element);

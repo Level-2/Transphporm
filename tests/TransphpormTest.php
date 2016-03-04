@@ -83,6 +83,26 @@ class TransphpormTest extends PHPUnit_Framework_TestCase {
 
 	
 
+	public function testRepeatMaxDynamic() {
+		$template = '
+				<ul><li>TEST1</li></ul>
+		';
+
+		//When using repeat to repeat some data, set the content to the data for the iteration
+		$css = 'ul li {repeat: data(list) data(max); content: iteration()}';
+ 
+
+		$data = new stdclass;
+		$data->list = ['One', 'Two', 'Three'];
+		$data->max = 1;
+		
+		$template = new \Transphporm\Builder($template, $css);
+		
+		$this->assertEquals('<ul><li>One</li></ul>' ,$template->output($data)->body); 
+	}
+
+	
+
 
 	public function testRepeatObject() {
 		$template = '

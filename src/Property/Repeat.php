@@ -14,16 +14,13 @@ class Repeat implements \Transphporm\Property {
 		$this->elementData = $elementData;		
 	}
 
-	public function run($value, \DomElement $element, array $rules, \Transphporm\Hook\PseudoMatcher $pseudoMatcher, array $properties = []) {
+	public function run(array $values, \DomElement $element, array $rules, \Transphporm\Hook\PseudoMatcher $pseudoMatcher, array $properties = []) {
 		if ($element->getAttribute('transphporm') === 'added') return $element->parentNode->removeChild($element);
-
 		$rule = $rules['repeat'];
 
-		$parts = explode(' ', trim($rules['repeat']));
-		$max = isset($parts[1]) ? $parts[1] : PHP_INT_MAX;
-
+		$max = $this->getMax($values);
 		$count = 0;
-		foreach ($value as $key => $iteration) {
+		foreach ($values[0] as $key => $iteration) {
 			$clone = $element->cloneNode(true);
 			//Mark all but one of the nodes as having been added by transphporm, when the hook is run again, these are removed
 			if ($count++ > 0) $clone->setAttribute('transphporm', 'added');
@@ -41,6 +38,10 @@ class Repeat implements \Transphporm\Property {
 		//Remove the original element
 		$element->parentNode->removeChild($element);
 		return false;
+	}
+
+	private function getMax($values) {
+		return isset($values[1]) ? $values[1][0] : PHP_INT_MAX;
 	}
 
 	private function createHook($newRules, $pseudoMatcher, $properties) {

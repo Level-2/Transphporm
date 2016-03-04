@@ -6,5 +6,5 @@
  * @version         1.0                                                             */
 namespace Transphporm;
 interface Property {
-	public function run($value, \DomElement $element, array $rules, \Transphporm\Hook\PseudoMatcher $pseudoMatcher, array $properties = []);
+	public function run(array $values, \DomElement $element, array $rules, \Transphporm\Hook\PseudoMatcher $pseudoMatcher, array $properties = []);
 }
