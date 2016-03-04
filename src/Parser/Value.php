@@ -120,7 +120,7 @@ class Value {
 	
 	private function findMatchingPos($string, $char, $start = 0, $escape = '\\') {
 		$pos = $start+1;
-		$end = 0;
+
 		while ($end = strpos($string, $char, $pos)) {
 			if ($string[$end-1] === $escape) $pos = $end+1;
 			else {
