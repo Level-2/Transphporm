@@ -93,17 +93,8 @@ class Content implements \Transphporm\Property {
 		}			 
 	}
 
-	private function removeAdded($e) {
-		$remove = [];
-		while ($e = $e->previousSibling && !in_array($e->getAttribute('transphporm'), [null, 'remove'])) {
-			$remove[] = $e;
-		}
-		foreach ($remove as $r) $r->parentNode->removeChild($r);
-	}
-
 	private function replaceContent($element, $content) {
 		//If this rule was cached, the elements that were added last time need to be removed prior to running the rule again.
-		$this->removeAdded($element);
 		foreach ($this->getNode($content, $element->ownerDocument) as $node) {
 			$element->parentNode->insertBefore($node, $element);
 		}		

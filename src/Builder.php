@@ -16,7 +16,8 @@ class Builder {
 	private $defaultModules = [
 		'\\Transphporm\\Module\\Basics',
 		'\\Transphporm\\Module\\Pseudo',
-		'\\Transphporm\\Module\\Format'
+		'\\Transphporm\\Module\\Format',
+		'\\Transphporm\\Module\\Functions'
 	];
 
 	public function __construct($template, $tss = '', $modules = null) {
@@ -41,16 +42,18 @@ class Builder {
 	public function output($data = null, $document = false) {
 		$headers = [];
 		
-		$data = new Hook\DataFunction(new \SplObjectStorage(), $data, $this->baseDir);
-		$featureSet = new FeatureSet($data, new Hook\Formatter(), $headers);
+		$elementData = new \Transphporm\Hook\ElementData(new \SplObjectStorage(), $data);
+		
+		$data = new FunctionSet($elementData, $this->baseDir);
+		$config = new Config($data, $elementData, new Hook\Formatter(), $headers, $this->baseDir);
 
-		foreach ($this->modules as $module) $module->load($featureSet);
+		foreach ($this->modules as $module) $module->load($config);
 		
 		$cachedOutput = $this->loadTemplate();
 		//To be a valid XML document it must have a root element, automatically wrap it in <template> to ensure it does
 		$template = new Template($this->isValidDoc($cachedOutput['body']) ? str_ireplace('<!doctype', '<!DOCTYPE', $cachedOutput['body']) : '<template>' . $cachedOutput['body'] . '</template>' );
 
-		$this->processRules($template, $data, $featureSet);
+		$this->processRules($template, $data, $config);
 		
 		$result = ['body' => $template->output($document), 'headers' => array_merge($cachedOutput['headers'], $headers)];
 		$this->cache->write($this->template, $result);		
@@ -59,12 +62,12 @@ class Builder {
 		return (object) $result;
 	}
 
-	private function processRules($template, $data, $featureSet) {
+	private function processRules($template, $data, $config) {
 		$valueParser = new Parser\Value($data);
 		$rules = $this->getRules($template, $valueParser);
-		$data->setBaseDir($this->baseDir);
+
 		foreach ($rules as $rule) {
-			if ($rule->shouldRun($this->time)) $this->executeTssRule($rule, $template, $valueParser, $featureSet);
+			if ($rule->shouldRun($this->time)) $this->executeTssRule($rule, $template, $valueParser, $config);
 		}
 	}
 
@@ -75,12 +78,12 @@ class Builder {
 	}
 
 	//Process a TSS rule e.g. `ul li {content: "foo"; format: bar}
-	private function executeTssRule($rule, $template, $valueParser, $featureSet) {
+	private function executeTssRule($rule, $template, $valueParser, $config) {
 		$rule->touch();
-		$pseudoMatcher = $featureSet->createPseudoMatcher($rule->pseudo);
+		$pseudoMatcher = $config->createPseudoMatcher($rule->pseudo);
 
 		$hook = new Hook\PropertyHook($rule->properties, $pseudoMatcher, $valueParser);
-		$featureSet->loadProperties($hook);
+		$config->loadProperties($hook);
 		$template->addHook($rule->query, $hook);
 	}
 

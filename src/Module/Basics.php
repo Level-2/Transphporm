@@ -9,13 +9,13 @@ namespace Transphporm\Module;
 class Basics implements \Transphporm\Module {
 
 
-	public function load(\Transphporm\FeatureSet $featureSet) {
-		$data = $featureSet->getData();
-		$headers = &$featureSet->getHeaders();
+	public function load(\Transphporm\Config $config) {
+		$data = $config->getFunctionSet();
+		$headers = &$config->getHeaders();
 
-		$featureSet->registerProperty('content', new \Transphporm\Property\Content($data, $headers, $featureSet->getFormatter()));
-		$featureSet->registerProperty('repeat', new \Transphporm\Property\Repeat($data));
-		$featureSet->registerProperty('display', new \Transphporm\Property\Display);
-		$featureSet->registerProperty('bind', new \Transphporm\Property\Bind($data));
+		$config->registerProperty('content', new \Transphporm\Property\Content($data, $headers, $config->getFormatter()));
+		$config->registerProperty('repeat', new \Transphporm\Property\Repeat($data, $config->getElementData()));
+		$config->registerProperty('display', new \Transphporm\Property\Display);
+		$config->registerProperty('bind', new \Transphporm\Property\Bind($config->getElementData()));
 	}
 }

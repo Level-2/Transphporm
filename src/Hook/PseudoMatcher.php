@@ -57,7 +57,4 @@ class PseudoMatcher {
 		return ['[', ']'];
 	}
 	
-	public function getPseudo() {
-		return $this->pseudo;
-	}
 }

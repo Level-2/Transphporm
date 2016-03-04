@@ -6,10 +6,10 @@
  * @version         1.0                                                             */
 namespace Transphporm\Pseudo;
 class Attribute implements \Transphporm\Pseudo {
-	private $dataFunction;
+	private $functionSet;
 
-	public function __construct(\Transphporm\Hook\DataFunction $dataFunction) {
-		$this->dataFunction = $dataFunction;
+	public function __construct(\Transphporm\FunctionSet $functionSet) {
+		$this->functionSet = $functionSet;
 	}
 
 	public function match($pseudo, \DomElement $element) {
@@ -17,19 +17,19 @@ class Attribute implements \Transphporm\Pseudo {
 		if ($pos === false) return true;
 		
 		$name = substr($pseudo, 0, $pos);
-		if (!is_callable([$this->dataFunction, $name])) return true;
+		if (!is_callable([$this->functionSet, $name])) return true;
 
 		$bracketMatcher = new \Transphporm\Parser\BracketMatcher($pseudo);
 		$criteria = $bracketMatcher->match('[', ']');
 
 		if (strpos($pseudo, '=') === false) {
-			$lookupValue = $this->dataFunction->$name([$criteria], $element);
+			$lookupValue = $this->functionSet->$name([$criteria], $element);
 			return $lookupValue !== null;
 		}
 		list ($field, $value) = explode('=', $criteria);
 
 		$operator = $this->getOperator($field);
-		$lookupValue = $this->dataFunction->$name([trim($field, $operator)], $element);
+		$lookupValue = $this->functionSet->$name([trim($field, $operator)], $element);
 		return $this->processOperator($operator, $lookupValue, $this->parseValue(trim($value, '"')));
 	}
 

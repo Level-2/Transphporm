@@ -8,7 +8,7 @@ namespace Transphporm\Property;
 class Bind implements \Transphporm\Property {
 	private $data;
 
-	public function __construct(\Transphporm\Hook\DataFunction $data) {
+	public function __construct(\Transphporm\Hook\ElementData $data) {
 		$this->data = $data;
 	}
 

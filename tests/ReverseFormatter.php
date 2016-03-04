@@ -11,7 +11,7 @@ class ReverseFormatter {
 }
 
 class ReverseFormatterModule implements \Transphporm\Module {
-	public function load(\Transphporm\FeatureSet $featureSet) {
-		$featureSet->registerFormatter(new ReverseFormatter);
+	public function load(\Transphporm\Config $config) {
+		$config->registerFormatter(new ReverseFormatter);
 	}
 }

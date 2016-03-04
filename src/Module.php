@@ -6,5 +6,5 @@
  * @version         1.0                                                             */
 namespace Transphporm;
 interface Module {
-	public function load(FeatureSet $featureSet);
+	public function load(Config $config);
 }

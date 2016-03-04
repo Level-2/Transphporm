@@ -18,10 +18,10 @@ class Format implements \Transphporm\Module {
 		else return json_decode(file_get_contents(__DIR__ . DIRECTORY_SEPARATOR . '../Formatter' . DIRECTORY_SEPARATOR . 'Locale' . DIRECTORY_SEPARATOR . 'enGB.json'), true);
 	}
 
-	public function load(\Transphporm\FeatureSet $featureSet) {
+	public function load(\Transphporm\Config $config) {
 		$locale = $this->getLocale();
-		$featureSet->registerFormatter(new \Transphporm\Formatter\Number($locale));
-		$featureSet->registerFormatter(new \Transphporm\Formatter\Date($locale));
-		$featureSet->registerFormatter(new \Transphporm\Formatter\StringFormatter());
+		$config->registerFormatter(new \Transphporm\Formatter\Number($locale));
+		$config->registerFormatter(new \Transphporm\Formatter\Date($locale));
+		$config->registerFormatter(new \Transphporm\Formatter\StringFormatter());
 	}
 }

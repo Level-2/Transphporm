@@ -28,20 +28,8 @@ class PropertyHook implements \Transphporm\Hook {
 		}
 	}
 
-	public function getPseudoMatcher() {
-		return $this->pseudoMatcher;
-	}
-
-	public function getRules() {
-		return $this->rules;
-	}
-
 	public function registerProperty($name, \Transphporm\Property $property) {
 		$this->properties[$name] = $property;
-	}
-
-	public function getProperties() {
-		return $this->properties;
 	}
 
 	private function callProperty($name, $element, $value) {

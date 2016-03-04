@@ -6,15 +6,15 @@
  * @version         1.0                                                             */
 namespace Transphporm\Pseudo;
 class Not implements \Transphporm\Pseudo {
-	private $dataFunction;
+	private $functionSet;
 
-	public function __construct(\Transphporm\Hook\DataFunction $dataFunction) {
-		$this->dataFunction = $dataFunction;
+	public function __construct(\Transphporm\FunctionSet $functionSet) {
+		$this->functionSet = $functionSet;
 	}
 
 	public function match($pseudo, \DomElement $element) {
 		if (strpos($pseudo, 'not') === 0) {
-			$valueParser = new \Transphporm\Parser\Value($this->dataFunction);
+			$valueParser = new \Transphporm\Parser\Value($this->functionSet);
 			$bracketMatcher = new \Transphporm\Parser\BracketMatcher($pseudo);
 			$css = explode(',', $bracketMatcher->match('(', ')'));
 			$xpath = new \DomXpath($element->ownerDocument);
