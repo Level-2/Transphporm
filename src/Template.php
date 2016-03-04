@@ -32,13 +32,11 @@ class Template {
 	private function loadDocument($doc) {
 		libxml_use_internal_errors(true);
 		if ($this->document->loadXml($doc) === false) {
-				$htmlDoc = new \DomDocument;
-				$htmlDoc->loadHtml($doc);
-				
-				if (strpos($doc, '<!') === 0) $this->document = $htmlDoc;
-				else {
-					$templateNode = $htmlDoc->getElementsByTagName('template')[0];
-					$this->document->appendChild($this->document->importNode($templateNode, true));
+				$this->document->loadHtml($doc);
+
+				if (strpos($doc, '<!') !== 0) {
+					$templateNode = $this->document->getElementsByTagName('template')[0];
+					$this->document->replaceChild($templateNode, $this->document->documentElement);
 				}
 		}
 		libxml_clear_errors();
