@@ -7,6 +7,7 @@
 namespace Transphporm\Module;
 /** Module for loading a formatter with a locale */
 class Format implements \Transphporm\Module {
+	private $locale;
 
 	public function __construct($locale = null) {
 		$this->locale = $locale;
