@@ -61,6 +61,8 @@ class Date {
 
 		$parts = ['h' => 'hours', 'i' => 'minutes', 's'  => 'seconds'];
 
+		$result = '';
+
 		foreach ($parts as $l => $time) {
 			if ($diff->$l > 0) {				
 				$result = sprintf($str, $diff->$l, $this->getPlural($strings, $diff->$l, $time));
@@ -100,6 +102,8 @@ class Date {
 	private function dayOffset($diffDays) {
 		$strings = $this->locale['offset_strings'];
 
+		$result = '';
+		
 		foreach ($this->getRanges($strings) as list($lower, $upper, $str, $divisor, $plural)) {
 			if ($diffDays >= $lower && $diffDays <= $upper) {
 				$num = abs(round($diffDays / $divisor));
