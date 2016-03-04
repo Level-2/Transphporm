@@ -8,7 +8,6 @@ use Transphporm\Builder;
 class TransphpormTest extends PHPUnit_Framework_TestCase {
 
 	public function testContentSimple() {
-		ini_set('max_execution_time', '10');
 		$template = '
 				<ul><li>TEST1</li></ul>
 		';
@@ -1552,6 +1551,21 @@ ul li span {
 	}
 
 
+	public function testFuncCalledGetData() {
+		$xml = '<div></div>';
+
+		$obj = new Foo();
+
+		$tss = 'div {content: data(model.getData()); }';
+
+		$template = new \Transphporm\Builder($xml, $tss);
+
+		$this->assertEquals($this->stripTabs($template->output($obj)->body), $this->stripTabs('<div>bar</div>'));		
+
+
+
+	}
+
 	public function testFunctionCallAsConditonal() {
 		
 		$xml = '<div></div>';
@@ -1686,6 +1700,11 @@ ul li span {
 
 
 class Foo {
+	public $model;
+
+	public function __construct() {
+		$this->model = new Bar();
+	}
 	public function getBar($bar) {
 		return $bar;
 	}
@@ -1700,5 +1719,11 @@ class Foo {
 
 	public function add($a, $b) {
 		return $a+$b;
+	}
+}
+
+class Bar {
+	public function getData() {
+		return 'bar';
 	}
 }
