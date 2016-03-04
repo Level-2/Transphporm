@@ -40,7 +40,8 @@ class Data implements \Transphporm\TSSFunction{
 	private function traverseObj($part, $obj, $valueParser, $element) {
 		if (strpos($part, '(') !== false) {
 			$subObjParser = new \Transphporm\Parser\Value($obj, $valueParser, false);
-			return $subObjParser->parse($part, $element)[0];
+			$value = $subObjParser->parse($part, $element);
+			return isset($value[0]) ? $value[0] : null;
 		}
 		else if (method_exists($obj, $part)) return call_user_func([$obj, $part]); 
 		else return false;
