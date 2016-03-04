@@ -1759,6 +1759,20 @@ ul li span {
 		 $this->assertEquals('<div>foobar</div>', $template->output()->body);
 	}
 
+	public function testPlusConcatWithLookup() {
+		$xml = '<div></div>';
+
+		$data = ['foo' => 'foo'];
+		
+		$tss = 'div {
+			content: data(foo) + "bar";
+		 }';
+
+		 $template = new \Transphporm\Builder($xml, $tss);
+
+		 $this->assertEquals('<div>foobar</div>', $template->output($data)->body);
+	}
+
 
 	public function testNestedData() {
 		        $data = json_decode('{ "children": [
