@@ -17,11 +17,18 @@ class Repeat implements \Transphporm\Property {
 	public function run($value, \DomElement $element, array $rules, \Transphporm\Hook\PseudoMatcher $pseudoMatcher, array $properties = []) {
 		if ($element->getAttribute('transphporm') === 'added') return $element->parentNode->removeChild($element);
 
+		$rule = $rules['repeat'];
+
+		$parts = explode(' ', trim($rules['repeat']));
+		$max = isset($parts[1]) ? $parts[1] : PHP_INT_MAX;
+
 		$count = 0;
 		foreach ($value as $key => $iteration) {
 			$clone = $element->cloneNode(true);
 			//Mark all but one of the nodes as having been added by transphporm, when the hook is run again, these are removed
 			if ($count++ > 0) $clone->setAttribute('transphporm', 'added');
+			if ($count > $max) break;
+			
 			$this->elementData->bind($clone, $iteration, 'iteration');
 			$this->elementData->bind($clone, $key, 'key');
 			$element->parentNode->insertBefore($clone, $element);
