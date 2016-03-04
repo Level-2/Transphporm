@@ -8,7 +8,7 @@ namespace Transphporm\TSSFunction;
 /* Handles data() and iteration() function calls from the stylesheet */
 class Data implements \Transphporm\TSSFunction{
 	private $data;
-	private $dataType;
+	private $dataKey;
 	private $functionSet;
 
 	public function __construct(\Transphporm\Hook\ElementData $data,  \Transphporm\FunctionSet $functionSet, $dataKey = 'data') {
