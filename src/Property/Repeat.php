@@ -16,7 +16,6 @@ class Repeat implements \Transphporm\Property {
 
 	public function run(array $values, \DomElement $element, array $rules, \Transphporm\Hook\PseudoMatcher $pseudoMatcher, array $properties = []) {
 		if ($element->getAttribute('transphporm') === 'added') return $element->parentNode->removeChild($element);
-
 		$max = $this->getMax($values);
 		$count = 0;
 		foreach ($values[0] as $key => $iteration) {
@@ -28,7 +27,6 @@ class Repeat implements \Transphporm\Property {
 			$this->elementData->bind($clone, $iteration, 'iteration');
 			$this->elementData->bind($clone, $key, 'key');
 			$element->parentNode->insertBefore($clone, $element);
-
 			//Re-run the hook on the new element, but use the iterated data
 			//Don't run repeat on the clones element or it will loop forever
 			unset($rules['repeat']);
@@ -42,6 +40,7 @@ class Repeat implements \Transphporm\Property {
 	private function tagElement($element, $count) {
 		if ($count > 0) $element->setAttribute('transphporm', 'added');
 	}
+
 	private function getMax($values) {
 		return isset($values[1]) ? $values[1][0] : PHP_INT_MAX;
 	}
