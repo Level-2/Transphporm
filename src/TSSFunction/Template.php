@@ -7,7 +7,6 @@
 namespace Transphporm\TSSFunction;
 /* Handles template() function calls from the stylesheet */
 class Template implements \Transphporm\TSSFunction {
-	private $selector;
 	private $elementData;
 	private $baseDir;
 
