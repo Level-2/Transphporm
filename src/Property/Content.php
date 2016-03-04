@@ -31,7 +31,6 @@ class Content implements \Transphporm\Property {
 	}
 
 	private function shouldRun($element) {
-		if ($element->getAttribute('transphporm') === 'remove') return false;
 		do {
 			if ($element->getAttribute('transphporm') == 'includedtemplate') return false;
 		}

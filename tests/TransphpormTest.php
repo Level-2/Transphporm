@@ -31,7 +31,6 @@ class TransphpormTest extends PHPUnit_Framework_TestCase {
 	}
 
 
-
 	public function testContentSimple() {
 		$template = '
 				<ul><li>TEST1</li></ul>
@@ -772,6 +771,25 @@ class TransphpormTest extends PHPUnit_Framework_TestCase {
 		$template = new \Transphporm\Builder($template, $tss);
 
 		$this->assertEquals('<div>foo</div>', $template->output()->body);
+	}
+
+	public function testImportDynamic() {
+		$template = '
+			<div>Test</div>
+		';
+
+		
+		$tss = "
+			@import data(filename);
+		";
+
+		$data = [
+			'filename' => __DIR__  . DIRECTORY_SEPARATOR . 'import.tss'
+		];
+
+		$template = new \Transphporm\Builder($template, $tss);
+
+		$this->assertEquals('<div>foo</div>', $template->output($data)->body);
 	}
 
 	public function testImportMiddleOfFile() {
@@ -1836,7 +1854,6 @@ ul li span {
 				</li>
 	</ul>'), $this->stripTabs($template->output($data)->body));
 	}
-
 
 }
 

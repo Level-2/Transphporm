@@ -79,7 +79,8 @@ class Sheet {
 	}
 
 	private function import($args, $indexStart) {
-		$sheet = new Sheet(file_get_contents($this->baseDir . trim($args, '\'" ')), $this->baseDir, $this->valueParser, $this->prefix);
+		$fileName = $this->valueParser->parse(trim($args, '\'" '));
+		$sheet = new Sheet(file_get_contents($this->baseDir . $fileName[0]), $this->baseDir, $this->valueParser, $this->prefix);
 		return $sheet->parse(0, [], $indexStart);
 	}
 

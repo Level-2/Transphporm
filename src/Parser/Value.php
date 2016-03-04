@@ -37,7 +37,7 @@ class Value {
 		else return ['name' => null, 'params' => $function, 'endPoint' => strlen($function)];
 	}
 
-	public function parse($function, \DomElement $element) {
+	public function parse($function, \DomElement $element = null) {
 		$stringExtractor = new StringExtractor($function);
 		$parts = explode('+', $stringExtractor);
 
@@ -59,7 +59,6 @@ class Value {
 		else {
 			$func = $this->parseFunction($function);
 			$finalPos = $func['endPoint'];			
-
 			if (($data = $this->getFunctionValue($func['name'], $func['params'], $element)) !== self::IS_NOT_FUNCTION) $result = $this->appendToArray($result, $data);
 			else $result[] = trim($function);
 		}

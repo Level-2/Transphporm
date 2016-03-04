@@ -53,7 +53,7 @@ class Data implements \Transphporm\TSSFunction{
 	}
 
 
-	public function run(array $args, \DomElement $element) {
+	public function run(array $args, \DomElement $element = null) {
 		$data = $this->data->getData($element, $this->dataKey);
 		$value = $this->traverse($args[0], $data, $element);
 		return $value;
