@@ -15,8 +15,9 @@ class Template {
 	/** Takes an XML string and loads it into a DomDocument object */
 	public function __construct($doc) {
 		$this->document = new \DomDocument;
+		
+		$this->loadDocument($doc);
 
-		$this->document->loadXML($doc);
 		$this->xpath = new \DomXPath($this->document);
 		$this->xpath->registerNamespace('php', 'http://php.net/xpath');
 		$this->xpath->registerPhpFunctions();
@@ -25,6 +26,22 @@ class Template {
 			$this->xpath->registerNamespace('nsprefix', $this->document->documentElement->namespaceURI);
 			$this->prefix = 'nsprefix:';
 		}
+	}
+
+	/** Loads a HTML or XML document */ 	
+	private function loadDocument($doc) {
+		libxml_use_internal_errors(true);
+		if ($this->document->loadXml($doc) === false) {
+			$htmlDoc = new \DomDocument;
+			$htmlDoc->loadHtml($doc);
+			
+			if (strpos($doc, '<!') === 0) $doc = $htmlDoc;
+			else {
+				$templateNode = $htmlDoc->getElementsByTagName('template')[0];
+				$this->document->appendChild($this->document->importNode($templateNode, true));
+			}
+		}
+		libxml_clear_errors();
 	}
 
 	/** Returns the document's XML prefix */

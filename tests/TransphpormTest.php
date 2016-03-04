@@ -7,6 +7,31 @@
 use Transphporm\Builder;
 class TransphpormTest extends PHPUnit_Framework_TestCase {
 
+	public function testLoadHTMLWithEntities() {
+		$template = '
+				<div>&nbsp; &lt;</div>
+		';
+
+		
+		$template = new Builder($template);
+		
+		$this->assertEquals('<div>' . html_entity_decode('&nbsp;') . ' &lt;</div>' ,$template->output()->body); 
+	}
+
+	public function testLoadHTMLUnclosed() {
+		$template = '
+				<div><img src="foo.jpg"></div>
+		';
+
+
+		
+		$template = new Builder($template);
+		
+		$this->assertEquals('<div><img src="foo.jpg" /></div>' ,$template->output()->body); 
+	}
+
+
+
 	public function testContentSimple() {
 		$template = '
 				<ul><li>TEST1</li></ul>
@@ -1797,6 +1822,7 @@ ul li span {
 				</li>
 	</ul>'), $this->stripTabs($template->output($data)->body));
 	}
+
 
 }
 
