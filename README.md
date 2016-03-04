@@ -134,7 +134,11 @@ Transphporm gives both designers and developers an unprecedented level of flexib
 
 # Installation
 
-The preferred method of installing Transphprom is via Composer. However, if you don't want to use Composer you can manually install Transphporm:
+The preferred method of installing Transphporm is via Composer. Transphorm is available from Packagist:
+
+	level-2/transphporm
+	
+However, if you don't want to use Composer you can manually install Transphporm:
 
 1. Download and extract Transphporm into your project
 2. Use a PSR-0 compliant autoloader such as [Axel](https://github.com/Level-2/Axel)
