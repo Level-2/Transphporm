@@ -550,8 +550,56 @@ class TransphpormTest extends PHPUnit_Framework_TestCase {
 
 	}
 
+	public function testNthChild2() {
+		$template = '
+			<ul>
+				<li>One</li>
+				<li>Two</li>
+				<li>Three</li>
+				<li>Four</li>
+			</ul>
+		';
+
+		$tss = 'ul li:nth-child(3) {content: "REPLACED"}';
+
+		$template = new \Transphporm\Builder($template, $tss);
+
+		$this->assertEquals($this->stripTabs('<ul>
+				<li>One</li>
+				<li>Two</li>
+				<li>REPLACED</li>
+				<li>Four</li>
+			</ul>'), $this->stripTabs($template->output()->body));
+
+	}
+
+	public function testNthChild3() {
+		$template = '
+			<ul>
+				<li>One</li>
+				<li>Two</li>
+				<li>Three</li>
+				<li>Four</li>
+			</ul>
+		';
+
+		$tss = 'ul li:nth-child(1) {content: "REPLACED"}';
+
+		$template = new \Transphporm\Builder($template, $tss);
+
+		$this->assertEquals($this->stripTabs('<ul>
+				<li>REPLACED</li>
+				<li>Two</li>
+				<li>Three</li>
+				<li>Four</li>
+			</ul>'), $this->stripTabs($template->output()->body));
+
+	}
+
+
 	public function testNthChildOdd() {
 		$template = '
+
 			<ul>
 				<li>One</li>
 				<li>Two</li>
@@ -1562,7 +1610,20 @@ ul li span {
 
 		$this->assertEquals($this->stripTabs($template->output($obj)->body), $this->stripTabs('<div>bar</div>'));		
 
+	}
 
+
+	public function testFuncCalledGetDataBind() {
+		$xml = '<div></div>';
+
+		$obj = new Foo();
+
+		$includeFile = __DIR__ . '/include.xml';
+		$tss = 'div {content: template(' . $includeFile  . ');  bind: data(model.getData()); }';
+
+		$template = new \Transphporm\Builder($xml, $tss);
+
+		$this->assertEquals($this->stripTabs($template->output($obj)->body), $this->stripTabs('<div><p>foo</p></div>'));		
 
 	}
 
