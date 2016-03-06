@@ -26,17 +26,20 @@ class Template implements \Transphporm\TSSFunction {
 
 		$doc = $newTemplate->output($this->elementData->getData($element), true)->body;
 		if ($selector != '') return $this->templateSubsection($doc, $selector);
-		
-		$newNode = $doc->documentElement;
+			
+		return $this->getTemplateContent($doc, $tss);
+
+	}
+
+	private function getTemplateContent($document, $tss) {
+		$newNode = $document->documentElement;
 		$result = [];
 		if ($newNode->tagName === 'template') {
 			foreach ($newNode->childNodes as $node) {
 				$result[] = $this->getClonedElement($node, $tss);
 			}
 		}
-		//else $result[] = $newNode;
 		return $result;
-
 	}
 
 	private function templateSubsection($doc, $selector) {
