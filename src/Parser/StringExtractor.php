@@ -16,17 +16,21 @@ class StringExtractor {
 	}
 
 	private function extractStrings($str) {
+		$double = $this->extractStringsByType($str, '"');
+		$single = $this->extractStringsByType($double[0], '\'', count($double[1]));
+		return [$single[0], array_merge($double[1], $single[1])];
+	}
+
+	private function extractStringsByType($str, $type, $num = 0) {
 		$pos = 0;
-		$num = 0;
 		$strings = [];
-		while (isset($str[$pos]) && ($pos = strpos($str, '"', $pos)) !== false) {
-			$end = strpos($str, '"', $pos+1);
+		while (isset($str[$pos]) && ($pos = strpos($str, $type, $pos)) !== false) {
+			$end = strpos($str, $type, $pos+1);
 			if (!$end) break;
-			$end = $this->getNextPosEscaped($str, '\\', '"', $end);
+			$end = $this->getNextPosEscaped($str, '\\', $type, $end);
 			$strings['$___STR' . ++$num] = substr($str, $pos, $end-$pos+1);
 			$str = substr_replace($str, '$___STR' . $num, $pos, $end-$pos+1);
 		}
-
 		return [$str, $strings];
 	}
 
