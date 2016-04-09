@@ -1054,6 +1054,21 @@ class TransphpormTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('<div>TE:ST</div>', $this->stripTabs($template->output()->body));
 	}
 
+	public function testStringSingleQuotes() {
+		$template = '<div>Test</div>'	;
+
+		$tss = "div:attr(style) {
+  content: 'display: none;';
+}
+
+";
+
+		$template = new \Transphporm\Builder($template, $tss);
+
+		$this->assertEquals('<div style="display: none;">Test</div>', $this->stripTabs($template->output()->body));
+
+
+	}
 
 	public function testSemicolonInStrings() {
 
@@ -1854,6 +1869,8 @@ ul li span {
 				</li>
 	</ul>'), $this->stripTabs($template->output($data)->body));
 	}
+
+
 
 }
 
