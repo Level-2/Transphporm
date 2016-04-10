@@ -348,7 +348,7 @@ Which will output:
 
 For more information on loops see the [Wiki page Basic usage: Loops](https://github.com/Level-2/Transphporm/wiki/Basic-Usage:-Loops)
 
-# Hiding Blocks
+# Removing Blocks
 
 Lifted straight from CSS grammar, Transphporm supports `display: none` which will actually remove the element from the document entirely:
 
