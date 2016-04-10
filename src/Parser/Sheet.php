@@ -35,6 +35,7 @@ class Sheet {
 		//there may be processing instructions at the end
 		if ($processing = $this->processingInstructions($this->tss, $pos, strlen($this->tss), count($rules)+$indexStart)) $rules = array_merge($rules, $processing['rules']);
 		usort($rules, [$this, 'sortRules']);
+		if (empty($rules)) trigger_error("No TSS rules parsed");
 		return $rules;
 	}
 
