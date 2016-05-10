@@ -30,9 +30,7 @@ class Attribute implements \Transphporm\Pseudo {
 
 		$operator = $this->getOperator($field);
 		$lookupValue = $this->functionSet->$name([trim($field, $operator)], $element);
-		$valueParser = new \Transphporm\Parser\Value($this->functionSet);
-		$value = $valueParser->parse($value, $element);
-		return $this->processOperator($operator, $lookupValue, $this->parseValue(trim($value, '"')));
+		return $this->processOperator($operator, $lookupValue, $this->parseValue(trim($value, '"'), $element));
 	}
 
 
@@ -42,10 +40,11 @@ class Attribute implements \Transphporm\Pseudo {
 		return $operator === '!' ? !$matched : $matched;
 	}
 
-	private function parseValue($value) {
+	private function parseValue($value, $element) {
+		$valueParser = new \Transphporm\Parser\Value($this->functionSet);
 		if ($value == 'true') return true;
 		else if ($value == 'false') return false;
-		else return $value;
+		else return $valueParser->parse($value, $element)[0];
 	}
 
 	private function getOperator($field) {
