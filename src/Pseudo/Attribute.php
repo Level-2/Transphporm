@@ -15,7 +15,7 @@ class Attribute implements \Transphporm\Pseudo {
 	public function match($pseudo, \DomElement $element) {
 		$pos = strpos($pseudo, '[');
 		if ($pos === false) return true;
-		
+
 		$name = substr($pseudo, 0, $pos);
 		if (!is_callable([$this->functionSet, $name])) return true;
 
@@ -30,6 +30,8 @@ class Attribute implements \Transphporm\Pseudo {
 
 		$operator = $this->getOperator($field);
 		$lookupValue = $this->functionSet->$name([trim($field, $operator)], $element);
+		$valueParser = new \Transphporm\Parser\Value($this->functionSet);
+		$value = $valueParser->parse($value, $element);
 		return $this->processOperator($operator, $lookupValue, $this->parseValue(trim($value, '"')));
 	}
 
