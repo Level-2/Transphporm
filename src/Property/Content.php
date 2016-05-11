@@ -19,14 +19,14 @@ class Content implements \Transphporm\Property {
 
 	public function run(array $values, \DomElement $element, array $rules, \Transphporm\Hook\PseudoMatcher $pseudoMatcher, array $properties = []) {
 		if (!$this->shouldRun($element)) return false;
-			
-		$value = $this->formatter->format($values[0], $rules);
-		if (!$this->processPseudo($value, $element, $pseudoMatcher)) {
+
+		$values = $this->formatter->format($values, $rules);
+		if (!$this->processPseudo($values, $element, $pseudoMatcher)) {
 			//Remove the current contents
 			$this->removeAllChildren($element);
 			//Now make a text node
-			if ($this->getContentMode($rules) === 'replace') $this->replaceContent($element, $value);
-			else $this->appendContent($element, $value);
+			if ($this->getContentMode($rules) === 'replace') $this->replaceContent($element, $values);
+			else $this->appendContent($element, $values);
 		}
 	}
 
@@ -54,15 +54,22 @@ class Content implements \Transphporm\Property {
 	}
 	
 	private function getNode($node, $document) {
+		if (is_array($node[0])) $node = $node[0];
 		foreach ($node as $n) {
+
 			if ($n instanceof \DomElement) {
 				$new = $document->importNode($n, true);
 				//Removing this might cause problems with caching... 
 				//$new->setAttribute('transphporm', 'added');
 			}
 			else {
+				
+
+
 				if ($n instanceof \DomText) $n = $n->nodeValue;
 				$new = $document->createElement('text');
+				if (is_array($n)) throw new \Exception();
+				
 				$new->appendChild($document->createTextNode($n));
 				$new->setAttribute('transphporm', 'text');
 			}

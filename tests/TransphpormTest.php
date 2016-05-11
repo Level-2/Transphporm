@@ -864,7 +864,7 @@ class TransphpormTest extends PHPUnit_Framework_TestCase {
 
 		$includeFile = __DIR__ . DIRECTORY_SEPARATOR . 'include.xml';
 
-		$tss = "div {content: template($includeFile); }";
+		$tss = "div {content: template('$includeFile'); }";
 		$template = new \Transphporm\Builder($template, $tss);
 
 		$this->assertEquals('<div><p>foo</p></div>', $this->stripTabs($template->output()->body));
@@ -1462,11 +1462,34 @@ div:after {content: 'bar' }
 
 		$includeFile = __DIR__ . DIRECTORY_SEPARATOR . 'include.xml';
 
-		$tss = "div:before {content: template($includeFile); }";
+		$tss = "div:before {content: template('$includeFile'); }";
 		$template = new \Transphporm\Builder($xml, $tss);
 
 		$this->assertEquals('<div><p>foo</p><span>Test</span></div>', $this->stripTabs($template->output()->body));
 
+	}
+
+	public function testAttrRead() {
+		$xml = '
+		<div class="one">
+
+		</div>
+		<div class="two">
+
+		</div>
+		<div class="three">
+		</div>
+		';
+
+		$tss = 'div {content: attr(class); }';
+
+		$template = new \Transphporm\Builder($xml, $tss);
+
+		$this->assertEquals($this->stripTabs($template->output()->body), $this->stripTabs('
+			<div class="one">one</div>
+			<div class="two">two</div>
+			<div class="three">three</div>
+		'));
 	}
 
 	public function testFilterDataArray() {
@@ -1488,7 +1511,7 @@ div:after {content: 'bar' }
 		</div>
 		';
 
-		$tss = 'div:data[anArray[attr(class)]] {content: "set" }';
+		$tss = 'div:data[anArray[attr("class")]] {content: attr(class); }';
 
 		$template = new \Transphporm\Builder($xml, $tss);
 
@@ -1497,7 +1520,7 @@ div:after {content: 'bar' }
 			<div class="two">set</div>
 			<div class="three">
 			</div>
-		'));;
+		'));
 
 	}
 
@@ -1617,7 +1640,7 @@ ul li span {
         </ul>'));
 	}
 
-	public function testFunctionCall() {
+	public function testFunctionCall1() {
 		
 		$xml = '<div></div>';
 
@@ -1635,7 +1658,7 @@ ul li span {
 
 	}
 
-	public function testFunctionCallWithDataArg() {
+	public function testFunctionCallWithDataArg1() {
 		
 		$xml = '<div></div>';
 
@@ -1675,7 +1698,7 @@ ul li span {
 
 		$obj = new Foo();
 
-		$tss = 'div {content: data(add(2, 3)); }';
+		$tss = 'div {content: data().add(2,3); }';
 
 		$template = new \Transphporm\Builder($xml, $tss);
 
@@ -1703,7 +1726,7 @@ ul li span {
 		$obj = new Foo();
 
 		$includeFile = __DIR__ . '/include.xml';
-		$tss = 'div {content: template(' . $includeFile  . ');  bind: data(model.getData()); }';
+		$tss = 'div {content: template("' . $includeFile  . '");  bind: data(model.getData()); }';
 
 		$template = new \Transphporm\Builder($xml, $tss);
 

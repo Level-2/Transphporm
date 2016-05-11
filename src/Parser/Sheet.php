@@ -79,8 +79,9 @@ class Sheet {
 	}
 
 	private function import($args, $indexStart) {
-		$fileName = $this->valueParser->parse(trim($args, '\'" '));
-		$sheet = new Sheet(file_get_contents($this->baseDir . $fileName[0]), $this->baseDir, $this->valueParser, $this->prefix);
+		if (is_file(trim($args,'\'" '))) $fileName = trim($args,'\'" ');
+		else $fileName = $this->valueParser->parse($args)[0];
+		$sheet = new Sheet(file_get_contents($this->baseDir . $fileName), $this->baseDir, $this->valueParser, $this->prefix);
 		return $sheet->parse(0, [], $indexStart);
 	}
 
@@ -110,7 +111,6 @@ class Sheet {
 		foreach ($rules as $rule) {
 			if (trim($rule) === '') continue;
 			$parts = explode(':', $rule, 2);
-
 			$parts[1] = $stringExtractor->rebuild($parts[1]);
 			$return[trim($parts[0])] = isset($parts[1]) ? trim($parts[1]) : '';
 		}

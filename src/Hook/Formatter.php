@@ -16,6 +16,7 @@ class Formatter {
 	public function format($value, $rules) {
 		if (!isset($rules['format'])) return $value;
 		$format = new \Transphporm\Parser\StringExtractor($rules['format']);
+
 		$options = explode(' ', $format);
 		$functionName = array_shift($options);
 		foreach ($options as &$f) $f = trim($format->rebuild($f), '"');

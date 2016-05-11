@@ -20,13 +20,16 @@ class Template implements \Transphporm\TSSFunction {
 	}
 
 	public function run(array $args, \DomElement $element) {
+		$parser = new \Transphporm\Parser\Value($this->elementData);
+		$args = $parser->parseTokens($args, $element, $this->elementData->getData($element));
 		$selector = $this->readArray($args, 1);
 		$tss = $this->readArray($args, 2);
+
 		$newTemplate = new \Transphporm\Builder($this->baseDir . $args[0], $tss ? $this->baseDir . $tss : null);
 
 		$doc = $newTemplate->output($this->elementData->getData($element), true)->body;
 		if ($selector != '') return $this->templateSubsection($doc, $selector);
-			
+
 		return $this->getTemplateContent($doc, $tss);
 
 	}

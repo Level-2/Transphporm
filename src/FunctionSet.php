@@ -8,11 +8,9 @@ namespace Transphporm;
 /* Handles data() and iteration() function calls from the stylesheet */
 class FunctionSet {
 	private $elementData;
-	private $baseDir;
 	private $functions = [];
 
-	public function __construct(Hook\ElementData $elementData, &$baseDir) {
-		$this->baseDir = &$baseDir;
+	public function __construct(Hook\ElementData $elementData) {
 		$this->elementData = $elementData;
 	}
 
@@ -20,7 +18,8 @@ class FunctionSet {
 		if (isset($this->functions[$name])) {
 			return $this->functions[$name]->run($args[0], $args[1]);
 		}
-		else return \Transphporm\Parser\Value::IS_NOT_FUNCTION;
+		return true;
+		//else return \Transphporm\Parser\Value::IS_NOT_FUNCTION;
 	}
 
 	public function addFunction($name, \Transphporm\TSSFunction $function) {

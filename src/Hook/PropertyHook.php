@@ -23,23 +23,13 @@ class PropertyHook implements \Transphporm\Hook {
 		if (!$this->pseudoMatcher->matches($element)) return;
 
 		foreach ($this->rules as $name => $value) {
-			$result = $this->callProperty($name, $element, $this->getArgs($value, $element)) ;
+			$result = $this->callProperty($name, $element, $this->getArgs($value, $element));
 			if ($result === false) break;
 		}
 	}
 
 	private function getArgs($value, $element) {
-		$stringExtractor = new \Transphporm\Parser\StringExtractor(trim($value));
-		$value = str_replace(', ', ',', $stringExtractor);
-		$value = str_replace(' + ', '+', $value);
-		$parts = explode(' ', $value);
-
-		$args = [];
-		foreach ($parts as $part) {
-			$args[] = $this->valueParser->parse($stringExtractor->rebuild($part), $element);
-		}
-
-		return $args;
+		return $this->valueParser->parse($value, $element);
 	}
 
 	public function registerProperty($name, \Transphporm\Property $property) {

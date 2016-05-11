@@ -18,6 +18,8 @@ class Repeat implements \Transphporm\Property {
 		if ($element->getAttribute('transphporm') === 'added') return $element->parentNode->removeChild($element);
 		$max = $this->getMax($values);
 		$count = 0;
+
+		var_dump($values);
 		foreach ($values[0] as $key => $iteration) {
 			if ($count+1 > $max) break;
 			$clone = $this->cloneElement($element, $iteration, $key, $count++);
@@ -47,7 +49,7 @@ class Repeat implements \Transphporm\Property {
 	}
 
 	private function getMax($values) {
-		return isset($values[1]) ? $values[1][0] : PHP_INT_MAX;
+		return isset($values[1]) ? $values[1] : PHP_INT_MAX;
 	}
 
 	private function createHook($newRules, $pseudoMatcher, $properties) {
