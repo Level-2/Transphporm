@@ -16,7 +16,7 @@ class Attribute implements \Transphporm\Pseudo {
 
 		$pos = strpos($pseudo, '[');
 		if ($pos === false) return true;
-		
+
 		$name = substr($pseudo, 0, $pos);
 		if (!is_callable([$this->functionSet, $name])) return true;
 
@@ -24,6 +24,16 @@ class Attribute implements \Transphporm\Pseudo {
 		$criteria = $bracketMatcher->match('[', ']');
 
 		$valueParser = new \Transphporm\Parser\Value($this->functionSet);
-		return $valueParser->parse($criteria)[0];
+
+		$criteria = $name . '(' . $criteria;
+
+		$pos = strpos($pseudo, '!');
+		if ($pos === false) $pos = strpos($pseudo, '=');
+		if ($pos === false) {
+			$criteria .= ')=true';
+		}
+		else $criteria = substr_replace($criteria, ')', $pos, 0);
+
+		return $valueParser->parse($criteria, $element)[0];
 	}
 }

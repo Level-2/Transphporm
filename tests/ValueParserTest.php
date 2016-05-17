@@ -58,7 +58,7 @@ class ValueParserTest extends PHPUnit_Framework_TestCase {
 
 		$result = $value->parse('"foo\"bar"');
 		$this->assertEquals(['foo"bar'], $result);
-	
+
 	}
 
 
@@ -94,7 +94,7 @@ class ValueParserTest extends PHPUnit_Framework_TestCase {
                      ->getMock();
 
         $stub->expects($this->any())->method('data')->with($this->equalTo('foo'))->will($this->returnValue('bar'));
-    
+
 		$subStub = $this->getMockBuilder('TestData')->setMethods(['someMethod'])
                      ->getMock();
 
@@ -102,7 +102,7 @@ class ValueParserTest extends PHPUnit_Framework_TestCase {
 	}
 
 	public function testFunctionCallBasic() {
-		
+
 		$stub = $this->getDataStub();
 
         $value = new Value($stub, false);
@@ -173,6 +173,19 @@ class ValueParserTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals(['foo'], $result);
 	}
 
+	public function testNonExistantProperty() {
+		$data = new stdclass;
+		$data->user = new stdclass;
+		$data->user->name = 'foo';
+
+		//Enable auto-lookup so user can be used instead of data(user).name
+		$value = new Value($data, true);
+
+		$result = $value->parse('user.info');
+
+		$this->assertEquals([], $result);
+	}
+
 	public function testTwoArgs() {
 		$value = new Value(new TestData);
 
@@ -231,7 +244,7 @@ class ValueParserTest extends PHPUnit_Framework_TestCase {
 
 		$this->assertEquals([true], $result);
 	}
-
+/*
 	public function testConditionalDataFunction() {
 		$value = new Value($this->getFunctionSet(new TestData), true);
 
@@ -240,16 +253,18 @@ class ValueParserTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals([true], $data);
 
 	}
-
+*/
 	public function testArrayLookup() {
-		$data = [
+		$data = ["anArray" => [
 			'one' => 'a',
 			'two' => 'two'
-		];
+		]];
 
-		$value = new Value($data);
+		$value = new Value($data, true);
 
-				
+		$result = $value->parse('anArray["one"]');
+
+		$this->assertEquals(['a'], $result);
 
 	}
 
