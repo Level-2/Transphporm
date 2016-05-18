@@ -183,7 +183,20 @@ class ValueParserTest extends PHPUnit_Framework_TestCase {
 
 		$result = $value->parse('user.info');
 
-		$this->assertEquals([], $result);
+		$this->assertEquals([false], $result);
+	}
+
+	public function testNonExistantIndex() {
+		$data = new stdclass;
+		$data->user = [];
+		$data->user['name'] = 'foo';
+
+		//Enable auto-lookup so user can be used instead of data(user).name
+		$value = new Value($data, true);
+
+		$result = $value->parse('user["info"]');
+
+		$this->assertEquals([false], $result);
 	}
 
 	public function testTwoArgs() {

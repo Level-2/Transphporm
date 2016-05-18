@@ -8,9 +8,7 @@ use Transphporm\Builder;
 class TransphpormTest extends PHPUnit_Framework_TestCase {
 
 	public function testLoadHTMLWithEntities() {
-		$template = '
-				<div>&nbsp; &lt;</div>
-		';
+		$template = '<div>&nbsp; &lt;</div>';
 
 
 		$template = new Builder($template);
@@ -19,9 +17,7 @@ class TransphpormTest extends PHPUnit_Framework_TestCase {
 	}
 
 	public function testLoadHTMLUnclosed() {
-		$template = '
-				<div><img src="foo.jpg"></div>
-		';
+		$template = '<div><img src="foo.jpg"></div>';
 
 
 
@@ -1515,7 +1511,7 @@ div:after {content: 'bar' }
 		</div>
 		';
 
-		$tss = 'div:data[anArray[attr("class")]] {content: attr(class); }';
+		$tss = 'div:data[anArray[attr("class")]] {content: "set"; }';
 
 		$template = new \Transphporm\Builder($xml, $tss);
 

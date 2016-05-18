@@ -36,6 +36,7 @@ class Value {
 
 			if (in_array($token['type'], [Tokenizer::NOT, Tokenizer::EQUALS])) {
 				// ($last !== null) $result = $this->processValue($result, $mode, $last);
+
 				$result = $this->processLast($last, $result, $mode, $data);
 
 				if ($mode == Tokenizer::NOT && $token['type'] == Tokenizer::EQUALS) {
@@ -46,7 +47,8 @@ class Value {
 
 			if ($token['type'] === Tokenizer::DOT) {
 				if ($last !== null) {
-					$data = $data->$last;
+					if (isset($data->$last)) $data = $data->$last;
+					else if (is_array($data) && isset($data[$last])) $data = $data[$last];
 				}
 				else $data = array_pop($result);
 
@@ -55,10 +57,11 @@ class Value {
 
 			if ($token['type'] == Tokenizer::OPEN_SQUARE_BRACKET) {
 				if ($last !== null) {
-					$data = $data[$last];
+					if (isset($data->$last)) $data = $data->$last;
+					else if (is_array($data) && isset($data[$last])) $data = $data[$last];
 				}
 
-				$last = $this->parseTokens($token['value'], $element, $data)[0];
+				$last = $this->parseTokens($token['value'], $element, null)[0];
 			}
 
 			if (in_array($token['type'], [Tokenizer::ARG, Tokenizer::CONCAT])) {
@@ -71,7 +74,7 @@ class Value {
 				$result = $this->processValue($result, $mode, $token['value']);
 			}
 
-			if ($token['type'] === Tokenizer::NAME || $token['type'] == Tokenizer::NUMERIC || $token['type'] == Tokenizer::BOOL) {
+			if (in_array($token['type'], [Tokenizer::NAME, Tokenizer::NUMERIC, Tokenizer::BOOL])) {
 				$last = $token['value'];
 			}
 
@@ -120,7 +123,10 @@ class Value {
 			else if (is_array($data) && isset($data[$last])) {
 				$result = $this->processValue($result, $mode, $data[$last]);
 			}
-			else $result = $this->processValue($result, $mode, $last);
+			else if (!$this->autoLookup) {
+				$result = $this->processValue($result, $mode, $last);
+			}
+			else $result = [false];
 		}
 		return $result;
 	}
