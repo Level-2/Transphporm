@@ -11,7 +11,7 @@ class Repeat implements \Transphporm\Property {
 
 	public function __construct(\Transphporm\FunctionSet $functionSet, \Transphporm\Hook\ElementData $elementData) {
 		$this->functionSet = $functionSet;
-		$this->elementData = $elementData;		
+		$this->elementData = $elementData;
 	}
 
 	public function run(array $values, \DomElement $element, array $rules, \Transphporm\Hook\PseudoMatcher $pseudoMatcher, array $properties = []) {
@@ -19,7 +19,7 @@ class Repeat implements \Transphporm\Property {
 		$max = $this->getMax($values);
 		$count = 0;
 
-		var_dump($values);
+		//var_dump($values);
 		foreach ($values[0] as $key => $iteration) {
 			if ($count+1 > $max) break;
 			$clone = $this->cloneElement($element, $iteration, $key, $count++);
@@ -34,7 +34,7 @@ class Repeat implements \Transphporm\Property {
 	}
 
 	private function cloneElement($element, $iteration, $key, $count) {
-		$clone = $element->cloneNode(true);	
+		$clone = $element->cloneNode(true);
 		$this->tagElement($clone, $count);
 
 		$this->elementData->bind($clone, $iteration, 'iteration');

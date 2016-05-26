@@ -23,6 +23,7 @@ class Tokenizer {
 	const NOT = 14;
 	const OPEN_BRACE = 15;
 	const CLOSE_BRACE = 16;
+	const BOOL = 17;
 
 	public $chars = [
 		'"' => self::STRING,
@@ -53,7 +54,7 @@ class Tokenizer {
 
 		for ($i = 0; $i < strlen($this->str); $i++) {
 			$char = $this->identifyChar($this->str[$i]);
-				
+
 			$this->doSimpleTokens($tokens, $char);
 			$this->doLiterals($tokens, $char, $i);
 			$i += $this->doStrings($tokens, $char, $i);
@@ -76,6 +77,8 @@ class Tokenizer {
 				$i++;
 			}
 			if (is_numeric($name)) $tokens[] = ['type' => self::NUMERIC, 'value' => $name];
+			else if ($name == 'true') $tokens[] = ['type' => self::BOOL, 'value' => true];
+			else if ($name == 'false') $tokens[] = ['type' => self::BOOL, 'value' => false];
 			else $tokens[] = ['type' => self::NAME, 'value' => $name];
 		}
 	}
@@ -135,4 +138,3 @@ class Tokenizer {
 		else return false;
 	}
 }
-

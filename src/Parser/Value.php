@@ -5,12 +5,12 @@
  * @license         http://www.opensource.org/licenses/bsd-license.php  BSD License *
  * @version         1.0                                                             */
 namespace Transphporm\Parser;
-/** Parses "string" and function(args) e.g. data(foo) or iteration(bar) */ 
+/** Parses "string" and function(args) e.g. data(foo) or iteration(bar) */
 class Value {
 	private $data;
 	private $autoLookup;
 	private $tokens;
-	
+
 	public function __construct($data, $autoLookup = false) {
 		$this->data = $data;
 		$this->autoLookup = $autoLookup;
@@ -36,6 +36,7 @@ class Value {
 
 			if (in_array($token['type'], [Tokenizer::NOT, Tokenizer::EQUALS])) {
 				// ($last !== null) $result = $this->processValue($result, $mode, $last);
+
 				$result = $this->processLast($last, $result, $mode, $data);
 
 				if ($mode == Tokenizer::NOT && $token['type'] == Tokenizer::EQUALS) {
@@ -46,11 +47,21 @@ class Value {
 
 			if ($token['type'] === Tokenizer::DOT) {
 				if ($last !== null) {
-					$data = $data->$last;
+					if (isset($data->$last)) $data = $data->$last;
+					else if (is_array($data) && isset($data[$last])) $data = $data[$last];
 				}
 				else $data = array_pop($result);
 
 				$last = null;
+			}
+
+			if ($token['type'] == Tokenizer::OPEN_SQUARE_BRACKET) {
+				if ($last !== null) {
+					if (isset($data->$last)) $data = $data->$last;
+					else if (is_array($data) && isset($data[$last])) $data = $data[$last];
+				}
+
+				$last = $this->parseTokens($token['value'], $element, null)[0];
 			}
 
 			if (in_array($token['type'], [Tokenizer::ARG, Tokenizer::CONCAT])) {
@@ -62,22 +73,22 @@ class Value {
 			if ($token['type'] === Tokenizer::STRING) {
 				$result = $this->processValue($result, $mode, $token['value']);
 			}
-			
-			if ($token['type'] === Tokenizer::NAME || $token['type'] == Tokenizer::NUMERIC) {
-				$last = $token['value'];		
+
+			if (in_array($token['type'], [Tokenizer::NAME, Tokenizer::NUMERIC, Tokenizer::BOOL])) {
+				$last = $token['value'];
 			}
 
 			if ($token['type'] == Tokenizer::OPEN_BRACKET) {
-				
+
 				if ($this->data instanceof \Transphporm\Functionset && ($last == 'data' || $last == 'iteration' || $last == 'attr')) {
 					$result = $this->processValue($result, $mode, $this->data->$last($token['value'], $element));
-					
+
 					foreach ($result as $i => $value) {
 						if (is_array($data)) {
 							if (isset($data[$value])) $result[$i] = $data[$value];
 						}
 						else if (is_scalar($value) && isset($data->$value)) $result[$i] = $data->$value;
-					}	
+					}
 					$last = null;
 				}
 				else if ($data instanceof \Transphporm\Functionset) {
@@ -88,17 +99,17 @@ class Value {
 					$args = $this->parseTokens($token['value'], $element, $data);
 					$funcResult = $this->callFunc($last, $args, $element, $data);
 					$result = $this->processValue($result, $mode, $funcResult);
-					$last = null;	
+					$last = null;
 				}
 			}
-
+/*
 			if ($token['type'] == Tokenizer::OPEN_SQUARE_BRACKET) {
 				if ($this->autoLookup === true) {
 					$result = $this->processValue($result, $mode, $data->$last($token['value'], $element));
 					$last = null;
 
 				}
-			}		
+			}//*/
 		}
 
 		return $this->processLast($last, $result, $mode, $data);
@@ -110,9 +121,12 @@ class Value {
 				$result = $this->processValue($result, $mode, $data->$last);
 			}
 			else if (is_array($data) && isset($data[$last])) {
-				$result = $this->processValue($result, $mode, $data[$last]);	
+				$result = $this->processValue($result, $mode, $data[$last]);
 			}
-			else $result = $this->processValue($result, $mode, $last);
+			else if (!$this->autoLookup) {
+				$result = $this->processValue($result, $mode, $last);
+			}
+			else $result = [false];
 		}
 		return $result;
 	}
@@ -128,14 +142,14 @@ class Value {
 			$result[count($result)-1] = $result[count($result)-1] != $newValue;
 		}
 		else if ($mode == Tokenizer::EQUALS) {
-			$result[count($result)-1] = $result[count($result)-1] == $newValue;	
+			$result[count($result)-1] = $result[count($result)-1] == $newValue;
 		}
 
 		return $result;
 	}
 
 	private function callFunc($name, $args, $element, $data) {
-		if ($data instanceof \Transphporm\FunctionSet) return $data->$name($args, $element);	
+		if ($data instanceof \Transphporm\FunctionSet) return $data->$name($args, $element);
 		else return $this->callFuncOnObject($data, $name, $args, $element);
 	}
 
