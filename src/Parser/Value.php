@@ -29,7 +29,7 @@ class Value {
 		$mode = Tokenizer::ARG;
 		$last = null;
 
-		if (empty($tokens) && $this->data instanceof \Transphporm\Functionset) return [$data];
+		if (empty($tokens)) return [$data];
 
 		foreach ($tokens as $token) {
 		if (is_string($token)) throw new \Exception($token);
@@ -97,6 +97,7 @@ class Value {
 				}
 				else {
 					$args = $this->parseTokens($token['value'], $element, $data);
+					if ($args[0] == $data) $args = [];
 					$funcResult = $this->callFunc($last, $args, $element, $data);
 					$result = $this->processValue($result, $mode, $funcResult);
 					$last = null;
