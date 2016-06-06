@@ -29,7 +29,7 @@ class Value {
 		$mode = Tokenizer::ARG;
 		$last = null;
 
-		if (empty($tokens)) return [$data];
+		if (empty($tokens) && $this->data instanceof \Transphporm\Functionset) return [$data];
 
 		foreach ($tokens as $token) {
 		if (is_string($token)) throw new \Exception($token);
