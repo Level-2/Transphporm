@@ -876,9 +876,9 @@ class TransphpormTest extends PHPUnit_Framework_TestCase {
 		$includeFile = str_replace('\\', '/', $includeFile);
 
 		$data = new \stdClass;
-		$data->includedFile = $includedFile;
+		$data->includeFile = $includeFile;
 
-		$tss = "div {content: template(data(includedFile)); }";
+		$tss = "div {content: template(data(includeFile)); }";
 		$template = new \Transphporm\Builder($template, $tss);
 
 		$this->assertEquals('<div><p>foo</p></div>', $this->stripTabs($template->output($data)->body));
