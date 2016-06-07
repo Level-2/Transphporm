@@ -10,11 +10,39 @@ class Value {
 	private $baseData;
 	private $autoLookup;
 	private $tokens;
+
+	/*
+		The next operation to perform. Will be one of the following:
+			ARG - A new value e.g,  "a","b"  becomes ["a", "b"]
+			CONCAT - Concat onto the current arg e.g "a" + "b" becomes ["ab"]
+			NOT - Boolean operation "a" != "b" becomes [true]
+			EQUALS - Boolean operation "a" = "b" becomes [false]
+	*/
 	private $mode;
+
+	/*
+		Stores the last value e.g. 
+			"a" + "b"
+		Will store "a" before reading the token for the + and perfoming the concatenate operation
+	*/
 	private $last;
 	private $data;
 	private $result;
 	private $element;
+
+	private $tokenFuncs = [
+			Tokenizer::NOT => 'processComparator',
+			Tokenizer::EQUALS => 'processComparator',
+			Tokenizer::DOT => 'processDot',
+			Tokenizer::OPEN_SQUARE_BRACKET => 'processSquareBracket',
+			Tokenizer::ARG => 'processSeparator',
+			Tokenizer::CONCAT => 'processSeparator',
+			Tokenizer::NAME => 'processScalar',
+			Tokenizer::NUMERIC => 'processScalar',
+			Tokenizer::BOOL => 'processScalar',
+			Tokenizer::STRING => 'processString',
+			Tokenizer::OPEN_BRACKET => 'processBrackets'
+	];
 
 	public function __construct($data, $autoLookup = false) {
 		$this->baseData = $data;
@@ -37,23 +65,9 @@ class Value {
 		$this->element = $element;
 
 		if (empty($tokens)) return [$this->data];
-
-		$tokenFuncs = [
-			Tokenizer::NOT => 'processComparator',
-			Tokenizer::EQUALS => 'processComparator',
-			Tokenizer::DOT => 'processDot',
-			Tokenizer::OPEN_SQUARE_BRACKET => 'processSquareBracket',
-			Tokenizer::ARG => 'processSeparator',
-			Tokenizer::CONCAT => 'processSeparator',
-			Tokenizer::NAME => 'processScalar',
-			Tokenizer::NUMERIC => 'processScalar',
-			Tokenizer::BOOL => 'processScalar',
-			Tokenizer::STRING => 'processString',
-			Tokenizer::OPEN_BRACKET => 'processBrackets'
-		];
-
+		
 		foreach ($tokens as $token) {
-			$this->{$tokenFuncs[$token['type']]}($token);	
+			$this->{$this->tokenFuncs[$token['type']]}($token);	
 		}
 
 		return $this->processLast();
@@ -133,7 +147,7 @@ class Value {
 		$this->last = null;
 	}
 
-	//Processes the last entry down an object graph using foo.bar.baz and adds it to the result
+	//Applies the current operation to whatever is in $last based on $mode
 	private function processLast() {
 		if ($this->last !== null) {
 			try {
@@ -149,6 +163,9 @@ class Value {
 		return $this->result;
 	}
 
+
+	//Extracts $last from $data. If "last" is "bar" from value "foo.bar",
+	//$data contains "foo" and this function reads $data[$bar] or $data->$bar
 	private function extractLast($result) {
 		if ($this->autoLookup && isset($this->data->{$this->last})) {
 			return $this->processValue($this->data->{$this->last});
@@ -159,6 +176,8 @@ class Value {
 		throw new \UnexpectedValueException('Not found');
 	}	
 
+	//Processes $newValue using $mode. Either concats to the current argument, adds a new argument
+	//Or usess the two arguments for a boolean comparison
 	private function processValue($newValue) {
 		if ($this->mode == Tokenizer::ARG) {
 			$this->result[] = $newValue;
@@ -183,9 +202,6 @@ class Value {
 
 	private function callFuncOnObject($obj, $func, $args, $element) {
 		if (isset($obj->$func) && is_callable($obj->$func)) return call_user_func_array($obj->$func, $args);
-		else if (isset($obj->$func) && is_array($obj->$func))  {
-
-		}
 		else return call_user_func_array([$obj, $func], $args);
 	}
 }
