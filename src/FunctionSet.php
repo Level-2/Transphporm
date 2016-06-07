@@ -25,4 +25,8 @@ class FunctionSet {
 	public function addFunction($name, \Transphporm\TSSFunction $function) {
 		$this->functions[$name] = $function;
 	}
+	
+	public function hasFunction($name) {
+		return isset($this->functions[$name]);
+	}
 }

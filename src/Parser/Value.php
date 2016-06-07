@@ -7,12 +7,17 @@
 namespace Transphporm\Parser;
 /** Parses "string" and function(args) e.g. data(foo) or iteration(bar) */
 class Value {
-	private $data;
+	private $baseData;
 	private $autoLookup;
 	private $tokens;
+	private $mode;
+	private $last;
+	private $data;
+	private $result;
+	private $element;
 
 	public function __construct($data, $autoLookup = false) {
-		$this->data = $data;
+		$this->baseData = $data;
 		$this->autoLookup = $autoLookup;
 	}
 
@@ -20,138 +25,160 @@ class Value {
 		$tokenizer = new Tokenizer($str);
 		$tokens = $tokenizer->getTokens();
 		if ($returnTokens) return $tokens;
-		$result = $this->parseTokens($tokens, $element, $this->data);
-		return $result;
+		$this->result = $this->parseTokens($tokens, $element, $this->baseData);
+		return $this->result;
 	}
 
 	public function parseTokens($tokens, $element, $data) {
-		$result = [];
-		$mode = Tokenizer::ARG;
-		$last = null;
+		$this->result = [];
+		$this->mode = Tokenizer::ARG;
+		$this->data = $data;
+		$this->last = null;
+		$this->element = $element;
 
-		if (empty($tokens)) return [$data];
+		if (empty($tokens)) return [$this->data];
+
+		$tokenFuncs = [
+			Tokenizer::NOT => 'processComparator',
+			Tokenizer::EQUALS => 'processComparator',
+			Tokenizer::DOT => 'processDot',
+			Tokenizer::OPEN_SQUARE_BRACKET => 'processSquareBracket',
+			Tokenizer::ARG => 'processSeparator',
+			Tokenizer::CONCAT => 'processSeparator',
+			Tokenizer::NAME => 'processScalar',
+			Tokenizer::NUMERIC => 'processScalar',
+			Tokenizer::BOOL => 'processScalar',
+			Tokenizer::STRING => 'processString',
+			Tokenizer::OPEN_BRACKET => 'processBrackets'
+		];
 
 		foreach ($tokens as $token) {
-		if (is_string($token)) throw new \Exception($token);
-
-			if (in_array($token['type'], [Tokenizer::NOT, Tokenizer::EQUALS])) {
-				// ($last !== null) $result = $this->processValue($result, $mode, $last);
-
-				$result = $this->processLast($last, $result, $mode, $data);
-
-				if ($mode == Tokenizer::NOT && $token['type'] == Tokenizer::EQUALS) {
-					$mode = Tokenizer::NOT;
-				}
-				else $mode = $token['type'];
-			}
-
-			if ($token['type'] === Tokenizer::DOT) {
-				if ($last !== null) {
-					if (isset($data->$last)) $data = $data->$last;
-					else if (is_array($data) && isset($data[$last])) $data = $data[$last];
-				}
-				else $data = array_pop($result);
-
-				$last = null;
-			}
-
-			if ($token['type'] == Tokenizer::OPEN_SQUARE_BRACKET) {
-				if ($last !== null) {
-					if (isset($data->$last)) $data = $data->$last;
-					else if (is_array($data) && isset($data[$last])) $data = $data[$last];
-				}
-
-				$last = $this->parseTokens($token['value'], $element, null)[0];
-			}
-
-			if (in_array($token['type'], [Tokenizer::ARG, Tokenizer::CONCAT])) {
-				$mode = $token['type'];
-				//if ($last !== null) $result = $this->processValue($result, $mode, $last);
-				$result = $this->processLast($last, $result, $mode, $data);
-			}
-
-			if ($token['type'] === Tokenizer::STRING) {
-				$result = $this->processValue($result, $mode, $token['value']);
-			}
-
-			if (in_array($token['type'], [Tokenizer::NAME, Tokenizer::NUMERIC, Tokenizer::BOOL])) {
-				$last = $token['value'];
-			}
-
-			if ($token['type'] == Tokenizer::OPEN_BRACKET) {
-
-				if ($this->data instanceof \Transphporm\Functionset && ($last == 'data' || $last == 'iteration' || $last == 'attr')) {
-					$result = $this->processValue($result, $mode, $this->data->$last($token['value'], $element));
-
-					foreach ($result as $i => $value) {
-						if (is_array($data)) {
-							if (isset($data[$value])) $result[$i] = $data[$value];
-						}
-						else if (is_scalar($value) && isset($data->$value)) $result[$i] = $data->$value;
-					}
-					$last = null;
-				}
-				else if ($data instanceof \Transphporm\Functionset) {
-					$result = $this->processValue($result, $mode, $data->$last($token['value'], $element));
-					$last = null;
-				}
-				else {
-					$args = $this->parseTokens($token['value'], $element, $data);
-					if ($args[0] == $data) $args = [];
-					$funcResult = $this->callFunc($last, $args, $element, $data);
-					$result = $this->processValue($result, $mode, $funcResult);
-					$last = null;
-				}
-			}
-/*
-			if ($token['type'] == Tokenizer::OPEN_SQUARE_BRACKET) {
-				if ($this->autoLookup === true) {
-					$result = $this->processValue($result, $mode, $data->$last($token['value'], $element));
-					$last = null;
-
-				}
-			}//*/
+			$this->{$tokenFuncs[$token['type']]}($token);	
 		}
 
-		return $this->processLast($last, $result, $mode, $data);
+		return $this->processLast();
 	}
 
-	private function processLast($last, $result, $mode, $data) {
-		if ($last !== null) {
-			if ($this->autoLookup && isset($data->$last)) {
-				$result = $this->processValue($result, $mode, $data->$last);
-			}
-			else if (is_array($data) && isset($data[$last])) {
-				$result = $this->processValue($result, $mode, $data[$last]);
-			}
-			else if (!$this->autoLookup) {
-				$result = $this->processValue($result, $mode, $last);
-			}
-			else $result = [false];
+	private function processComparator($token) {
+		$this->result = $this->processLast();
+
+		if ($this->mode == Tokenizer::NOT && $token['type'] == Tokenizer::EQUALS) {
+			$this->mode = Tokenizer::NOT;
 		}
-		return $result;
+		else $this->mode = $token['type'];
 	}
 
-	private function processValue($result, $mode, $newValue) {
-		if ($mode == Tokenizer::ARG) {
-			$result[] = $newValue;
+
+	//Reads the last selected value from $data regardless if it's an array or object and overrides $this->data with the new value
+	private function moveLastToData() {
+		if (isset($this->data->{$this->last})) $this->data = $this->data->{$this->last};
+		else if (is_array($this->data) && isset($this->data[$this->last])) $this->data = $this->data[$this->last];
+	}
+
+	//Dot moves $data to the next object in $data foo.bar moves the $data pointer from `foo` to `bar`
+	private function processDot($token) {
+		if ($this->last !== null) $this->moveLastToData();
+		else $this->data = array_pop($this->result);
+
+		$this->last = null;
+	}
+
+	private function processSquareBracket($token) {
+		if ($this->last !== null) $this->moveLastToData();
+
+		$parser = new Value($this->baseData, $this->autoLookup);
+		$this->last = $parser->parseTokens($token['value'], $this->element, null)[0];
+	}
+
+	private function processSeparator($token) {
+		$this->mode = $token['type'];
+		//if ($this->last !== null) $this->result = $this->processValue($this->result, $this->mode, $this->last);
+		$this->result = $this->processLast();
+	}
+
+	private function processScalar($token) {
+		$this->last = $token['value'];
+	}
+
+	private function processString($token) {
+		$this->result = $this->processValue($token['value']);
+	}
+
+	private function processBrackets($token) {
+		if ($this->baseData instanceof \Transphporm\Functionset && $this->baseData->hasFunction($this->last)) {
+			$this->callTransphpormFunctions($token);
 		}
-		else if ($mode == Tokenizer::CONCAT) {
-				$result[count($result)-1] .= $newValue;
+		else if ($this->data instanceof \Transphporm\Functionset) {
+			$this->result = $this->processValue($this->data->{$this->last}($token['value'], $this->element));
+			$this->last = null;
 		}
-		else if ($mode == Tokenizer::NOT) {
-			$result[count($result)-1] = $result[count($result)-1] != $newValue;
+		else {
+			$parser = new Value($this->baseData, $this->autoLookup);
+			$args = $parser->parseTokens($token['value'], $this->element, $this->data);
+			if ($args[0] == $this->data) $args = [];
+			$funcResult = $this->callFunc($this->last, $args, $this->element, $this->data);
+			$this->result = $this->processValue($funcResult);
+			$this->last = null;
 		}
-		else if ($mode == Tokenizer::EQUALS) {
-			$result[count($result)-1] = $result[count($result)-1] == $newValue;
+	}
+
+	private function callTransphpormFunctions($token) {
+		$this->result = $this->processValue($this->baseData->{$this->last}($token['value'], $this->element));
+		foreach ($this->result as $i => $value) {
+			if (is_array($this->data)) {
+				if (isset($this->data[$value])) $this->result[$i] = $this->data[$value];
+			}
+			else if (is_scalar($value) && isset($this->data->$value)) $this->result[$i] = $this->data->$value;
+		}
+		$this->last = null;
+	}
+
+	//Processes the last entry down an object graph using foo.bar.baz and adds it to the result
+	private function processLast() {
+		if ($this->last !== null) {
+			try {
+				$this->result = $this->extractLast($this->result);
+			}
+			catch (\UnexpectedValueException $e) {
+				if (!$this->autoLookup) {
+					$this->result = $this->processValue($this->last);
+				}
+				else $this->result = [false];			
+			}			
+		}
+		return $this->result;
+	}
+
+	private function extractLast($result) {
+		if ($this->autoLookup && isset($this->data->{$this->last})) {
+			return $this->processValue($this->data->{$this->last});
+		}
+		else if (is_array($this->data) && isset($this->data[$this->last])) {
+			return $this->processValue($this->data[$this->last]);
+		}
+		throw new \UnexpectedValueException('Not found');
+	}	
+
+	private function processValue($newValue) {
+		if ($this->mode == Tokenizer::ARG) {
+			$this->result[] = $newValue;
+		}
+		else if ($this->mode == Tokenizer::CONCAT) {
+				$this->result[count($this->result)-1] .= $newValue;
+		}
+		else if ($this->mode == Tokenizer::NOT) {
+			$this->result[count($this->result)-1] = $this->result[count($this->result)-1] != $newValue;
+		}
+		else if ($this->mode == Tokenizer::EQUALS) {
+			$this->result[count($this->result)-1] = $this->result[count($this->result)-1] == $newValue;
 		}
 
-		return $result;
+		return $this->result;
 	}
 
 	private function callFunc($name, $args, $element, $data) {
-		if ($data instanceof \Transphporm\FunctionSet) return $data->$name($args, $element);
-		else return $this->callFuncOnObject($data, $name, $args, $element);
+		if ($this->data instanceof \Transphporm\FunctionSet) return $this->data->$name($args, $element);
+		else return $this->callFuncOnObject($this->data, $name, $args, $element);
 	}
 
 	private function callFuncOnObject($obj, $func, $args, $element) {

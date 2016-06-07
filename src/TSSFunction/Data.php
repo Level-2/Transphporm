@@ -11,7 +11,7 @@ class Data implements \Transphporm\TSSFunction{
 	private $dataKey;
 	private $functionSet;
 
-	public function __construct(\Transphporm\Hook\ElementData $data,  \Transphporm\FunctionSet $functionSet, $dataKey = 'data') {
+	public function __construct(\Transphporm\Hook\ElementData $data, \Transphporm\FunctionSet $functionSet, $dataKey = 'data') {
 		$this->data = $data;
 		$this->dataKey = $dataKey;
 		$this->functionSet = $functionSet;
