@@ -11,14 +11,17 @@ class PropertyHook implements \Transphporm\Hook {
 	private $valueParser;
 	private $pseudoMatcher;
 	private $properties = [];
+	private $functionSet;
 
-	public function __construct(array $rules, PseudoMatcher $pseudoMatcher, \Transphporm\Parser\Value $valueParser) {
+	public function __construct(array $rules, PseudoMatcher $pseudoMatcher, \Transphporm\Parser\Value $valueParser, \Transphporm\FunctionSet $functionSet) {
 		$this->rules = $rules;
 		$this->valueParser = $valueParser;
 		$this->pseudoMatcher = $pseudoMatcher;
+		$this->functionSet = $functionSet;
 	}
 
 	public function run(\DomElement $element) {	
+		$this->functionSet->setElement($element);
 		//Don't run if there's a pseudo element like nth-child() and this element doesn't match it
 		if (!$this->pseudoMatcher->matches($element)) return;
 

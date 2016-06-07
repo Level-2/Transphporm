@@ -9,7 +9,7 @@ namespace Transphporm\TSSFunction;
 class Attr implements \Transphporm\TSSFunction {
 	public function run(array $args, \DomElement $element) {
 		$parser = new \Transphporm\Parser\Value(null);
-		$args = $parser->parseTokens($args, $element, null);
+		$args = $parser->parseTokens($args, null);
 		return $element->getAttribute(trim($args[0]));
 	}
 }

@@ -28,7 +28,6 @@ class Value {
 	private $last;
 	private $data;
 	private $result;
-	private $element;
 
 	private $tokenFuncs = [
 			Tokenizer::NOT => 'processComparator',
@@ -49,20 +48,18 @@ class Value {
 		$this->autoLookup = $autoLookup;
 	}
 
-	public function parse($str, $element = null, $returnTokens = false) {
+	public function parse($str) {
 		$tokenizer = new Tokenizer($str);
 		$tokens = $tokenizer->getTokens();
-		if ($returnTokens) return $tokens;
-		$this->result = $this->parseTokens($tokens, $element, $this->baseData);
+		$this->result = $this->parseTokens($tokens, $this->baseData);
 		return $this->result;
 	}
 
-	public function parseTokens($tokens, $element, $data) {
+	public function parseTokens($tokens, $data) {
 		$this->result = [];
 		$this->mode = Tokenizer::ARG;
 		$this->data = $data;
 		$this->last = null;
-		$this->element = $element;
 
 		if (empty($tokens)) return [$this->data];
 		
@@ -101,7 +98,7 @@ class Value {
 		if ($this->last !== null) $this->moveLastToData();
 
 		$parser = new Value($this->baseData, $this->autoLookup);
-		$this->last = $parser->parseTokens($token['value'], $this->element, null)[0];
+		$this->last = $parser->parseTokens($token['value'], null)[0];
 	}
 
 	private function processSeparator($token) {
@@ -123,21 +120,21 @@ class Value {
 			$this->callTransphpormFunctions($token);
 		}
 		else if ($this->data instanceof \Transphporm\Functionset) {
-			$this->result = $this->processValue($this->data->{$this->last}($token['value'], $this->element));
+			$this->result = $this->processValue($this->data->{$this->last}($token['value']));
 			$this->last = null;
 		}
 		else {
 			$parser = new Value($this->baseData, $this->autoLookup);
-			$args = $parser->parseTokens($token['value'], $this->element, $this->data);
+			$args = $parser->parseTokens($token['value'], $this->data);
 			if ($args[0] == $this->data) $args = [];
-			$funcResult = $this->callFunc($this->last, $args, $this->element, $this->data);
+			$funcResult = $this->callFunc($this->last, $args, $this->data);
 			$this->result = $this->processValue($funcResult);
 			$this->last = null;
 		}
 	}
 
 	private function callTransphpormFunctions($token) {
-		$this->result = $this->processValue($this->baseData->{$this->last}($token['value'], $this->element));
+		$this->result = $this->processValue($this->baseData->{$this->last}($token['value']));
 		foreach ($this->result as $i => $value) {
 			if (is_array($this->data)) {
 				if (isset($this->data[$value])) $this->result[$i] = $this->data[$value];
@@ -195,12 +192,12 @@ class Value {
 		return $this->result;
 	}
 
-	private function callFunc($name, $args, $element, $data) {
-		if ($this->data instanceof \Transphporm\FunctionSet) return $this->data->$name($args, $element);
-		else return $this->callFuncOnObject($this->data, $name, $args, $element);
+	private function callFunc($name, $args, $data) {
+		if ($this->data instanceof \Transphporm\FunctionSet) return $this->data->$name($args);
+		else return $this->callFuncOnObject($this->data, $name, $args);
 	}
 
-	private function callFuncOnObject($obj, $func, $args, $element) {
+	private function callFuncOnObject($obj, $func, $args) {
 		if (isset($obj->$func) && is_callable($obj->$func)) return call_user_func_array($obj->$func, $args);
 		else return call_user_func_array([$obj, $func], $args);
 	}

@@ -9,14 +9,15 @@ namespace Transphporm;
 class FunctionSet {
 	private $elementData;
 	private $functions = [];
+	private $element;
 
 	public function __construct(Hook\ElementData $elementData) {
 		$this->elementData = $elementData;
 	}
 
 	public function __call($name, $args) {
-		if (isset($this->functions[$name])) {
-			return $this->functions[$name]->run($args[0], $args[1]);
+		if (isset($this->functions[$name])) {			
+			return $this->functions[$name]->run($args[0], $this->element);
 		}
 		return true;
 		//else return \Transphporm\Parser\Value::IS_NOT_FUNCTION;
@@ -28,5 +29,9 @@ class FunctionSet {
 	
 	public function hasFunction($name) {
 		return isset($this->functions[$name]);
+	}
+
+	public function setElement(\DomElement $element) {
+		$this->element = $element;
 	}
 }
