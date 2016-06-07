@@ -9,10 +9,12 @@ namespace Transphporm\TSSFunction;
 class Template implements \Transphporm\TSSFunction {
 	private $elementData;
 	private $baseDir;
+	private $functionSet;
 
-	public function __construct(\Transphporm\Hook\ElementData $elementData, &$baseDir) {
+	public function __construct(\Transphporm\Hook\ElementData $elementData, \Transphporm\FunctionSet $functionSet, &$baseDir) {
 		$this->baseDir = &$baseDir;
-		$this->elementData = $elementData;	
+		$this->elementData = $elementData;
+		$this->functionSet = $functionSet;
 	}
 
 	private function readArray($array, $index) {
@@ -20,7 +22,7 @@ class Template implements \Transphporm\TSSFunction {
 	}
 
 	public function run(array $args, \DomElement $element) {
-		$parser = new \Transphporm\Parser\Value($this->elementData);
+		$parser = new \Transphporm\Parser\Value($this->functionSet);
 		$args = $parser->parseTokens($args, $element, $this->elementData->getData($element));
 		$selector = $this->readArray($args, 1);
 		$tss = $this->readArray($args, 2);

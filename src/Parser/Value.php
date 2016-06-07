@@ -97,6 +97,7 @@ class Value {
 				}
 				else {
 					$args = $this->parseTokens($token['value'], $element, $data);
+					if ($args[0] == $data) $args = [];
 					$funcResult = $this->callFunc($last, $args, $element, $data);
 					$result = $this->processValue($result, $mode, $funcResult);
 					$last = null;

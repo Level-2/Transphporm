@@ -867,6 +867,23 @@ class TransphpormTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('<div><p>foo</p></div>', $this->stripTabs($template->output()->body));
 	}
 
+	public function testContentTemplateFromData() {
+		$template = '
+			<div>Test</div>
+		';
+
+		$includeFile = __DIR__ . DIRECTORY_SEPARATOR . 'include.xml';
+		$includeFile = str_replace('\\', '/', $includeFile);
+
+		$data = new \stdClass;
+		$data->includeFile = $includeFile;
+
+		$tss = "div {content: template(data(includeFile)); }";
+		$template = new \Transphporm\Builder($template, $tss);
+
+		$this->assertEquals('<div><p>foo</p></div>', $this->stripTabs($template->output($data)->body));
+	}
+
 	public function testNestedFunction() {
 		//Reads from the data using an attribute from the HTML
 		//In this case, sets the input's value attribute by reading it's name from data
