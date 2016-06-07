@@ -31,7 +31,7 @@ class CacheTest extends PHPUnit_Framework_TestCase {
 				<div>test</div>
 		');
 
-		$css = $this->makeTss('div {content: data(getRand); update-frequency: ' . $frequency . ';}');
+		$css = $this->makeTss('div {content: data(getRand()); update-frequency: ' . $frequency . ';}');
 
 		return [$xml, $css];
 	}

@@ -7,7 +7,7 @@
 namespace Transphporm\Hook;
 /* Maps which data is applied to which element */
 class ElementData {
-	private $data; 
+	private $data;
 	private $elementMap;
 
 	public function __construct(\SplObjectStorage $elementMap, $data) {
@@ -18,7 +18,7 @@ class ElementData {
 	/** Binds data to an element */
 	public function bind(\DomNode $element, $data, $type = 'data') {
 		//This is a bit of a hack to workaround #24, might need a better way of doing this if it causes a problem
-		if (is_array($data) && $this->isObjectArray($data)) $data = $data[0];
+		//if (is_array($data) && $this->isObjectArray($data)) $data = $data[0];
 		$content = isset($this->elementMap[$element]) ? $this->elementMap[$element] : [];
 		$content[$type] = $data;
 		$this->elementMap[$element] = $content;

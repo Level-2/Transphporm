@@ -13,6 +13,7 @@ class Attribute implements \Transphporm\Pseudo {
 	}
 
 	public function match($pseudo, \DomElement $element) {
+
 		$pos = strpos($pseudo, '[');
 		if ($pos === false) return true;
 
@@ -22,36 +23,17 @@ class Attribute implements \Transphporm\Pseudo {
 		$bracketMatcher = new \Transphporm\Parser\BracketMatcher($pseudo);
 		$criteria = $bracketMatcher->match('[', ']');
 
-		if (strpos($pseudo, '=') === false) {
-			$lookupValue = $this->functionSet->$name([$criteria], $element);
-			return $lookupValue !== null;
-		}
-		list ($field, $value) = explode('=', $criteria);
-
-		$operator = $this->getOperator($field);
-		$lookupValue = $this->functionSet->$name([trim($field, $operator)], $element);
-		return $this->processOperator($operator, $lookupValue, $this->parseValue(trim($value, '"'), $element));
-	}
-
-
-	//Currently only not is supported, but this is separated out to support others in future
-	private function processOperator($operator, $lookupValue, $value) {
-		$matched = $lookupValue == $value;
-		return $operator === '!' ? !$matched : $matched;
-	}
-
-	private function parseValue($value, $element) {
 		$valueParser = new \Transphporm\Parser\Value($this->functionSet);
-		if ($value == 'true') return true;
-		else if ($value == 'false') return false;
-		else return $valueParser->parse($value, $element)[0];
-	}
 
-	private function getOperator($field) {
-		if ($field[strlen($field)-1] == '!') {
-			return '!';
+		$criteria = $name . '(' . $criteria;
+
+		$pos = strpos($pseudo, '!');
+		if ($pos === false) $pos = strpos($pseudo, '=');
+		if ($pos === false) {
+			$criteria .= ')=true';
 		}
-		else return '';
-	}
+		else $criteria = substr_replace($criteria, ')', $pos, 0);
 
+		return $valueParser->parse($criteria, $element)[0];
+	}
 }

@@ -20,7 +20,7 @@ class PseudoMatcher {
 
 	public function matches($element) {
 		$matches = true;
-	
+
 		foreach ($this->pseudo as $pseudo) {			
 			foreach ($this->functions as $function) {
 				$matches = $matches && $function->match($pseudo, $element);

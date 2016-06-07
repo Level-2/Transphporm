@@ -17,45 +17,10 @@ class Data implements \Transphporm\TSSFunction{
 		$this->functionSet = $functionSet;
 	}
 
-	private function traverse($name, $data, $element) {
-		$name = str_replace(['[', ']'], ['.', ''], $name);
-		$parts = explode('.', $name);
-		$obj = $data;
-
-		$valueParser = new \Transphporm\Parser\Value($this->functionSet);
-
-		foreach ($parts as $part) {
-			if ($part === '') continue;
-			$part = $valueParser->parse($part, $element)[0];
-
-			$funcResult = $this->traverseObj($part, $obj, $valueParser, $element);
-
-			if ($funcResult !== false) $obj = $funcResult;
-			
-			else $obj = $this->ifNull($obj, $part);
-		}
-		return $obj;
-	}
-
-	private function traverseObj($part, $obj, $valueParser, $element) {
-		if (strpos($part, '(') !== false) {
-			$subObjParser = new \Transphporm\Parser\Value($obj, $valueParser, false);
-			$value = $subObjParser->parse($part, $element);
-			return isset($value[0]) ? $value[0] : null;
-		}
-		else if (method_exists($obj, $part)) return call_user_func([$obj, $part]); 
-		else return false;
-	}
-
-	private function ifNull($obj, $key) {
-		if (is_array($obj)) return isset($obj[$key]) ? $obj[$key] : null;
-		else return isset($obj->$key) ? $obj->$key : null;
-	}
-
-
 	public function run(array $args, \DomElement $element = null) {
 		$data = $this->data->getData($element, $this->dataKey);
-		$value = $this->traverse($args[0], $data, $element);
-		return $value;
+		$parser = new \Transphporm\Parser\Value($this->functionSet, true);
+		$return = $parser->parseTokens($args, $element, $data);
+		return $return[0];
 	}
 }

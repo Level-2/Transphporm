@@ -8,26 +8,22 @@ use Transphporm\Builder;
 class TransphpormTest extends PHPUnit_Framework_TestCase {
 
 	public function testLoadHTMLWithEntities() {
-		$template = '
-				<div>&nbsp; &lt;</div>
-		';
+		$template = '<div>&nbsp; &lt;</div>';
 
 
 		$template = new Builder($template);
 
-		$this->assertEquals('<div>' . html_entity_decode('&nbsp;') . ' &lt;</div>' ,$template->output()->body);
+		$this->assertEquals('<div>' . html_entity_decode('&nbsp;') . ' &lt;</div>', $template->output()->body);
 	}
 
 	public function testLoadHTMLUnclosed() {
-		$template = '
-				<div><img src="foo.jpg"></div>
-		';
+		$template = '<div><img src="foo.jpg"></div>';
 
 
 
 		$template = new Builder($template);
 
-		$this->assertEquals('<div><img src="foo.jpg" /></div>' ,$template->output()->body);
+		$this->assertEquals('<div><img src="foo.jpg" /></div>', $template->output()->body);
 	}
 
 
@@ -485,29 +481,6 @@ class TransphpormTest extends PHPUnit_Framework_TestCase {
 
 	}
 
-	public function testDataPseudoWithDataAsSecond() {
-		$data = new stdclass;
-		$data->start = "Today";
-		$data->end = "Today";
-
-
-		$template = '
-				<div>It ends later</div>
-		';
-
-		$css = '
-		div:data[start=data(end)] { content: "It ends today"; }
-		';
-
-
-		$template = new \Transphporm\Builder($template, $css);
-
-
-		$this->assertEquals($this->stripTabs('
-			<div>It ends today</div>'), $this->stripTabs($template->output($data)->body));
-
-	}
-
 
 	public function testIterationPseudoNotEquals() {
 		$data = new stdclass;
@@ -886,11 +859,29 @@ class TransphpormTest extends PHPUnit_Framework_TestCase {
 		';
 
 		$includeFile = __DIR__ . DIRECTORY_SEPARATOR . 'include.xml';
+		$includeFile = str_replace('\\', '/', $includeFile);
 
-		$tss = "div {content: template($includeFile); }";
+		$tss = "div {content: template('$includeFile'); }";
 		$template = new \Transphporm\Builder($template, $tss);
 
 		$this->assertEquals('<div><p>foo</p></div>', $this->stripTabs($template->output()->body));
+	}
+
+	public function testContentTemplateFromData() {
+		$template = '
+			<div>Test</div>
+		';
+
+		$includeFile = __DIR__ . DIRECTORY_SEPARATOR . 'include.xml';
+		$includeFile = str_replace('\\', '/', $includeFile);
+
+		$data = new \stdClass;
+		$data->includeFile = $includeFile;
+
+		$tss = "div {content: template(data(includeFile)); }";
+		$template = new \Transphporm\Builder($template, $tss);
+
+		$this->assertEquals('<div><p>foo</p></div>', $this->stripTabs($template->output($data)->body));
 	}
 
 	public function testNestedFunction() {
@@ -1077,21 +1068,6 @@ class TransphpormTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('<div>TE:ST</div>', $this->stripTabs($template->output()->body));
 	}
 
-	public function testStringSingleQuotes() {
-		$template = '<div>Test</div>'	;
-
-		$tss = "div:attr(style) {
-  content: 'display: none;';
-}
-
-";
-
-		$template = new \Transphporm\Builder($template, $tss);
-
-		$this->assertEquals('<div style="display: none;">Test</div>', $this->stripTabs($template->output()->body));
-
-
-	}
 
 	public function testSemicolonInStrings() {
 
@@ -1384,6 +1360,7 @@ class TransphpormTest extends PHPUnit_Framework_TestCase {
 		</div>';
 
 		$tpl = __DIR__ . '/include.xml';
+		$tpl = str_replace('\\', '/', $tpl);
 
 		$tss = 'span {content: template(\'' . $tpl . '\'); content-mode: replace; }';
 
@@ -1445,6 +1422,7 @@ select option[value=data()]:attr(selected) { content: "selected"; }
 
 
 		$includeFile = __DIR__ . DIRECTORY_SEPARATOR . 'include.xml';
+		$includeFile = str_replace('\\', '/', $includeFile);
 
 		$tss = "div:after {content: 'foo' }
 div:after {content: 'bar' }
@@ -1499,12 +1477,36 @@ div:after {content: 'bar' }
 
 
 		$includeFile = __DIR__ . DIRECTORY_SEPARATOR . 'include.xml';
+		$includeFile = str_replace('\\', '/', $includeFile);
 
-		$tss = "div:before {content: template($includeFile); }";
+		$tss = "div:before {content: template('$includeFile'); }";
 		$template = new \Transphporm\Builder($xml, $tss);
 
 		$this->assertEquals('<div><p>foo</p><span>Test</span></div>', $this->stripTabs($template->output()->body));
 
+	}
+
+	public function testAttrRead() {
+		$xml = '
+		<div class="one">
+
+		</div>
+		<div class="two">
+
+		</div>
+		<div class="three">
+		</div>
+		';
+
+		$tss = 'div {content: attr(class); }';
+
+		$template = new \Transphporm\Builder($xml, $tss);
+
+		$this->assertEquals($this->stripTabs($template->output()->body), $this->stripTabs('
+			<div class="one">one</div>
+			<div class="two">two</div>
+			<div class="three">three</div>
+		'));
 	}
 
 	public function testFilterDataArray() {
@@ -1526,16 +1528,15 @@ div:after {content: 'bar' }
 		</div>
 		';
 
-		$tss = 'div:data[anArray[attr(class)]] {content: "set" }';
+		$tss = 'div:data[anArray[attr("class")]] {content: "set"; }';
 
 		$template = new \Transphporm\Builder($xml, $tss);
 
-		$this->assertEquals($this->stripTabs($template->output($data)->body), $this->stripTabs('
+		$this->assertEquals($this->stripTabs('
 			<div class="one">set</div>
 			<div class="two">set</div>
-			<div class="three">
-			</div>
-		'));;
+			<div class="three"></div>
+		'), $this->stripTabs($template->output($data)->body));
 
 	}
 
@@ -1655,7 +1656,7 @@ ul li span {
         </ul>'));
 	}
 
-	public function testFunctionCall() {
+	public function testFunctionCall1() {
 
 		$xml = '<div></div>';
 
@@ -1673,7 +1674,7 @@ ul li span {
 
 	}
 
-	public function testFunctionCallWithDataArg() {
+	public function testFunctionCallWithDataArg1() {
 
 		$xml = '<div></div>';
 
@@ -1713,7 +1714,7 @@ ul li span {
 
 		$obj = new Foo();
 
-		$tss = 'div {content: data(add(2, 3)); }';
+		$tss = 'div {content: data().add(2,3); }';
 
 		$template = new \Transphporm\Builder($xml, $tss);
 
@@ -1741,7 +1742,8 @@ ul li span {
 		$obj = new Foo();
 
 		$includeFile = __DIR__ . '/include.xml';
-		$tss = 'div {content: template(' . $includeFile  . ');  bind: data(model.getData()); }';
+		$includeFile = str_replace('\\', '/', $includeFile);
+		$tss = 'div {content: template("' . $includeFile  . '");  bind: data(model.getData()); }';
 
 		$template = new \Transphporm\Builder($xml, $tss);
 
@@ -1892,8 +1894,6 @@ ul li span {
 				</li>
 	</ul>'), $this->stripTabs($template->output($data)->body));
 	}
-
-
 
 }
 

@@ -8,6 +8,8 @@ namespace Transphporm\TSSFunction;
 /* Handles attr() function in the TSS stlyesheet */
 class Attr implements \Transphporm\TSSFunction {
 	public function run(array $args, \DomElement $element) {
+		$parser = new \Transphporm\Parser\Value(null);
+		$args = $parser->parseTokens($args, $element, null);
 		return $element->getAttribute(trim($args[0]));
 	}
 }
