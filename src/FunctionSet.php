@@ -16,7 +16,12 @@ class FunctionSet {
 	}
 
 	public function __call($name, $args) {
-		if (isset($this->functions[$name])) {			
+		if (!($this->functions[$name] instanceof TSSFunction\Data)) {
+			$tokens = $args[0];
+			$parser = new \Transphporm\Parser\Value($this);
+			$args[0] = $parser->parseTokens($tokens, $this->elementData->getData($this->element));
+		}
+		if (isset($this->functions[$name])) {
 			return $this->functions[$name]->run($args[0], $this->element);
 		}
 		return true;
@@ -26,7 +31,7 @@ class FunctionSet {
 	public function addFunction($name, \Transphporm\TSSFunction $function) {
 		$this->functions[$name] = $function;
 	}
-	
+
 	public function hasFunction($name) {
 		return isset($this->functions[$name]);
 	}

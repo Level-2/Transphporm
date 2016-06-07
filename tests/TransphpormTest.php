@@ -1895,6 +1895,24 @@ ul li span {
 	</ul>'), $this->stripTabs($template->output($data)->body));
 	}
 
+	public function testJsonBasic() {
+		$data = '{
+			"foo" : "bar"
+		}';
+
+		$xml = "
+		<div></div>
+		";
+
+		$tss = "
+		div { content: json(data()).foo; }
+		";
+
+		$template = new \Transphporm\Builder($xml, $tss);
+
+		$this->assertEquals($this->stripTabs('<div>bar</div>'), $this->stripTabs($template->output($data)->body));
+	}
+
 }
 
 

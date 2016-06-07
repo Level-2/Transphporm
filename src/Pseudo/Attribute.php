@@ -18,7 +18,7 @@ class Attribute implements \Transphporm\Pseudo {
 		if ($pos === false) return true;
 
 		$name = substr($pseudo, 0, $pos);
-		if (!is_callable([$this->functionSet, $name])) return true;
+		if (!$this->functionSet->hasFunction($name)) return true;
 
 		$bracketMatcher = new \Transphporm\Parser\BracketMatcher($pseudo);
 		$criteria = $bracketMatcher->match('[', ']');
