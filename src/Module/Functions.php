@@ -17,5 +17,6 @@ class Functions implements \Transphporm\Module {
 		$functionSet->addFunction('key', new \Transphporm\TSSFunction\Data($config->getElementData(), $functionSet, 'key'));
 		$functionSet->addFunction('iteration', new \Transphporm\TSSFunction\Data($config->getElementData(), $functionSet, 'iteration'));
 		$functionSet->addFunction('template', new \Transphporm\TSSFunction\Template($config->getElementData(), $functionSet, $baseDir));
+		$functionSet->addFunction('json', new \Transphporm\TSSFunction\Json($baseDir));
 	}
 }

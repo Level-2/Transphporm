@@ -165,7 +165,7 @@ $data = 'My Title!'
 $tss = 'h1 {content: data(); }';
 
 
-$template = new \Transphporm\Builder($xml, $tss)
+$template = new \Transphporm\Builder($xml, $tss);
 
 echo $template->output($data)->body;
 
@@ -217,7 +217,7 @@ Which will output:
 
 ### Content
 
-The content property can take multiple values, either a function call such as `data` or a quoted string as each value and will concatenate any supplied values:
+The content property can take multiple values, either a function call such as `data` or a quoted string as each value, and will concatenate any supplied values:
 
 ```php
 $xml = '<h1>Original Title</h1>';
@@ -346,9 +346,9 @@ Which will output:
 
 ```
 
-For more information on loops see the [Wiki page Basic usage: Loops](https://github.com/Level-2/Transphporm/wiki/Basic-Usage:-Loops)
+For more information on loops see the [Wiki page Basic usage: Loops](https://github.com/Level-2/Transphporm/wiki/Basic-Usage:-Loops).
 
-# Hiding Blocks
+# Removing Blocks
 
 Lifted straight from CSS grammar, Transphporm supports `display: none` which will actually remove the element from the document entirely:
 
@@ -372,7 +372,7 @@ $tss = '
 $data = ['users' => $users];
 
 
-$template = new \Transphporm\Builder($xml, $tss)
+$template = new \Transphporm\Builder($xml, $tss);
 
 echo $template->output($data)->body;
 
@@ -440,7 +440,7 @@ The format is:
 element:iteration[name=value] {}
 ```
 
-Which will select any element whose iteration content's `name` attribute is equal to `value`
+This will select any element whose iteration content's `name` attribute is equal to `value`.
 
 The following code will hide any user whose type is 'Admin'.
 
