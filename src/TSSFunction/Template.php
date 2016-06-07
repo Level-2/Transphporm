@@ -22,8 +22,6 @@ class Template implements \Transphporm\TSSFunction {
 	}
 
 	public function run(array $args, \DomElement $element) {
-		$parser = new \Transphporm\Parser\Value($this->functionSet);
-		$args = $parser->parseTokens($args, $this->elementData->getData($element));
 		$selector = $this->readArray($args, 1);
 		$tss = $this->readArray($args, 2);
 

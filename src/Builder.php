@@ -41,22 +41,22 @@ class Builder {
 
 	public function output($data = null, $document = false) {
 		$headers = [];
-		
+
 		$elementData = new \Transphporm\Hook\ElementData(new \SplObjectStorage(), $data);
-		
-		$data = new FunctionSet($elementData, $this->baseDir);
+
+		$data = new FunctionSet($elementData);
 		$config = new Config($data, $elementData, new Hook\Formatter(), $headers, $this->baseDir);
 
 		foreach ($this->modules as $module) $module->load($config);
-		
+
 		$cachedOutput = $this->loadTemplate();
 		//To be a valid XML document it must have a root element, automatically wrap it in <template> to ensure it does
 		$template = new Template($this->isValidDoc($cachedOutput['body']) ? str_ireplace('<!doctype', '<!DOCTYPE', $cachedOutput['body']) : '<template>' . $cachedOutput['body'] . '</template>' );
 
 		$this->processRules($template, $data, $config, $data);
-		
+
 		$result = ['body' => $template->output($document), 'headers' => array_merge($cachedOutput['headers'], $headers)];
-		$this->cache->write($this->template, $result);		
+		$this->cache->write($this->template, $result);
 		$result['body'] = $this->doPostProcessing($template)->output($document);
 
 		return (object) $result;
@@ -89,16 +89,16 @@ class Builder {
 
 	//Load a template, firstly check if it's a file or a valid string
 	private function loadTemplate() {
-		if (trim($this->template)[0] !== '<') {			
+		if (trim($this->template)[0] !== '<') {
 			$xml = $this->cache->load($this->template, filemtime($this->template));
 			return $xml ? $xml : ['body' => file_get_contents($this->template), 'headers' => []];
 		}
-		else return ['body' => $this->template, 'headers' => []];	
+		else return ['body' => $this->template, 'headers' => []];
 	}
 
 	//Load the TSS rules either from a file or as a string
 	//N.b. only files can be cached
-	private function getRules($template, $valueParser) {		
+	private function getRules($template, $valueParser) {
 		if (is_file($this->tss)) {
 			$this->baseDir = dirname(realpath($this->tss)) . DIRECTORY_SEPARATOR;
 			//The cache for the key: the filename and template prefix
