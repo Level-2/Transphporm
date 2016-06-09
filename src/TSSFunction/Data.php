@@ -18,7 +18,8 @@ class Data implements \Transphporm\TSSFunction{
 	}
 
 	public function run(array $args, \DomElement $element = null) {
-		$data = $this->data->getData($element, $this->dataKey);
+		if ($this->dataKey === "root") $data = $this->data->getData(null, 'data');
+		else $data = $this->data->getData($element, $this->dataKey);
 		$parser = new \Transphporm\Parser\Value($this->functionSet, true);
 		$return = $parser->parseTokens($args, $data);
 		return $return[0];
