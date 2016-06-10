@@ -9,14 +9,14 @@ namespace Transphporm\Parser;
 class Sheet {
 	private $tss;
 	private $baseDir;
-	private $prefix;
 	private $valueParser;
+	private $xPath;
 
-	public function __construct($tss, $baseDir, Value $valueParser, $prefix = '') {
+	public function __construct($tss, $baseDir, CssToXpath $xPath, Value $valueParser) {
 		$this->tss = $this->stripComments($tss, '/*', '*/');
 		$this->tss = $this->stripComments($this->tss, '//', "\n");
 		$this->baseDir = $baseDir;
-		$this->prefix = $prefix;
+		$this->xPath = $xPath;
 		$this->valueParser = $valueParser;
 	}
 
@@ -42,8 +42,7 @@ class Sheet {
 		$parts = explode(',', $selector);
 		$rules = [];
 		foreach ($parts as $part) {
-			$xPath = new CssToXpath($part, $this->valueParser, $this->prefix);
-			$rules[$part] = new \Transphporm\Rule($xPath->getXpath(), $xPath->getPseudo(), $xPath->getDepth(), $index++);
+			$rules[$part] = new \Transphporm\Rule($this->xPath->getXpath($part), $this->xPath->getPseudo($part), $this->xPath->getDepth($part), $index++);
 			$rules[$part]->properties = $properties;
 		}		
 		return $rules;
@@ -81,7 +80,7 @@ class Sheet {
 	private function import($args, $indexStart) {
 		if (is_file(trim($args,'\'" '))) $fileName = trim($args,'\'" ');
 		else $fileName = $this->valueParser->parse($args)[0];
-		$sheet = new Sheet(file_get_contents($this->baseDir . $fileName), $this->baseDir, $this->valueParser, $this->prefix);
+		$sheet = new Sheet(file_get_contents($this->baseDir . $fileName), $this->baseDir, $this->xPath, $this->valueParser);
 		return $sheet->parse(0, [], $indexStart);
 	}
 

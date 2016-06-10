@@ -7,9 +7,11 @@
 namespace Transphporm\Pseudo;
 class Not implements \Transphporm\Pseudo {
 	private $functionSet;
+	private $cssToXpath;
 
-	public function __construct(\Transphporm\FunctionSet $functionSet) {
+	public function __construct(\Transphporm\FunctionSet $functionSet, \Transphporm\Parser\CssToXpath $cssToXpath) {
 		$this->functionSet = $functionSet;
+		$this->cssToXpath = $cssToXpath;
 	}
 
 	public function match($pseudo, \DomElement $element) {
@@ -25,8 +27,7 @@ class Not implements \Transphporm\Pseudo {
 
 	private function notElement($css, $valueParser, $xpath, $element) {
 		foreach ($css as $selector) {
-			$cssToXpath = new \Transphporm\Parser\CssToXpath($selector, $valueParser);
-			$xpathString = $cssToXpath->getXpath();					
+			$xpathString = $this->cssToXpath->getXpath($selector);					
 			//Find all nodes matched by the expressions in the brackets :not(EXPR)
 			foreach ($xpath->query($xpathString) as $matchedElement) {
 				//Check to see whether this node was matched by the not query

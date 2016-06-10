@@ -10,11 +10,13 @@ class Template implements \Transphporm\TSSFunction {
 	private $elementData;
 	private $baseDir;
 	private $functionSet;
+	private $xPath;
 
-	public function __construct(\Transphporm\Hook\ElementData $elementData, \Transphporm\FunctionSet $functionSet, &$baseDir) {
+	public function __construct(\Transphporm\Hook\ElementData $elementData, \Transphporm\Parser\CssToXpath $xPath, \Transphporm\FunctionSet $functionSet, &$baseDir) {
 		$this->baseDir = &$baseDir;
 		$this->elementData = $elementData;
 		$this->functionSet = $functionSet;
+		$this->xPath = $xPath;
 	}
 
 	private function readArray($array, $index) {
@@ -46,7 +48,7 @@ class Template implements \Transphporm\TSSFunction {
 	}
 
 	private function templateSubsection($doc, $selector) {
-		$xpathStr = (new \Transphporm\Parser\CssToXpath($selector, new \Transphporm\Parser\Value($this)))->getXpath();
+		$xpathStr = $this->xPath->getXpath($selector);
 		$xpath = new \DomXpath($doc);
 		$nodes = $xpath->query($xpathStr);
 		$result = [];

@@ -13,13 +13,17 @@ class Config {
 	private $formatter; 
 	private $baseDir;
 	private $elementData;
-	
-	public function __construct(Functionset $functionSet, Hook\ElementData $elementData, Hook\Formatter $formatter, &$headers, &$baseDir) {
+	private $xPath;
+	private $valueParser;
+
+	public function __construct(Functionset $functionSet, Parser\Value $valueParser, Hook\ElementData $elementData, Hook\Formatter $formatter, Parser\CssToXpath $xPath, &$headers, &$baseDir) {
 		$this->formatter = $formatter;
 		$this->headers = &$headers;
 		$this->baseDir = &$baseDir;
 		$this->functionSet = $functionSet;
 		$this->elementData = $elementData;
+		$this->xPath = $xPath;
+		$this->valueParser = $valueParser;
 	}
 
 	public function getFormatter() {
@@ -46,6 +50,14 @@ class Config {
 		return $this->elementData;
 	}
 
+	public function getCssToXpath() {
+		return $this->xPath;
+	}
+
+	public function getValueParser() {
+		return $this->valueParser;
+	}
+
 	public function registerProperty($name, Property $property) {
 		$this->properties[$name] = $property;
 	}
@@ -63,4 +75,5 @@ class Config {
 		foreach ($this->pseudo as $pseudoFunction) $pseudoMatcher->registerFunction($pseudoFunction);
 		return $pseudoMatcher;
 	}
+
 }

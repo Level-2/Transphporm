@@ -14,10 +14,11 @@ class CssToXpath {
 	private static $instances = [];
 
 
-	public function __construct($css, Value $valueParser, $prefix = '') {
+	public function __construct(Value $valueParser, \Transphporm\FunctionSet $functionSet, $prefix = '') {
 		$hash = $this->registerInstance();
 		$this->valueParser = $valueParser;
-		$this->css = str_replace([' >', '> '],['>', '>'], trim($css));
+		$this->functionSet = $functionSet;		
+
 		$this->translators = [
 			' ' => function($string) use ($prefix) { return '//' . $prefix . $string;	},
 			'' => function($string) use ($prefix) { return '/' . $prefix . $string;	},
@@ -46,11 +47,13 @@ class CssToXpath {
 	public static function processAttr($attr, $element, $hash) {
 		$comparators = ['!=', '='];
 		$valueParser = self::$instances[$hash]->valueParser;
+		$valueParser = self::$instances[$hash]->valueParser;
+
 		foreach ($comparators as $comparator) {
 			if (strpos($attr, $comparator) !== false) {
 				$parts = explode($comparator, $attr);
 				$parts = array_map(function($val) use ($valueParser, $element) {
-					return $valueParser->parse($val, $element[0])[0];
+										return $valueParser->parse($val, $element[0])[0];
 				}, $parts);
 				
 				return self::compare($comparator, $element[0]->getAttribute($parts[0]), $parts[1]);
@@ -81,10 +84,10 @@ class CssToXpath {
 		return $selectors;
 	}
 
-	public function getXpath() {
+	public function getXpath($css) {
+		$this->css = str_replace([' >', '> '],['>', '>'], trim($css));
 		$css = explode(':', $this->css)[0];
 		$selectors = $this->split($css);
-		$this->depth = count($selectors);
 		$xpath = '/';
 		foreach ($selectors as $selector) {
 			if (isset($this->translators[$selector->type])) $xpath .= $this->translators[$selector->type]($selector->string, $xpath);
@@ -95,8 +98,8 @@ class CssToXpath {
 		return $xpath;
 	}
 
-	public function getDepth() {
-		return $this->depth;
+	public function getDepth($css) {
+		return count($this->split($css));
 	}
 	
 	public function getPseudo() {
