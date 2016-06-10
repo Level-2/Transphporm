@@ -24,5 +24,6 @@ class Format implements \Transphporm\Module {
 		$config->registerFormatter(new \Transphporm\Formatter\Number($locale));
 		$config->registerFormatter(new \Transphporm\Formatter\Date($locale));
 		$config->registerFormatter(new \Transphporm\Formatter\StringFormatter());
+		$config->registerFormatter(new \Transphporm\Formatter\Nl2br());
 	}
 }
