@@ -9,9 +9,9 @@ class CssToXpath {
 	private $specialChars = [' ', '.', '>', '~', '#', ':', '[', ']'];
 	private $translators = [];
 	private $css;
-	private $depth;
 	private $valueParser;
 	private static $instances = [];
+	private $functionSet;
 
 
 	public function __construct(Value $valueParser, \Transphporm\FunctionSet $functionSet, $prefix = '') {
@@ -47,13 +47,13 @@ class CssToXpath {
 	public static function processAttr($attr, $element, $hash) {
 		$comparators = ['!=', '='];
 		$valueParser = self::$instances[$hash]->valueParser;
-		$valueParser = self::$instances[$hash]->valueParser;
+		self::$instances[$hash]->functionSet->setElement($element[0]);
 
 		foreach ($comparators as $comparator) {
 			if (strpos($attr, $comparator) !== false) {
 				$parts = explode($comparator, $attr);
 				$parts = array_map(function($val) use ($valueParser, $element) {
-										return $valueParser->parse($val, $element[0])[0];
+						return $valueParser->parse($val, $element[0])[0];
 				}, $parts);
 				
 				return self::compare($comparator, $element[0]->getAttribute($parts[0]), $parts[1]);
