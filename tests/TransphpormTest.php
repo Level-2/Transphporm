@@ -1913,24 +1913,35 @@ ul li span {
 		$this->assertEquals($this->stripTabs('<div>bar</div>'), $this->stripTabs($template->output($data)->body));
 	}
 
-	public function testRoot() {
-		$xml = "
-		<div></div>
-		";
+	public function testNl2brBasic() {
+        $xml = "
+        <div></div>
+        ";
 
-		$tss = "
-		div { bind: data(foo1); content: data() + root(foo2); }
-		";
+        $tss = "
+        div { content: 'Test Line 1 \n Test Line 2'; format: nl2br; }
+        ";
 
-		$data = [
-			"foo1" => "bar1",
-			"foo2" => "bar2"
-		];
+        $transphporm = new Builder($xml, $tss);
 
-		$template = new \Transphporm\Builder($xml, $tss);
+        $this->assertEquals($this->stripTabs('<div>Test Line 1 <br /> Test Line 2</div>'), $this->stripTabs($transphporm->output()->body));
+    }
 
-		$this->assertEquals($this->stripTabs('<div>bar1bar2</div>'), $this->stripTabs($template->output($data)->body));
-	}
+    public function testNl2brBasicFromData() {
+        $xml = "
+        <div></div>
+        ";
+
+        $tss = "
+        div { content: data(); format: nl2br; }
+        ";
+
+        $data = "Test Line 1 \n Test Line 2";
+
+        $transphporm = new Builder($xml, $tss);
+
+        $this->assertEquals($this->stripTabs('<div>Test Line 1 <br /> Test Line 2</div>'), $this->stripTabs($transphporm->output($data)->body));
+    }
 }
 
 
