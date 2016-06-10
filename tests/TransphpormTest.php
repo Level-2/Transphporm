@@ -1942,6 +1942,25 @@ ul li span {
 
         $this->assertEquals($this->stripTabs('<div>Test Line 1 <br /> Test Line 2</div>'), $this->stripTabs($transphporm->output($data)->body));
     }
+
+	public function testRoot() {
+		$xml = "
+		<div></div>
+		";
+
+		$tss = "
+		div { bind: data(foo1); content: data() + root(foo2); }
+		";
+
+		$data = [
+			"foo1" => "bar1",
+			"foo2" => "bar2"
+		];
+
+		$template = new \Transphporm\Builder($xml, $tss);
+
+		$this->assertEquals($this->stripTabs('<div>bar1bar2</div>'), $this->stripTabs($template->output($data)->body));
+	}
 }
 
 
