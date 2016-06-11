@@ -18,7 +18,7 @@ class Not implements \Transphporm\Pseudo {
 		if (strpos($pseudo, 'not') === 0) {
 			$valueParser = new \Transphporm\Parser\Value($this->functionSet);
 			$bracketMatcher = new \Transphporm\Parser\BracketMatcher($pseudo);
-			$css = explode(',', $bracketMatcher->match('(', ')'));
+			$css = $valueParser->parse($bracketMatcher->match('(', ')'));
 			$xpath = new \DomXpath($element->ownerDocument);
 			return $this->notElement($css, $valueParser, $xpath, $element);
 		}
