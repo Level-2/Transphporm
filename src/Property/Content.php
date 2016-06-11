@@ -63,12 +63,9 @@ class Content implements \Transphporm\Property {
 				//$new->setAttribute('transphporm', 'added');
 			}
 			else {
-				
-
 
 				if ($n instanceof \DomText) $n = $n->nodeValue;
 				$new = $document->createElement('text');
-				if (is_array($n)) throw new \Exception();
 				
 				$new->appendChild($document->createTextNode($n));
 				$new->setAttribute('transphporm', 'text');
