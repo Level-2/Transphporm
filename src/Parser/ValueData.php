@@ -22,7 +22,7 @@ class ValueData {
 		if (is_array($this->data)) {
 			if (isset($this->data[$value])) return $this->data[$value];
 		}
-		else if (is_scalar($value) && isset($this->data->$value)) return $this->data->$value;
+		else if (isset($this->data->$value)) return $this->data->$value;
 		else return false;
 	}
 
@@ -50,11 +50,9 @@ class ValueData {
 	}
 
 	public function extract($last, $autoLookup) {
-		if ($autoLookup && isset($this->data->{$last})) {
-			return $this->data->{$last};
-		}
-		else if (is_array($this->data) && isset($this->data[$last])) {
-			return $this->data[$last];
+		$value = $this->read($last);
+		if ($value && ($autoLookup || is_array($this->data)) ) {
+			return $value;
 		}
 		throw new \UnexpectedValueException('Not found');
 	}

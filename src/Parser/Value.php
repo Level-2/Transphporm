@@ -10,7 +10,7 @@ class Value {
 	private $baseData;
 	private $autoLookup;
 	private $tokens;
-
+	public $debug = false;
 	/*
 		Stores the last value e.g. 
 			"a" + "b"
@@ -29,7 +29,7 @@ class Value {
 			Tokenizer::CONCAT => 'processSeparator',
 			Tokenizer::NAME => 'processScalar',
 			Tokenizer::NUMERIC => 'processScalar',
-			Tokenizer::BOOL => 'processScalar',
+			Tokenizer::BOOL => 'processString',
 			Tokenizer::STRING => 'processString',
 			Tokenizer::OPEN_BRACKET => 'processBrackets'
 	];
@@ -52,7 +52,7 @@ class Value {
 		$this->last = null;
 
 		if (empty($tokens)) return [$data];
-		
+
 		foreach ($tokens as $token) {
 			$this->{$this->tokenFuncs[$token['type']]}($token);	
 		}
@@ -62,17 +62,19 @@ class Value {
 	}
 
 	private function processComparator($token) {
-		$this->result = $this->processLast();
+		$this->processLast();
 
 		if ($this->result->getMode() == Tokenizer::NOT && $token['type'] == Tokenizer::EQUALS) {
 			$this->result->setMode(Tokenizer::NOT);
 		}
-		else $this->result->setMode($token['type']);
+		else {
+			$this->result->setMode($token['type']);
+			$this->last = null;
+		}
 	}
 
 
 	//Reads the last selected value from $data regardless if it's an array or object and overrides $this->data with the new value
-
 	//Dot moves $data to the next object in $data foo.bar moves the $data pointer from `foo` to `bar`
 	private function processDot($token) {
 		if ($this->last !== null) $this->data->traverse($this->last);
@@ -82,15 +84,20 @@ class Value {
 	}
 
 	private function processSquareBracket($token) {
-		if ($this->last !== null) $this->data->traverse($this->last);
 		$parser = new Value($this->baseData, $this->autoLookup);
-		$this->last = $parser->parseTokens($token['value'], null)[0];
+		if ($this->baseData instanceof \Transphporm\Functionset && $this->baseData->hasFunction($this->last)) {
+			$this->callTransphpormFunctions($token);
+		}
+		else {
+			if ($this->last !== null) $this->data->traverse($this->last);			
+			$this->last = $parser->parseTokens($token['value'], null)[0];
+		}
 	}
 
 	private function processSeparator($token) {
 		$this->result->setMode($token['type']);
 		//if ($this->last !== null) $this->result = $this->processValue($this->result, $this->mode, $this->last);
-		$this->result = $this->processLast();
+		$this->processLast();
 	}
 
 	private function processScalar($token) {
@@ -124,8 +131,10 @@ class Value {
 	private function callTransphpormFunctions($token) {
 		$this->result->processValue($this->baseData->{$this->last}($token['value']));
 		foreach ($this->result->getResult() as $i => $value) {
-			$val = $this->data->read($value);
-			if ($val) $this->result[$i] = $val;
+			if (is_scalar($value)) {
+				$val = $this->data->read($value);
+				if ($val) $this->result[$i] = $val;
+			}
 		}
 		$this->last = null;
 	}
@@ -147,6 +156,5 @@ class Value {
 				}
 			}			
 		}
-		return $this->result;
 	}	
 }

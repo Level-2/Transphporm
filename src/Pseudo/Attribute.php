@@ -13,27 +13,15 @@ class Attribute implements \Transphporm\Pseudo {
 	}
 
 	public function match($pseudo, \DomElement $element) {
-
 		$pos = strpos($pseudo, '[');
 		if ($pos === false) return true;
 
 		$name = substr($pseudo, 0, $pos);
 		if (!$this->functionSet->hasFunction($name)) return true;
 
-		$bracketMatcher = new \Transphporm\Parser\BracketMatcher($pseudo);
-		$criteria = $bracketMatcher->match('[', ']');
-
+		$this->functionSet->setElement($element);
 		$valueParser = new \Transphporm\Parser\Value($this->functionSet);
-
-		$criteria = $name . '(' . $criteria;
-
-		$pos = strpos($pseudo, '!');
-		if ($pos === false) $pos = strpos($pseudo, '=');
-		if ($pos === false) {
-			$criteria .= ')=true';
-		}
-		else $criteria = substr_replace($criteria, ')', $pos, 0);
-
-		return $valueParser->parse($criteria, $element)[0];
+		$valueParser->debug = true;
+		return $valueParser->parse($pseudo)[0];
 	}
 }
