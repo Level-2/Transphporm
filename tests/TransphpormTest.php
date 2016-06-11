@@ -1961,6 +1961,36 @@ ul li span {
 
 		$this->assertEquals($this->stripTabs('<div>bar1bar2</div>'), $this->stripTabs($template->output($data)->body));
 	}
+
+	public function testEmptyFunctionCallAsConditonal() {
+
+		$xml = '<div></div>';
+
+		$data = "test";
+
+		$tss = 'div:data[="test"] {content: "test" }';
+
+		$template = new \Transphporm\Builder($xml, $tss);
+
+		$this->assertEquals($this->stripTabs($template->output($data)->body), $this->stripTabs('<div>test</div>'));
+	}
+
+	public function testRepeatNotExistant() {
+		$template = '
+				<main><ul><li>TEST1</li></ul></main>
+		';
+
+		//When using repeat to repeat some data, set the content to the data for the iteration
+		$css = 'ul li {repeat: data(list); content: iteration()}';
+
+
+		$data = new stdclass;
+
+
+		$template = new \Transphporm\Builder($template, $css);
+
+		$this->assertEquals('<main></main>' ,$template->output($data)->body);
+	}
 }
 
 
