@@ -39,6 +39,7 @@ class ValueResult implements \ArrayAccess {
 	}
 
 	public function not($value) {
+
 		$this->result[count($this->result)-1] = $this->result[count($this->result)-1] != $value;
 	}
 	

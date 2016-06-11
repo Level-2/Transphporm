@@ -12,7 +12,7 @@ class Pseudo implements \Transphporm\Module {
 		$data = $config->getFunctionSet();
 		$config->registerPseudo(new \Transphporm\Pseudo\Attribute($data));
 		$config->registerPseudo(new \Transphporm\Pseudo\Nth());
-		$config->registerPseudo(new \Transphporm\Pseudo\Not($data));
+		$config->registerPseudo(new \Transphporm\Pseudo\Not($data, $config->getCssToXpath()));
 	}
 }
 

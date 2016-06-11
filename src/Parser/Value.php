@@ -10,7 +10,7 @@ class Value {
 	private $baseData;
 	private $autoLookup;
 	private $tokens;
-
+	public $debug = false;
 	/*
 		Stores the last value e.g. 
 			"a" + "b"
@@ -29,7 +29,7 @@ class Value {
 			Tokenizer::CONCAT => 'processSeparator',
 			Tokenizer::NAME => 'processScalar',
 			Tokenizer::NUMERIC => 'processScalar',
-			Tokenizer::BOOL => 'processScalar',
+			Tokenizer::BOOL => 'processString',
 			Tokenizer::STRING => 'processString',
 			Tokenizer::OPEN_BRACKET => 'processBrackets'
 	];
@@ -48,11 +48,11 @@ class Value {
 
 	public function parseTokens($tokens, $data) {
 		$this->result = new ValueResult;
-		$this->data = $data;
+		$this->data = new ValueData($data);
 		$this->last = null;
 
-		if (empty($tokens)) return [$this->data];
-		
+		if (empty($tokens)) return [$data];
+
 		foreach ($tokens as $token) {
 			$this->{$this->tokenFuncs[$token['type']]}($token);	
 		}
@@ -62,39 +62,42 @@ class Value {
 	}
 
 	private function processComparator($token) {
-		$this->result = $this->processLast();
+		$this->processLast();
 
 		if ($this->result->getMode() == Tokenizer::NOT && $token['type'] == Tokenizer::EQUALS) {
 			$this->result->setMode(Tokenizer::NOT);
 		}
-		else $this->result->setMode($token['type']);
+		else {
+			$this->result->setMode($token['type']);
+			$this->last = null;
+		}
 	}
 
 
 	//Reads the last selected value from $data regardless if it's an array or object and overrides $this->data with the new value
-	private function moveLastToData() {
-		if (isset($this->data->{$this->last})) $this->data = $this->data->{$this->last};
-		else if (is_array($this->data) && isset($this->data[$this->last])) $this->data = $this->data[$this->last];
-	}
-
 	//Dot moves $data to the next object in $data foo.bar moves the $data pointer from `foo` to `bar`
 	private function processDot($token) {
-		if ($this->last !== null) $this->moveLastToData();
-		else $this->data = $this->result->pop();
+		if ($this->last !== null) $this->data->traverse($this->last);
+		else $this->data = new ValueData($this->result->pop());
 
 		$this->last = null;
 	}
 
 	private function processSquareBracket($token) {
-		if ($this->last !== null) $this->moveLastToData();
 		$parser = new Value($this->baseData, $this->autoLookup);
-		$this->last = $parser->parseTokens($token['value'], null)[0];
+		if ($this->baseData instanceof \Transphporm\Functionset && $this->baseData->hasFunction($this->last)) {
+			$this->callTransphpormFunctions($token);
+		}
+		else {
+			if ($this->last !== null) $this->data->traverse($this->last);			
+			$this->last = $parser->parseTokens($token['value'], null)[0];
+		}
 	}
 
 	private function processSeparator($token) {
 		$this->result->setMode($token['type']);
 		//if ($this->last !== null) $this->result = $this->processValue($this->result, $this->mode, $this->last);
-		$this->result = $this->processLast();
+		$this->processLast();
 	}
 
 	private function processScalar($token) {
@@ -109,27 +112,29 @@ class Value {
 		if ($this->baseData instanceof \Transphporm\Functionset && $this->baseData->hasFunction($this->last)) {
 			$this->callTransphpormFunctions($token);
 		}
-		else if ($this->data instanceof \Transphporm\Functionset) {
-			$this->result = $this->result->processValue($this->data->{$this->last}($token['value']));
+		else if ($this->data->isFunctionSet()) {
+			$this->result = $this->result->processValue($this->data->call($this->last, [$token['value']]));
 			$this->last = null;
 		}
 		else {
-			$parser = new Value($this->baseData, $this->autoLookup);
-			$args = $parser->parseTokens($token['value'], $this->data);
-			if ($args[0] == $this->data) $args = [];
-			$funcResult = $this->callFunc($this->last, $args, $this->data);
-			$this->result->processValue($funcResult);
-			$this->last = null;
+			$this->processNested($token);
 		}
+	}
+
+	private function processNested($token) {
+		$parser = new Value($this->baseData, $this->autoLookup);
+		$funcResult = $this->data->parseNested($parser, $token, $this->last);
+		$this->result->processValue($funcResult);
+		$this->last = null;
 	}
 
 	private function callTransphpormFunctions($token) {
 		$this->result->processValue($this->baseData->{$this->last}($token['value']));
 		foreach ($this->result->getResult() as $i => $value) {
-			if (is_array($this->data)) {
-				if (isset($this->data[$value])) $this->result[$i] = $this->data[$value];
+			if (is_scalar($value)) {
+				$val = $this->data->read($value);
+				if ($val) $this->result[$i] = $val;
 			}
-			else if (is_scalar($value) && isset($this->data->$value)) $this->result[$i] = $this->data->$value;
 		}
 		$this->last = null;
 	}
@@ -138,7 +143,8 @@ class Value {
 	private function processLast() {
 		if ($this->last !== null) {
 			try {
-				$this->extractLast($this->result);
+				$value = $this->data->extract($this->last, $this->autoLookup);
+				$this->result->processValue($value);
 			}
 			catch (\UnexpectedValueException $e) {
 				if (!$this->autoLookup) {
@@ -150,27 +156,5 @@ class Value {
 				}
 			}			
 		}
-		return $this->result;
-	}
-
-	//Extracts $last from $data. If "last" is "bar" from value "foo.bar",
-	//$data contains "foo" and this function reads $data[$bar] or $data->$bar
-	private function extractLast($result) {
-		if ($this->autoLookup && isset($this->data->{$this->last})) {
-			return $this->result->processValue($this->data->{$this->last});
-		}
-		else if (is_array($this->data) && isset($this->data[$this->last])) {
-			return $this->result->processValue($this->data[$this->last]);
-		}
-		throw new \UnexpectedValueException('Not found');
 	}	
-
-	private function callFunc($name, $args, $data) {
-		return $this->callFuncOnObject($this->data, $name, $args);
-	}
-
-	private function callFuncOnObject($obj, $func, $args) {
-		if (isset($obj->$func) && is_callable($obj->$func)) return call_user_func_array($obj->$func, $args);
-		else return call_user_func_array([$obj, $func], $args);
-	}
 }
