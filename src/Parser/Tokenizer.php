@@ -76,11 +76,15 @@ class Tokenizer {
 				$name .= $this->str[$i+1];
 				$i++;
 			}
-			if (is_numeric($name)) $tokens[] = ['type' => self::NUMERIC, 'value' => $name];
-			else if ($name == 'true') $tokens[] = ['type' => self::BOOL, 'value' => true];
-			else if ($name == 'false') $tokens[] = ['type' => self::BOOL, 'value' => false];
-			else $tokens[] = ['type' => self::NAME, 'value' => $name];
+			$this->processLiterals($tokens, $name);
 		}
+	}
+
+	private function processLiterals(&$tokens, $name) {
+		if (is_numeric($name)) $tokens[] = ['type' => self::NUMERIC, 'value' => $name];
+		else if ($name == 'true') $tokens[] = ['type' => self::BOOL, 'value' => true];
+		else if ($name == 'false') $tokens[] = ['type' => self::BOOL, 'value' => false];
+		else $tokens[] = ['type' => self::NAME, 'value' => $name];
 	}
 
 	private function doBrackets(&$tokens, $char, $i) {
