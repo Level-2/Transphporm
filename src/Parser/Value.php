@@ -76,7 +76,16 @@ class Value {
 	//Dot moves $data to the next object in $data foo.bar moves the $data pointer from `foo` to `bar`
 	private function processDot($token) {
 		if ($this->last !== null) $this->data->traverse($this->last);
-		else $this->data = new ValueData($this->result->pop());
+		else {
+			//When . is not preceeded by anything, treat it as part of the string instead of an operator
+			// foo.bar is treated as looking up `bar` in `foo` whereas .foo is treated as the string ".foo"
+			$lastResult = $this->result->pop();
+			if ($lastResult) $this->data = new ValueData($lastResult);
+			else {
+				$this->processString(['value' => '.']);
+				$this->result->setMode(Tokenizer::CONCAT);
+			}
+		}
 
 		$this->last = null;
 	}
