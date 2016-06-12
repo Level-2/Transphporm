@@ -52,8 +52,8 @@ class CssToXpath {
 		foreach ($comparators as $comparator) {
 			if (strpos($attr, $comparator) !== false) {
 				$parts = explode($comparator, $attr);
-				$parts = array_map(function($val) use ($valueParser, $element) {
-						return $valueParser->parse($val, $element[0])[0];
+				$parts = array_map(function($val) use ($valueParser) {
+						return $valueParser->parse($val)[0];
 				}, $parts);
 				
 				return self::compare($comparator, $element[0]->getAttribute($parts[0]), $parts[1]);

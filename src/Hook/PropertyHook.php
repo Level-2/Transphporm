@@ -32,7 +32,7 @@ class PropertyHook implements \Transphporm\Hook {
 	}
 
 	private function getArgs($value, $element) {
-		return $this->valueParser->parse($value, $element);
+		return $this->valueParser->parse($value);
 	}
 
 	public function registerProperty($name, \Transphporm\Property $property) {

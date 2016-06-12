@@ -10,7 +10,6 @@ class Value {
 	private $baseData;
 	private $autoLookup;
 	private $tokens;
-	public $debug = false;
 	/*
 		Stores the last value e.g. 
 			"a" + "b"
@@ -46,7 +45,7 @@ class Value {
 		return $this->result;
 	}
 
-	public function parseTokens($tokens, $data) {
+	public function parseTokens($tokens, $data, $el = -1) {
 		$this->result = new ValueResult;
 		$this->data = new ValueData($data);
 		$this->last = null;
@@ -72,7 +71,6 @@ class Value {
 			$this->last = null;
 		}
 	}
-
 
 	//Reads the last selected value from $data regardless if it's an array or object and overrides $this->data with the new value
 	//Dot moves $data to the next object in $data foo.bar moves the $data pointer from `foo` to `bar`

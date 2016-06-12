@@ -13,11 +13,7 @@ class Attribute implements \Transphporm\Pseudo {
 	}
 
 	public function match($pseudo, \DomElement $element) {
-		$pos = strpos($pseudo, '[');
-		if ($pos === false) return true;
-
-		$name = substr($pseudo, 0, $pos);
-		if (!$this->functionSet->hasFunction($name)) return true;
+		if (strpos($pseudo, '[') === false) return true;
 
 		$this->functionSet->setElement($element);
 		$valueParser = new \Transphporm\Parser\Value($this->functionSet);
