@@ -21,8 +21,6 @@ class Not implements \Transphporm\Pseudo {
 			$tokens = $tokenizer->getTokens();
 			$this->functionSet->setElement($element);
 
-
-			var_dump($tokens[1]);
 			$css = $parser->parse($tokens[1]['string']);
 		
 	
