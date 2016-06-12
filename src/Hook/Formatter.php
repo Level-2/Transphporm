@@ -15,11 +15,13 @@ class Formatter {
 
 	public function format($value, $rules) {
 		if (!isset($rules['format'])) return $value;
-		$format = new \Transphporm\Parser\StringExtractor($rules['format']);
 
-		$options = explode(' ', $format);
-		$functionName = array_shift($options);
-		foreach ($options as &$f) $f = trim($format->rebuild($f), '"');
+		$tokenizer = new \Transphporm\Parser\Tokenizer($rules['format']);
+		$tokens = $tokenizer->getTokens();
+
+		$functionName = $tokens[0]['value'];
+		$options = [];
+		for ($i = 1; $i < count($tokens); $i++) $options[] = $tokens[$i]['value'];
 
 		return $this->processFormat($options, $functionName, $value);		
 	}
