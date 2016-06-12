@@ -9,13 +9,14 @@ class Nth implements \Transphporm\Pseudo {
 	
 	public function match($pseudo, \DomElement $element) {
 		if (strpos($pseudo, 'nth-child') === 0) {
-			$bracketMatcher = new \Transphporm\Parser\BracketMatcher($pseudo);
-			$criteria = $bracketMatcher->match('(', ')');
+			$tokenizer = new \Transphporm\Parser\Tokenizer($pseudo);
+			$tokens = $tokenizer->getTokens();
+			$criteria = $tokens[1]['value'][0]['value'];
 		
-			$node_path = explode('/', $element->getNodePath());
-
-			$bracketMatcher = new \Transphporm\Parser\BracketMatcher(array_pop($node_path));
-			$num = $bracketMatcher->match('[', ']');
+			$nodePath = $element->getNodePath();
+			$tokenizer = new \Transphporm\Parser\Tokenizer($nodePath);
+			$tokens = $tokenizer->getTokens();
+			$num = end($tokens)['value'][0]['value'];
 			
 			if (is_callable([$this, $criteria])) return $this->$criteria($num);
 			else return $num == $criteria;			
