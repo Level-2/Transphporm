@@ -1968,7 +1968,7 @@ ul li span {
 
 		$data = "test";
 
-		$tss = 'div:data[="test"] {content: "test" }';
+		$tss = 'div:[data()="test"] {content: "test" }';
 
 		$template = new \Transphporm\Builder($xml, $tss);
 
