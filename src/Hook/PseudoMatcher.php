@@ -38,23 +38,10 @@ class PseudoMatcher {
 	public function getFuncArgs($name) {
 		foreach ($this->pseudo as $pseudo) {
 			if (strpos($pseudo, $name) === 0) {
-				$brackets = $this->getBracketType($pseudo);
-				$bracketMatcher = new \Transphporm\Parser\BracketMatcher($pseudo);
-				$ret = $bracketMatcher->match($brackets[0], $brackets[1]);
-				return $ret;
+				$tokenizer = new \Transphporm\Parser\Tokenizer($pseudo);
+				$tokens = $tokenizer->getTokens();
+				return isset($tokens[1]) ? $tokens[1]['value'][0]['value'] : '';
 			}
 		}
 	}
-
-	private function getBracketType($pseudo) {
-		$parenthesis = strpos($pseudo, '(');
-		$square = strpos($pseudo, ']');
-
-		if ($parenthesis === false) $parenthesis = 999;
-		if ($square === false) $square = 999;
-
-		if ($parenthesis < $square) return ['(', ')'];
-		return ['[', ']'];
-	}
-	
 }
