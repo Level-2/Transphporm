@@ -16,16 +16,18 @@ class Not implements \Transphporm\Pseudo {
 
 	public function match($pseudo, \DomElement $element) {
 		if (strpos($pseudo, 'not') === 0) {
-			$valueParser = new \Transphporm\Parser\Value($this->functionSet);
-			$bracketMatcher = new \Transphporm\Parser\BracketMatcher($pseudo);
-			$css = explode(',', $bracketMatcher->match('(', ')'));
+			
+			$tokenizer = new \Transphporm\Parser\Tokenizer($pseudo);
+			$tokens = $tokenizer->getTokens();
+
+			$css = explode(',', $tokens[1]['string']);
 			$xpath = new \DomXpath($element->ownerDocument);
-			return $this->notElement($css, $valueParser, $xpath, $element);
+			return $this->notElement($css, $xpath, $element);
 		}
 		return true;
 	}
 
-	private function notElement($css, $valueParser, $xpath, $element) {
+	private function notElement($css, $xpath, $element) {
 		foreach ($css as $selector) {
 			$xpathString = $this->cssToXpath->getXpath($selector);					
 			//Find all nodes matched by the expressions in the brackets :not(EXPR)

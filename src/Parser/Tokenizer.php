@@ -25,7 +25,7 @@ class Tokenizer {
 	const CLOSE_BRACE = 16;
 	const BOOL = 17;
 
-	public $chars = [
+	private $chars = [
 		'"' => self::STRING,
 		'\'' => self::STRING2,
 		'(' => self::OPEN_BRACKET,
@@ -98,7 +98,7 @@ class Tokenizer {
 			if ($char === $type) {
 				$contents = $this->extractBrackets($i, $brackets[0], $brackets[1]);
 				$tokenizer = new Tokenizer($contents);
-				$tokens[] = ['type' => $type, 'value' => $tokenizer->getTokens()];
+				$tokens[] = ['type' => $type, 'value' => $tokenizer->getTokens(), 'string' => $contents];
 				return strlen($contents);
 			}
 		}
