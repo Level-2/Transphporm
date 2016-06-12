@@ -26,10 +26,6 @@ class ValueData {
 		else return false;
 	}
 
-	public function isFunctionSet() {
-		return $this->data instanceof \Transphporm\Functioset;
-	}
-
 	public function call($func, $args) {
 		return $this->data->$func(...$args);
 	}

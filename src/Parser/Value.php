@@ -110,10 +110,6 @@ class Value {
 		if ($this->baseData instanceof \Transphporm\Functionset && $this->baseData->hasFunction($this->last)) {
 			$this->callTransphpormFunctions($token);
 		}
-		else if ($this->data->isFunctionSet()) {
-			$this->result = $this->result->processValue($this->data->call($this->last, [$token['value']]));
-			$this->last = null;
-		}
 		else {
 			$this->processNested($token);
 		}
