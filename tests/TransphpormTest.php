@@ -1989,7 +1989,7 @@ ul li span {
 
 		$template = new \Transphporm\Builder($template, $css);
 
-		$this->assertEquals('<main></main>' ,$template->output($data)->body);
+		$this->assertEquals('<main><ul></ul></main>' ,$template->output($data)->body);
 	}
 }
 

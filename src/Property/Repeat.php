@@ -19,8 +19,6 @@ class Repeat implements \Transphporm\Property {
 		$max = $this->getMax($values);
 		$count = 0;
 
-		//What was this if statement for? removing it breaks nothing
-		//if (empty($values[0])) $values[0] = [];
 		foreach ($values[0] as $key => $iteration) {
 			if ($count+1 > $max) break;
 			$clone = $this->cloneElement($element, $iteration, $key, $count++);
