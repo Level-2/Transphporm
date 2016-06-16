@@ -21,9 +21,14 @@ class CacheTest extends PHPUnit_Framework_TestCase {
 		return __DIR__ . DIRECTORY_SEPARATOR . 'temp.tss';
 	}
 
+	private function makeTssTwo($tss) {
+		$this->writeFile(__DIR__ . DIRECTORY_SEPARATOR . 'temptwo.tss', $tss);
+		return __DIR__ . DIRECTORY_SEPARATOR . 'temptwo.tss';
+	}
+
 	private function makeXml($xml) {
 		$this->writeFile(__DIR__ . DIRECTORY_SEPARATOR . 'temp.xml', $xml);
-		return __DIR__ . DIRECTORY_SEPARATOR . 'temp.xml';	
+		return __DIR__ . DIRECTORY_SEPARATOR . 'temp.xml';
 	}
 
 	private function createFiles($frequency) {
@@ -59,7 +64,7 @@ class CacheTest extends PHPUnit_Framework_TestCase {
 
 		$cache = new \ArrayObject;
 		$random = new RandomGenerator;
-		
+
 		$o1 = $this->buildTemplate('never', $cache)->output($random)->body;
 		$o2 = $this->buildTemplate('never', $cache)->output($random)->body;
 
@@ -73,14 +78,14 @@ class CacheTest extends PHPUnit_Framework_TestCase {
 
 
 	public function testCacheMinutes() {
-		
+
 		$cache = new \ArrayObject;
 		$random = new RandomGenerator;
-	
+
 		$o1 = $this->buildTemplate('10m', $cache)->output($random)->body;
 		$o2 = $this->buildTemplate('10m', $cache)->output($random)->body;
 
-		
+
 		// If the cache is working, the content should not be updated the second time
 		$this->assertEquals($o1, $o2);
 
@@ -117,7 +122,7 @@ class CacheTest extends PHPUnit_Framework_TestCase {
 
 		//Hide the span
 		$o1 = $template->output(['show' => false])->body;
-		
+
 		$this->assertFalse(strpos($o1, '<span>'));
 
 
@@ -126,10 +131,10 @@ class CacheTest extends PHPUnit_Framework_TestCase {
 		$template->setCache($cache);
 
 		$o1 = $template->output(['show' => true])->body;
-		
+
 		$this->assertFalse(strpos($o1, '<span>'));
 
-	
+
 		//Expire the cache by advancing time 10 mintes
 		$date = new \DateTime();
 		$date->modify('+11 minutes');
@@ -139,9 +144,58 @@ class CacheTest extends PHPUnit_Framework_TestCase {
 		$template->setTime($date->format('U'));
 
 		$o1 = $template->output(['show' => true])->body;
-		
+
 		//This time the span should be visible
 		$this->assertTrue((bool) strpos($o1, '<span>'));
+	}
+
+	public function testCacheWithAttribute() {
+		$xml = $this->makeXml('<div>
+			<span data-hide="1">Test1</span>
+			<span data-hide="2">Test2</span>
+			</div>');
+
+		$tss = $this->makeTss('
+			span {display: block; }
+			span[data-hide=data(show)] { display:none; }');
+
+		$cache = new \ArrayObject();
+
+		$template = new \Transphporm\Builder($xml, $tss);
+		$template->setCache($cache);
+
+		$expectedOutput = $this->stripTabs('<div><span data-hide="2">Test2</span></div>');
+		$this->assertEquals($this->stripTabs($template->output(['hide' => 1])->body), $expectedOutput);
+
+		$template = new \Transphporm\Builder($xml, $tss);
+		$template->setCache($cache);
+
+		$expectedOutput = $this->stripTabs('<div><span data-hide="1">Test1</span></div>');
+
+		// Run output again
+		$this->assertEquals($this->stripTabs($template->output(['hide' => 2])->body), $expectedOutput);
+	}
+
+	public function testCacheWithImport() {
+		$xml = $this->makeXml('<div>
+			<span>Test1</span>
+			</div>');
+
+		$tss = $this->makeTss('
+			main { content: "Test1"; }
+			@import "temp2.tss";');
+
+		$cache = new \ArrayObject();
+
+		$template = new \Transphporm\Builder($xml, $tss);
+		$template->setCache($cache);
+
+		$expectedOutput = $this->stripTabs('<div></div>');
+		$this->assertEquals($this->stripTabs($template->output()->body), $expectedOutput);
+
+		// Run output again
+		$this->assertEquals($this->stripTabs($template->output()->body), $expectedOutput);
+
 	}
 
 	public function testCacheRepeat() {
