@@ -1991,6 +1991,19 @@ ul li span {
 
 		$this->assertEquals('<main><ul></ul></main>' ,$template->output($data)->body);
 	}
+
+	public function testAttributeExists() {
+		$xml = "
+		<div data-test='test'>Test1</div>
+		<div>Test2</div>
+		";
+
+		$tss = "div[data-test] { display: none; }";
+
+		$template = new \Transphporm\Builder($xml, $tss);
+
+		$this->assertEquals('<div>Test2</div>', $template->output()->body);
+	}
 }
 
 
