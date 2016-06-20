@@ -17,14 +17,14 @@ class CssToXpath {
 	public function __construct(Value $valueParser, \Transphporm\FunctionSet $functionSet, $prefix = '') {
 		$hash = $this->registerInstance();
 		$this->valueParser = $valueParser;
-		$this->functionSet = $functionSet;		
+		$this->functionSet = $functionSet;
 
 		$this->translators = [
 			' ' => function($string) use ($prefix) { return '//' . $prefix . $string;	},
 			'' => function($string) use ($prefix) { return '/' . $prefix . $string;	},
 			'>' => function($string) use ($prefix) { return '/' . $prefix  . $string; },
 			'#' => function($string) { return '[@id=\'' . $string . '\']'; },
-			'.' => function($string) { return '[contains(concat(\' \', normalize-space(@class), \' \'), \' ' . $string . ' \')]'; }, 
+			'.' => function($string) { return '[contains(concat(\' \', normalize-space(@class), \' \'), \' ' . $string . ' \')]'; },
 			'[' => function($string) use ($hash) { return '[' .'php:function(\'\Transphporm\Parser\CssToXpath::processAttr\', \'' . $string . '\', ., "' . $hash . '")' . ']';	},
 			']' => function() {	return ''; }
 		];
@@ -55,11 +55,11 @@ class CssToXpath {
 				$parts = array_map(function($val) use ($valueParser) {
 						return $valueParser->parse($val)[0];
 				}, $parts);
-				
+
 				return self::compare($comparator, $element[0]->getAttribute($parts[0]), $parts[1]);
 			}
 		}
-		return $attr;
+		return $element[0]->getAttribute($attr) !== '';
 	}
 
 	private static function compare($comparator, $a, $b) {
@@ -79,7 +79,7 @@ class CssToXpath {
 				$selector->type = $css[$i];
 				$selectors[] = $selector;
 			}
-			else $selector->string .= $css[$i];			
+			else $selector->string .= $css[$i];
 		}
 		return $selectors;
 	}
@@ -101,7 +101,7 @@ class CssToXpath {
 	public function getDepth($css) {
 		return count($this->split($css));
 	}
-	
+
 	public function getPseudo() {
 		$parts = explode(':', $this->css);
 		array_shift($parts);
