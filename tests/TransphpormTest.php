@@ -1777,6 +1777,32 @@ ul li span {
 		$this->assertEquals($this->stripTabs($template->output($obj)->body), $this->stripTabs('<div>test</div>'));
 	}
 
+	public function testFunctionCallAsConditonal3() {
+
+	    $xml = '<div></div>';
+
+	    $obj = new Foo();
+
+	    $tss = 'div:data[returnOne()=1] {content: "test" }';
+
+	    $template = new \Transphporm\Builder($xml, $tss);
+
+	    $this->assertEquals($this->stripTabs($template->output($obj)->body), $this->stripTabs('<div>test</div>'));
+	}
+
+	public function testFunctionCallAsConditonal4() {
+
+	    $xml = '<div></div>';
+
+	    $obj = new Foo();
+
+	    $tss = 'div:[data(returnOne())=1] {content: "test" }';
+
+	    $template = new \Transphporm\Builder($xml, $tss);
+
+	    $this->assertEquals($this->stripTabs($template->output($obj)->body), $this->stripTabs('<div>test</div>'));
+	}
+
 
 	public function testRuleOneComment() {
 		$xml = '<div></div>';
@@ -2023,6 +2049,10 @@ class Foo {
 
 	public function returnTrue() {
 		return true;
+	}
+
+	public function returnOne() {
+		return 1;
 	}
 
 	public function add($a, $b) {
