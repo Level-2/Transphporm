@@ -11,7 +11,7 @@ class Value {
 	private $autoLookup;
 	private $tokens;
 	/*
-		Stores the last value e.g. 
+		Stores the last value e.g.
 			"a" + "b"
 		Will store "a" before reading the token for the + and perfoming the concatenate operation
 	*/
@@ -27,7 +27,7 @@ class Value {
 			Tokenizer::ARG => 'processSeparator',
 			Tokenizer::CONCAT => 'processSeparator',
 			Tokenizer::NAME => 'processScalar',
-			Tokenizer::NUMERIC => 'processScalar',
+			Tokenizer::NUMERIC => 'processString',
 			Tokenizer::BOOL => 'processString',
 			Tokenizer::STRING => 'processString',
 			Tokenizer::OPEN_BRACKET => 'processBrackets'
@@ -53,7 +53,7 @@ class Value {
 		if (empty($tokens)) return [$data];
 
 		foreach ($tokens as $token) {
-			$this->{$this->tokenFuncs[$token['type']]}($token);	
+			$this->{$this->tokenFuncs[$token['type']]}($token);
 		}
 
 		$this->processLast();
@@ -96,7 +96,7 @@ class Value {
 			$this->callTransphpormFunctions($token);
 		}
 		else {
-			if ($this->last !== null) $this->data->traverse($this->last);			
+			if ($this->last !== null) $this->data->traverse($this->last);
 			$this->last = $parser->parseTokens($token['value'], null)[0];
 		}
 	}
@@ -157,7 +157,7 @@ class Value {
 					$this->result->clear();
 					$this->result[0] = false;
 				}
-			}			
+			}
 		}
-	}	
+	}
 }
