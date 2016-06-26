@@ -35,6 +35,7 @@ class Sheet {
 		//there may be processing instructions at the end
 		if ($processing = $this->processingInstructions($this->tss, $pos, strlen($this->tss), count($rules)+$indexStart)) $rules = array_merge($rules, $processing['rules']);
 		usort($rules, [$this, 'sortRules']);
+		if (empty($rules) && !empty($this->tss)) throw new \Exception("No TSS rules parsed");
 		return $rules;
 	}
 
@@ -44,7 +45,7 @@ class Sheet {
 		foreach ($parts as $part) {
 			$rules[$part] = new \Transphporm\Rule($this->xPath->getXpath($part), $this->xPath->getPseudo($part), $this->xPath->getDepth($part), $index++);
 			$rules[$part]->properties = $properties;
-		}		
+		}
 		return $rules;
 	}
 
@@ -54,8 +55,8 @@ class Sheet {
 				$newRule->properties = array_merge($rules[$selector]->properties, $newRule->properties);
 			}
 			$rules[$selector] = $newRule;
-		}	
-		
+		}
+
 		return $rules;
 	}
 
@@ -70,8 +71,8 @@ class Sheet {
 				$rules = array_merge($rules, $this->$funcName($args, $indexStart));
 			}
 			else {
-				break;	
-			} 
+				break;
+			}
 		}
 
 		return empty($rules) ? false : ['endPos' => $pos, 'rules' => $rules];

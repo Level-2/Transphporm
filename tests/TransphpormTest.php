@@ -2030,6 +2030,13 @@ ul li span {
 
 		$this->assertEquals('<div>Test2</div>', $template->output()->body);
 	}
+
+	public function testNoTSSRules() {
+		$this->expectException("Exception");
+		$this->expectExceptionMessage("No TSS rules parsed");
+		$template = new \Transphporm\Builder("<div></div>", "NONEXISTANT_FILE");
+		$template->output();
+	}
 }
 
 
