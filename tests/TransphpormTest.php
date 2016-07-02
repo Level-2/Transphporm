@@ -1831,6 +1831,20 @@ ul li span {
 		 $this->assertEquals('<div></div>', $template->output()->body);
 	}
 
+	public function testCommentOutMultiLineComments() {
+		$xml = '<div></div>';
+
+		$tss = '
+		//*
+		div { content: "Test"; }
+		//*/
+		';
+
+		$template = new \Transphporm\Builder($xml, $tss);
+
+		$this->assertEquals('<div>Test</div>', $template->output()->body);
+	}
+
 	public function testPlusConcat() {
 		$xml = '<div></div>';
 

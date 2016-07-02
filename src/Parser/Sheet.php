@@ -13,8 +13,8 @@ class Sheet {
 	private $xPath;
 
 	public function __construct($tss, $baseDir, CssToXpath $xPath, Value $valueParser) {
-		$this->tss = $this->stripComments($tss, '/*', '*/');
-		$this->tss = $this->stripComments($this->tss, '//', "\n");
+		$this->tss = $this->stripComments($tss, '//', "\n");
+		$this->tss = $this->stripComments($this->tss, '/*', '*/');
 		$this->baseDir = $baseDir;
 		$this->xPath = $xPath;
 		$this->valueParser = $valueParser;
@@ -44,7 +44,7 @@ class Sheet {
 		foreach ($parts as $part) {
 			$rules[$part] = new \Transphporm\Rule($this->xPath->getXpath($part), $this->xPath->getPseudo($part), $this->xPath->getDepth($part), $index++);
 			$rules[$part]->properties = $properties;
-		}		
+		}
 		return $rules;
 	}
 
@@ -54,8 +54,8 @@ class Sheet {
 				$newRule->properties = array_merge($rules[$selector]->properties, $newRule->properties);
 			}
 			$rules[$selector] = $newRule;
-		}	
-		
+		}
+
 		return $rules;
 	}
 
@@ -70,8 +70,8 @@ class Sheet {
 				$rules = array_merge($rules, $this->$funcName($args, $indexStart));
 			}
 			else {
-				break;	
-			} 
+				break;
+			}
 		}
 
 		return empty($rules) ? false : ['endPos' => $pos, 'rules' => $rules];
