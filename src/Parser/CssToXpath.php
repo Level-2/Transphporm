@@ -57,7 +57,7 @@ class CssToXpath {
 				return self::compare($comparator, $element[0]->getAttribute($parts[0]), $parts[1]);
 			}
 		}
-		return $attr;
+		return $element[0]->getAttribute($attr) !== ''; ;
 	}
 
 	private static function compare($comparator, $a, $b) {
