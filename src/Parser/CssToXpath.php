@@ -10,30 +10,28 @@ class CssToXpath {
 	private $translators = [];
 	private $css;
 	private $valueParser;
-	private static $instances = [];
+	private static $instance;
 	private $functionSet;
 
 
 	public function __construct(Value $valueParser, \Transphporm\FunctionSet $functionSet, $prefix = '') {
-		$hash = $this->registerInstance();
+		$this->registerInstance();
 		$this->valueParser = $valueParser;
-		$this->functionSet = $functionSet;		
+		$this->functionSet = $functionSet;
 
 		$this->translators = [
 			' ' => function($string) use ($prefix) { return '//' . $prefix . $string;	},
 			'' => function($string) use ($prefix) { return '/' . $prefix . $string;	},
 			'>' => function($string) use ($prefix) { return '/' . $prefix  . $string; },
 			'#' => function($string) { return '[@id=\'' . $string . '\']'; },
-			'.' => function($string) { return '[contains(concat(\' \', normalize-space(@class), \' \'), \' ' . $string . ' \')]'; }, 
-			'[' => function($string) use ($hash) { return '[' .'php:function(\'\Transphporm\Parser\CssToXpath::processAttr\', \'' . $string . '\', ., "' . $hash . '")' . ']';	},
+			'.' => function($string) { return '[contains(concat(\' \', normalize-space(@class), \' \'), \' ' . $string . ' \')]'; },
+			'[' => function($string) { return '[' .'php:function(\'\Transphporm\Parser\CssToXpath::processAttr\', \'' . $string . '\', .)' . ']';	},
 			']' => function() {	return ''; }
 		];
 	}
 
 	private function registerInstance() {
-		$hash = spl_object_hash($this);
-		self::$instances[$hash] = $this;
-		return $hash;
+		self::$instance = $this;
 	}
 
 	private function createSelector() {
@@ -44,10 +42,10 @@ class CssToXpath {
 	}
 
 	//XPath only allows registering of static functions... this is a hacky workaround for that
-	public static function processAttr($attr, $element, $hash) {
+	public static function processAttr($attr, $element) {
 		$comparators = ['!=', '='];
-		$valueParser = self::$instances[$hash]->valueParser;
-		self::$instances[$hash]->functionSet->setElement($element[0]);
+		$valueParser = self::$instance->valueParser;
+		self::$instance->functionSet->setElement($element[0]);
 
 		foreach ($comparators as $comparator) {
 			if (strpos($attr, $comparator) !== false) {
@@ -55,7 +53,7 @@ class CssToXpath {
 				$parts = array_map(function($val) use ($valueParser) {
 						return $valueParser->parse($val)[0];
 				}, $parts);
-				
+
 				return self::compare($comparator, $element[0]->getAttribute($parts[0]), $parts[1]);
 			}
 		}
@@ -79,7 +77,7 @@ class CssToXpath {
 				$selector->type = $css[$i];
 				$selectors[] = $selector;
 			}
-			else $selector->string .= $css[$i];			
+			else $selector->string .= $css[$i];
 		}
 		return $selectors;
 	}
@@ -101,7 +99,7 @@ class CssToXpath {
 	public function getDepth($css) {
 		return count($this->split($css));
 	}
-	
+
 	public function getPseudo() {
 		$parts = explode(':', $this->css);
 		array_shift($parts);

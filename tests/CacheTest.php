@@ -157,7 +157,7 @@ class CacheTest extends PHPUnit_Framework_TestCase {
 
 		$tss = $this->makeTss('
 			span {display: block; }
-			span[data-hide=data(show)] { display:none; }');
+			span[data-hide=data(hide)] { display:none; }');
 
 		$cache = new \ArrayObject();
 
