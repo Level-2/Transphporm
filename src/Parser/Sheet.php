@@ -44,7 +44,7 @@ class Sheet {
 		foreach ($parts as $part) {
 			$rules[$part] = new \Transphporm\Rule($this->xPath->getXpath($part), $this->xPath->getPseudo($part), $this->xPath->getDepth($part), $index++);
 			$rules[$part]->properties = $properties;
-		}		
+		}
 		return $rules;
 	}
 
@@ -54,8 +54,8 @@ class Sheet {
 				$newRule->properties = array_merge($rules[$selector]->properties, $newRule->properties);
 			}
 			$rules[$selector] = $newRule;
-		}	
-		
+		}
+
 		return $rules;
 	}
 
@@ -70,8 +70,8 @@ class Sheet {
 				$rules = array_merge($rules, $this->$funcName($args, $indexStart));
 			}
 			else {
-				break;	
-			} 
+				break;
+			}
 		}
 
 		return empty($rules) ? false : ['endPos' => $pos, 'rules' => $rules];
@@ -96,7 +96,7 @@ class Sheet {
 		while (($pos = strpos($str, $open, $pos)) !== false) {
 			$end = strpos($str, $close, $pos);
 			if ($end === false) break;
-			$str = substr_replace($str, '', $pos, $end-$pos+2);
+			$str = substr_replace($str, '', $pos, $end-$pos+strlen($close));
 		}
 
 		return $str;

@@ -754,6 +754,21 @@ class TransphpormTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('<div>Test</div>', $template->output()->body);
 	}
 
+	public function testCommentBeforeRule() {
+		$template = '
+			<div>foo</div>
+		';
+
+		$tss = '
+// Comment
+div {content: "bar"; }
+		';
+
+		$template = new \Transphporm\Builder($template, $tss);
+
+		$this->assertEquals('<div>bar</div>', $template->output()->body);
+	}
+
 	public function testImport() {
 		$template = '
 			<div>Test</div>
