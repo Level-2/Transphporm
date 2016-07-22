@@ -868,6 +868,18 @@ div {content: "bar"; }
 
 	}
 
+	public function testImportInImportedFile() {
+		$template = new \Transphporm\Builder("tests/test.xml", "tests/other/otherImport.tss");
+
+		$this->assertEquals('<!DOCTYPE html><html><body>test</body></html>', $this->stripTabs($template->output()->body));
+	}
+
+	public function testBaseDirChangeWithImport() {
+		$template = new \Transphporm\Builder("tests/test.xml", "tests/other/templateFromImport.tss");
+
+		$this->assertEquals('<!DOCTYPE html><html><body><p>foo</p></body></html>', $this->stripTabs($template->output()->body));
+	}
+
 	public function testContentTemplate() {
 		$template = '
 			<div>Test</div>
