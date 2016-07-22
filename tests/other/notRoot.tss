@@ -1,0 +1,1 @@
+body { content: template("tests/include.xml"); }

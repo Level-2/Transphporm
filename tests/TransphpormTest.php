@@ -884,6 +884,18 @@ class TransphpormTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('<div><p>foo</p></div>', $this->stripTabs($template->output($data)->body));
 	}
 
+	public function testTemplateFunctionXMLFileFromRoot() {
+		$template = new \Transphporm\Builder("tests/test.xml", "tests/other/notRoot.tss");
+
+		$this->assertEquals('<!DOCTYPE html><html><body><p>foo</p></body></html>', $this->stripTabs($template->output()->body));
+	}
+
+	public function testTemplateFunctionTSSileFromRoot() {
+		$template = new \Transphporm\Builder("tests/test.xml", "tests/other/otherNotRoot.tss");
+
+		$this->assertEquals('<!DOCTYPE html><html><body><div>foo</div></body></html>', $this->stripTabs($template->output()->body));
+	}
+
 	public function testNestedFunction() {
 		//Reads from the data using an attribute from the HTML
 		//In this case, sets the input's value attribute by reading it's name from data
