@@ -31,7 +31,14 @@ class Template implements \Transphporm\TSSFunction {
 		elseif (is_file($args[0])) $xmlFile = $args[0];
 		else throw new \Exception('XML File "' . $args[0] .'" does not exist');
 
-		$newTemplate = new \Transphporm\Builder($xmlFile, $tss ? $this->baseDir . $tss : null);
+		if ($tss) {
+			if (is_file($this->baseDir . $tss)) $tssFile = $this->baseDir . $tss;
+			elseif (is_file($args[0])) $tssFile = $tss;
+			else throw new \Exception('TSS File "' . $tss .'" does not exist');
+		}
+		else $tssFile = null;
+
+		$newTemplate = new \Transphporm\Builder($xmlFile, $tssFile);
 
 		$doc = $newTemplate->output($this->elementData->getData($element), true)->body;
 		if ($selector != '') return $this->templateSubsection($doc, $selector);
