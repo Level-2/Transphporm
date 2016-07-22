@@ -11,9 +11,11 @@ class Json implements \Transphporm\TSSFunction {
         $json = $args[0];
 
         if (trim($json)[0] != '{') {
-            $path = $this->baseDir . $json;
-            if (!file_exists($path)) throw new \Exception('File does not exist at: ' . $path);
-            $json = file_get_contents($json);
+            if (is_file($this->baseDir . $args[0])) $jsonFile = $this->baseDir . $json;
+    		elseif (is_file($args[0])) $jsonFile = $json;
+    		else throw new \Exception('JSON File "' . $json .'" does not exist');
+
+            $json = file_get_contents($jsonFile);
         }
 
         $map = json_decode($json, true);
