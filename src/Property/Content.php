@@ -52,24 +52,24 @@ class Content implements \Transphporm\Property {
 		$pseudoContent = ['attr', 'header', 'before', 'after'];
 		foreach ($pseudoContent as $pseudo) {
 			if ($pseudoMatcher->hasFunction($pseudo)) {
-				$this->$pseudo($value, $pseudoMatcher->getFuncArgs($pseudo), $element);
+				$this->$pseudo($value, $pseudoMatcher->getFuncArgs($pseudo, $element)[0], $element);
 				return true;
 			}
 		}
 		return false;
 	}
-	
+
 	private function getNode($node, $document) {
 		foreach ($node as $n) {
 			if ($n instanceof \DomElement) {
 				$new = $document->importNode($n, true);
-				//Removing this might cause problems with caching... 
+				//Removing this might cause problems with caching...
 				//$new->setAttribute('transphporm', 'added');
 			}
 			else {
 				if ($n instanceof \DomText) $n = $n->nodeValue;
 				$new = $document->createElement('text');
-				
+
 				$new->appendChild($document->createTextNode($n));
 				$new->setAttribute('transphporm', 'text');
 			}
@@ -88,7 +88,7 @@ class Content implements \Transphporm\Property {
 
 	private function before($value, $pseudoArgs, $element) {
 		foreach ($this->getNode($value, $element->ownerDocument) as $node) {
-			$element->insertBefore($node, $element->firstChild);	
+			$element->insertBefore($node, $element->firstChild);
 		}
 		return true;
 	}
@@ -96,14 +96,14 @@ class Content implements \Transphporm\Property {
 	private function after($value, $pseudoArgs, $element) {
 		 foreach ($this->getNode($value, $element->ownerDocument) as $node) {
 		 		$element->appendChild($node);
-		}			 
+		}
 	}
 
 	private function replaceContent($element, $content) {
 		//If this rule was cached, the elements that were added last time need to be removed prior to running the rule again.
 		foreach ($this->getNode($content, $element->ownerDocument) as $node) {
 			$element->parentNode->insertBefore($node, $element);
-		}		
+		}
 		$element->setAttribute('transphporm', 'remove');
 	}
 
@@ -112,7 +112,7 @@ class Content implements \Transphporm\Property {
 			$element->appendChild($node);
 		}
 	}
-	
+
 	private function removeAllChildren($element) {
 		while ($element->hasChildNodes()) $element->removeChild($element->firstChild);
 	}

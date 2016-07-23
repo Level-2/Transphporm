@@ -62,7 +62,7 @@ class Builder {
 		return (object) $result;
 	}
 
-	private function processRules($template, $config) {		
+	private function processRules($template, $config) {
 		$rules = $this->getRules($template, $config);
 
 		foreach ($rules as $rule) {
@@ -79,7 +79,12 @@ class Builder {
 	//Process a TSS rule e.g. `ul li {content: "foo"; format: bar}
 	private function executeTssRule($rule, $template, $config) {
 		$rule->touch();
-		$pseudoMatcher = $config->createPseudoMatcher($rule->pseudo);
+
+		// TODO: Once `Sheet` uses tokens this can be removed
+		$pseudo = [];
+		foreach ($rule->pseudo as $pseudoString) $pseudo[] = (new \Transphporm\Parser\Tokenizer($pseudoString))->getTokens();
+
+		$pseudoMatcher = $config->createPseudoMatcher($pseudo);
 
 		$hook = new Hook\PropertyHook($rule->properties, $pseudoMatcher, $config->getValueParser(), $config->getFunctionSet());
 		$config->loadProperties($hook);
@@ -106,7 +111,7 @@ class Builder {
 			$key = $this->tss . $template->getPrefix() . $this->baseDir;
 			//Try to load the cached rules, if not set in the cache (or expired) parse the supplied sheet
 			$rules = $this->cache->load($key, filemtime($this->tss));
-		
+
 			if (!$rules) return $this->cache->write($key, (new Parser\Sheet(file_get_contents($this->tss), $this->baseDir, $config->getCssToXpath(), $config->getValueParser()))->parse());
 			else return $rules;
 		}

@@ -27,9 +27,7 @@ class PseudoMatcher {
 		$matches = true;
 		$this->functionSet->setElement($element);
 
-		foreach ($this->pseudo as $pseudo) {
-			$tokenizer = new \Transphporm\Parser\Tokenizer($pseudo);
-			$tokens = $tokenizer->getTokens();
+		foreach ($this->pseudo as $tokens) {
 			foreach ($this->functions as $function) {
 				$parts = $this->getFuncParts($tokens);
 				$matches = $matches && $function->match($parts['name'], $parts['args'], $element);
@@ -40,32 +38,33 @@ class PseudoMatcher {
 
 	private function getFuncParts($tokens) {
 		$parts = [];
-		if ($tokens[0]['type'] === Tokenizer::NAME) $parts['name'] = $tokens[0]['value'];
-		else $parts['name'] = null;
-		if ($parts['name'] === null || (isset($tokens[1]) && $tokens[1]['type'] === Tokenizer::OPEN_SQUARE_BRACKET)) {
-			$parts['name'] = null;
+		$parts['name'] = $this->getFuncName($tokens);
+		if ($parts['name'] === null || in_array($parts['name'], ['data', 'iteration', 'root'])) {
 			$parts['args'] = $this->valueParser->parseTokens($tokens, $this->functionSet);
 		}
 		elseif (isset($tokens[1])) $parts['args'] = $this->valueParser->parseTokens($tokens[1]['value'], $this->functionSet);
-		else $parts['args'] = [];
+		else $parts['args'] = [['']];
 		return $parts;
 	}
 
+	private function getFuncName($tokens) {
+		if ($tokens[0]['type'] === Tokenizer::NAME) return $tokens[0]['value'];
+		return null;
+	}
+
 	public function hasFunction($name) {
-		foreach ($this->pseudo as $pseudo) {
-			if (strpos($pseudo, $name) === 0) return true;
+		foreach ($this->pseudo as $tokens) {
+			if ($name === $this->getFuncName($tokens)) return true;
 		}
 	}
 
 	// TODO: Improve the functionality of getFuncArgs and make it similar to when using `match`
-	public function getFuncArgs($name) {
-		//$this->functionSet->setElement($element);
-		foreach ($this->pseudo as $pseudo) {
-			if (strpos($pseudo, $name) === 0) {
-				$tokenizer = new \Transphporm\Parser\Tokenizer($pseudo);
-				$tokens = $tokenizer->getTokens();
-				return isset($tokens[1]) ? $tokens[1]['value'][0]['value'] : '';
-			}
+	public function getFuncArgs($name, $element) {
+		$this->functionSet->setElement($element);
+
+		foreach ($this->pseudo as $tokens) {
+			$parts = $this->getFuncParts($tokens);
+			if ($name === $parts['name']) return $parts['args'];
 		}
 	}
 }
