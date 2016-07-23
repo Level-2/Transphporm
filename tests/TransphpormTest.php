@@ -1623,6 +1623,31 @@ div:after {content: 'bar' }
 
 	}
 
+	public function testNotWithMoreDepth() {
+		$xml = '
+		<div class="one">
+			<p></p>
+		</div>
+		<div class="two">
+			<p></p>
+		</div>
+		<div class="three">
+			<p></p>
+		</div>
+		';
+
+		$tss = 'p:not("div.two p") {content: "foo"; }';
+
+
+		$template = new \Transphporm\Builder($xml, $tss);
+
+		$this->assertEquals($this->stripTabs($template->output()->body), $this->stripTabs('
+			<div class="one"><p>foo</p></div>
+			<div class="two"><p></p></div>
+			<div class="three"><p>foo</p></div>
+		'));
+
+	}
 
 	public function testKeyChild() {
 		$xml = '<ul>
