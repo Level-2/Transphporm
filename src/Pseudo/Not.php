@@ -15,18 +15,11 @@ class Not implements \Transphporm\Pseudo {
 		$this->cssToXpath = $cssToXpath;
 	}
 
-	public function match($pseudo, \DomElement $element) {
-		if ($pseudo[0]['type'] === Tokenizer::NAME && $pseudo[0]['value'] === 'not') {
-			$parser = new \Transphporm\Parser\Value($this->functionSet);
-			$this->functionSet->setElement($element);
-
-			$css = $parser->parse($pseudo[1]['string']);
-
-
-			$xpath = new \DomXpath($element->ownerDocument);
-			return $this->notElement($css, $xpath, $element);
-		}
-		return true;
+	public function match($name, $args, \DomElement $element) {
+		if ($name !== 'not') return true;
+		
+		$xpath = new \DomXpath($element->ownerDocument);
+		return $this->notElement($args, $xpath, $element);
 	}
 
 	private function notElement($css, $xpath, $element) {

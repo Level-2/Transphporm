@@ -8,9 +8,9 @@ namespace Transphporm;
 class Config {
 	private $properties = [];
 	private $pseudo = [];
-	private $functionSet; 
+	private $functionSet;
 	private $headers;
-	private $formatter; 
+	private $formatter;
 	private $baseDir;
 	private $elementData;
 	private $xPath;
@@ -71,7 +71,7 @@ class Config {
 	}
 
 	public function createPseudoMatcher($pseudo) {
-		$pseudoMatcher = new Hook\PseudoMatcher($pseudo);
+		$pseudoMatcher = new Hook\PseudoMatcher($pseudo, $this->valueParser, $this->functionSet);
 		foreach ($this->pseudo as $pseudoFunction) $pseudoMatcher->registerFunction($pseudoFunction);
 		return $pseudoMatcher;
 	}

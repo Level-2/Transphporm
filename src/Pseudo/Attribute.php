@@ -13,13 +13,8 @@ class Attribute implements \Transphporm\Pseudo {
 		$this->functionSet = $functionSet;
 	}
 
-	public function match($pseudo, \DomElement $element) {//var_dump(Tokenizer::OPEN_SQUARE_BRACKET); var_Dump($pseudo[0]['type']);var_Dump($pseudo[1]['type']);
-		if ($pseudo[0]['type'] !== Tokenizer::OPEN_SQUARE_BRACKET
-			&& (isset($pseudo[1]) && $pseudo[1]['type'] !== Tokenizer::OPEN_SQUARE_BRACKET)) return true;
-
-		$this->functionSet->setElement($element);
-		$valueParser = new \Transphporm\Parser\Value($this->functionSet);
-		$valueParser->debug = true;
-		return $valueParser->parseTokens($pseudo, $this->functionSet)[0];
+	public function match($name, $args, \DomElement $element) {
+		if ($name !== null)  return true;
+		return $args[0];
 	}
 }

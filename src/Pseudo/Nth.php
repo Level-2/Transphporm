@@ -8,19 +8,18 @@ namespace Transphporm\Pseudo;
 use \Transphporm\Parser\Tokenizer;
 class Nth implements \Transphporm\Pseudo {
 
-	public function match($pseudo, \DomElement $element) {
-		if ($pseudo[0]['type'] === Tokenizer::NAME && $pseudo[0]['value'] === 'nth-child') {
-			$criteria = $pseudo[1]['value'][0]['value'];
+	public function match($name, $args, \DomElement $element) {
+		if ($name !== 'nth-child') return true;
 
-			$nodePath = $element->getNodePath();
-			$tokenizer = new \Transphporm\Parser\Tokenizer($nodePath);
-			$pseudo = $tokenizer->getTokens();
-			$num = end($pseudo)['value'][0]['value'];
+		$criteria = $args[0];
 
-			if (is_callable([$this, $criteria])) return $this->$criteria($num);
-			else return $num == $criteria;
-		}
-		return true;
+		$nodePath = $element->getNodePath();
+		$tokenizer = new \Transphporm\Parser\Tokenizer($nodePath);
+		$pseudo = $tokenizer->getTokens();
+		$num = end($pseudo)['value'][0]['value'];
+
+		if (is_callable([$this, $criteria])) return $this->$criteria($num);
+		else return $num == $criteria;
 	}
 
 	private function odd($num) {

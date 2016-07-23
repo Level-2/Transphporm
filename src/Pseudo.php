@@ -6,5 +6,5 @@
  * @version         1.0                                                             */
 namespace Transphporm;
 interface Pseudo {
-	public function match($pseudo, \DomElement $element);
+	public function match($name, $args, \DomElement $element);
 }
