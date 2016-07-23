@@ -10,9 +10,7 @@ class Content implements \Transphporm\Property {
 	private $headers;
 	private $formatter;
 
-
-	public function __construct($data, &$headers, \Transphporm\Hook\Formatter $formatter) {
-		$this->data = $data;
+	public function __construct(&$headers, \Transphporm\Hook\Formatter $formatter) {
 		$this->headers = &$headers;
 		$this->formatter = $formatter;
 	}

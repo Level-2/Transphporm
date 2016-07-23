@@ -7,17 +7,15 @@
 namespace Transphporm\Pseudo;
 use \Transphporm\Parser\Tokenizer;
 class Not implements \Transphporm\Pseudo {
-	private $functionSet;
 	private $cssToXpath;
 
-	public function __construct(\Transphporm\FunctionSet $functionSet, \Transphporm\Parser\CssToXpath $cssToXpath) {
-		$this->functionSet = $functionSet;
+	public function __construct(\Transphporm\Parser\CssToXpath $cssToXpath) {
 		$this->cssToXpath = $cssToXpath;
 	}
 
 	public function match($name, $args, \DomElement $element) {
 		if ($name !== 'not') return true;
-		
+
 		$xpath = new \DomXpath($element->ownerDocument);
 		return $this->notElement($args, $xpath, $element);
 	}
