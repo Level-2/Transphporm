@@ -730,6 +730,18 @@ class TransphpormTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('<div class="classname">Test</div>', $template->output()->body);
 	}
 
+	public function testWriteAttributeParamFromData() {
+		$template = '
+			<div>Test</div>
+		';
+
+		$tss = 'div:attr(data()) {content: "classname"; }';
+
+		$template = new \Transphporm\Builder($template, $tss);
+
+		$this->assertEquals('<div class="classname">Test</div>', $template->output("class")->body);
+	}
+
 	public function testComments() {
 			$template = '
 			<div>Test</div>

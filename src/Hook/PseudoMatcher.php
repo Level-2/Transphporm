@@ -25,7 +25,6 @@ class PseudoMatcher {
 
 	public function matches($element) {
 		$matches = true;
-		$this->functionSet->setElement($element);
 
 		foreach ($this->pseudo as $tokens) {
 			foreach ($this->functions as $function) {
@@ -58,10 +57,7 @@ class PseudoMatcher {
 		}
 	}
 
-	// TODO: Improve the functionality of getFuncArgs and make it similar to when using `match`
-	public function getFuncArgs($name, $element) {
-		$this->functionSet->setElement($element);
-
+	public function getFuncArgs($name) {
 		foreach ($this->pseudo as $tokens) {
 			$parts = $this->getFuncParts($tokens);
 			if ($name === $parts['name']) return $parts['args'];
