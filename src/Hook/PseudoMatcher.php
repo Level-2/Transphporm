@@ -21,14 +21,16 @@ class PseudoMatcher {
 	public function matches($element) {
 		$matches = true;
 
-		foreach ($this->pseudo as $pseudo) {			
+		foreach ($this->pseudo as $pseudo) {
+			$tokenizer = new \Transphporm\Parser\Tokenizer($pseudo);
+			$tokens = $tokenizer->getTokens();
 			foreach ($this->functions as $function) {
-				$matches = $matches && $function->match($pseudo, $element);
+				$matches = $matches && $function->match($tokens, $element);
 			}
-		}		
+		}
 		return $matches;
 	}
-	
+
 	public function hasFunction($name) {
 		foreach ($this->pseudo as $pseudo) {
 			if (strpos($pseudo, $name) === 0) return true;

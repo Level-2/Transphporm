@@ -1751,6 +1751,16 @@ ul li span {
 
 	}
 
+	public function testAttrPseudoSelectorAlternateSyntax() {
+		$xml = '<div></div>';
+
+		$tss = 'div:[data()=true] {content: "test" }';
+
+		$template = new \Transphporm\Builder($xml, $tss);
+
+		$this->assertEquals($this->stripTabs($template->output(true)->body), $this->stripTabs('<div>test</div>'));
+	}
+
 	public function testFunctionCallAsConditonal() {
 
 		$xml = '<div></div>';
