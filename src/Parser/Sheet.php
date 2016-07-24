@@ -13,8 +13,8 @@ class Sheet {
 	private $xPath;
 
 	public function __construct($tss, $baseDir, CssToXpath $xPath, Value $valueParser) {
-		$this->tss = $this->stripComments($tss, '/*', '*/');
-		$this->tss = $this->stripComments($this->tss, '//', "\n");
+		$this->tss = $this->stripComments($tss, '//', "\n");
+		$this->tss = $this->stripComments($this->tss, '/*', '*/');
 		$this->baseDir = $baseDir;
 		$this->xPath = $xPath;
 		$this->valueParser = $valueParser;
