@@ -5,7 +5,6 @@
  * @license         http://www.opensource.org/licenses/bsd-license.php  BSD License *
  * @version         1.0                                                             */
 namespace Transphporm\Pseudo;
-use \Transphporm\Parser\Tokenizer;
 class Attribute implements \Transphporm\Pseudo {
 	public function match($name, $args, \DomElement $element) {
 		if (!($name === null || in_array($name, ['data', 'iteration', 'root'])))  return true;

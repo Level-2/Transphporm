@@ -13,10 +13,9 @@ class PseudoMatcher {
 	private $functionSet;
 	private $functions = [];
 
-	public function __construct($pseudo, \Transphporm\Parser\Value $valueParser, \Transphporm\FunctionSet $functionSet) {
+	public function __construct($pseudo, \Transphporm\Parser\Value $valueParser) {
 		$this->pseudo = $pseudo;
 		$this->valueParser = $valueParser;
-		$this->functionSet = $functionSet;
 	}
 
 	public function registerFunction(\Transphporm\Pseudo $pseudo) {
@@ -39,9 +38,9 @@ class PseudoMatcher {
 		$parts = [];
 		$parts['name'] = $this->getFuncName($tokens);
 		if ($parts['name'] === null || in_array($parts['name'], ['data', 'iteration', 'root'])) {
-			$parts['args'] = $this->valueParser->parseTokens($tokens, $this->functionSet);
+			$parts['args'] = $this->valueParser->parseTokens($tokens);
 		}
-		elseif (isset($tokens[1])) $parts['args'] = $this->valueParser->parseTokens($tokens[1]['value'], $this->functionSet);
+		elseif (isset($tokens[1])) $parts['args'] = $this->valueParser->parseTokens($tokens[1]['value']);
 		else $parts['args'] = [['']];
 		return $parts;
 	}

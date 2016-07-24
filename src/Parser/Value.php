@@ -45,9 +45,9 @@ class Value {
 		return $this->result;
 	}
 
-	public function parseTokens($tokens, $data) {
+	public function parseTokens($tokens, $data = null) {
 		$this->result = new ValueResult;
-		$this->data = new ValueData($data);
+		$this->data = new ValueData($data ? $data : $this->baseData);
 		$this->last = null;
 
 		if (empty($tokens)) return [$data];
