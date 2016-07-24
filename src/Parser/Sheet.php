@@ -42,9 +42,9 @@ class Sheet {
 		$parts = explode(',', $selector);
 		$rules = [];
 		foreach ($parts as $part) {
-			$rules[$part] = new \Transphporm\Rule($this->xPath->getXpath($part), $this->xPath->getPseudo($part), $this->xPath->getDepth($part), $index++);
+			$rules[$part] = new \Transphporm\Rule($this->xPath->getXpath($part), $this->xPath->getPseudo($part), $this->xPath->getDepth($part), $this->baseDir, $index++);
 			$rules[$part]->properties = $properties;
-		}		
+		}
 		return $rules;
 	}
 
@@ -54,8 +54,8 @@ class Sheet {
 				$newRule->properties = array_merge($rules[$selector]->properties, $newRule->properties);
 			}
 			$rules[$selector] = $newRule;
-		}	
-		
+		}
+
 		return $rules;
 	}
 
@@ -70,8 +70,8 @@ class Sheet {
 				$rules = array_merge($rules, $this->$funcName($args, $indexStart));
 			}
 			else {
-				break;	
-			} 
+				break;
+			}
 		}
 
 		return empty($rules) ? false : ['endPos' => $pos, 'rules' => $rules];
@@ -80,7 +80,7 @@ class Sheet {
 	private function import($args, $indexStart) {
 		if (is_file(trim($args,'\'" '))) $fileName = trim($args,'\'" ');
 		else $fileName = $this->valueParser->parse($args)[0];
-		$sheet = new Sheet(file_get_contents($this->baseDir . $fileName), $this->baseDir, $this->xPath, $this->valueParser);
+		$sheet = new Sheet(file_get_contents($this->baseDir . $fileName), dirname(realpath($this->baseDir . $fileName)) . DIRECTORY_SEPARATOR, $this->xPath, $this->valueParser);
 		return $sheet->parse(0, [], $indexStart);
 	}
 
@@ -96,7 +96,7 @@ class Sheet {
 		while (($pos = strpos($str, $open, $pos)) !== false) {
 			$end = strpos($str, $close, $pos);
 			if ($end === false) break;
-			$str = substr_replace($str, '', $pos, $end-$pos+2);
+			$str = substr_replace($str, '', $pos, $end-$pos+strlen($close));
 		}
 
 		return $str;

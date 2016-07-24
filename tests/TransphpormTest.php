@@ -754,6 +754,21 @@ class TransphpormTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('<div>Test</div>', $template->output()->body);
 	}
 
+	public function testCommentBeforeRule() {
+		$template = '
+			<div>foo</div>
+		';
+
+		$tss = '
+// Comment
+div {content: "bar"; }
+		';
+
+		$template = new \Transphporm\Builder($template, $tss);
+
+		$this->assertEquals('<div>bar</div>', $template->output()->body);
+	}
+
 	public function testImport() {
 		$template = '
 			<div>Test</div>
@@ -851,6 +866,18 @@ class TransphpormTest extends PHPUnit_Framework_TestCase {
 
 		$this->assertEquals($this->stripTabs('<span>bar</span><div>foo</div><h1>h1</h1>'), $this->stripTabs($template->output()->body));
 
+	}
+
+	public function testImportInImportedFile() {
+		$template = new \Transphporm\Builder("tests/test.xml", "tests/other/otherImport.tss");
+
+		$this->assertEquals('<!DOCTYPE html><html><body>test</body></html>', $this->stripTabs($template->output()->body));
+	}
+
+	public function testBaseDirChangeWithImport() {
+		$template = new \Transphporm\Builder("tests/test.xml", "tests/other/templateFromImport.tss");
+
+		$this->assertEquals('<!DOCTYPE html><html><body><p>foo</p></body></html>', $this->stripTabs($template->output()->body));
 	}
 
 	public function testContentTemplate() {

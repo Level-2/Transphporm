@@ -10,6 +10,7 @@ class Rule {
 	private $pseudo;
 	private $depth;
 	private $index;
+    private $baseDir;
 	private $properties = [];
 	private $lastRun = 0;
 
@@ -19,11 +20,12 @@ class Rule {
 	const D = 86400;
 
 
-	public function __construct($query, $pseudo, $depth, $index, array $properties = []) {
+	public function __construct($query, $pseudo, $depth, $index, $baseDir, array $properties = []) {
 		$this->query = $query;
 		$this->pseudo = $pseudo;
 		$this->depth = $depth;
 		$this->index = $index;
+        $this->baseDir = $baseDir;
 		$this->properties = $properties;
 	}
 
@@ -43,7 +45,7 @@ class Rule {
 		if ($time === null) $time = time();
 		$num = (int) $frequency;
 		$unit = strtoupper(trim(str_replace($num, '', $frequency)));
-			
+
 		$offset = $num * constant(self::class . '::' . $unit);
 
 		if ($time > $this->lastRun + $offset) return true;

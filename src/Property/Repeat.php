@@ -8,10 +8,12 @@ namespace Transphporm\Property;
 class Repeat implements \Transphporm\Property {
 	private $functionSet;
 	private $elementData;
+	private $baseDir;
 
-	public function __construct(\Transphporm\FunctionSet $functionSet, \Transphporm\Hook\ElementData $elementData) {
+	public function __construct(\Transphporm\FunctionSet $functionSet, \Transphporm\Hook\ElementData $elementData, &$baseDir) {
 		$this->functionSet = $functionSet;
 		$this->elementData = $elementData;
+		$this->baseDir = &$baseDir;
 	}
 
 	public function run(array $values, \DomElement $element, array $rules, \Transphporm\Hook\PseudoMatcher $pseudoMatcher, array $properties = []) {
@@ -52,7 +54,7 @@ class Repeat implements \Transphporm\Property {
 	}
 
 	private function createHook($newRules, $pseudoMatcher, $properties) {
-		$hook = new \Transphporm\Hook\PropertyHook($newRules, $pseudoMatcher, new \Transphporm\Parser\Value($this->functionSet), $this->functionSet);
+		$hook = new \Transphporm\Hook\PropertyHook($newRules, $this->baseDir, $this->baseDir, $pseudoMatcher, new \Transphporm\Parser\Value($this->functionSet), $this->functionSet);
 		foreach ($properties as $name => $property) $hook->registerProperty($name, $property);
 		return $hook;
 	}

@@ -8,20 +8,25 @@ namespace Transphporm\Hook;
 /** Hooks into the template system, gets assigned as `ul li` or similar and `run()` is called with any elements that match */
 class PropertyHook implements \Transphporm\Hook {
 	private $rules;
+	private $origBaseDir;
+	private $newBaseDir;
 	private $valueParser;
 	private $pseudoMatcher;
 	private $properties = [];
 	private $functionSet;
 
-	public function __construct(array $rules, PseudoMatcher $pseudoMatcher, \Transphporm\Parser\Value $valueParser, \Transphporm\FunctionSet $functionSet) {
+	public function __construct(array $rules, &$origBaseDir, $newBaseDir, PseudoMatcher $pseudoMatcher, \Transphporm\Parser\Value $valueParser, \Transphporm\FunctionSet $functionSet) {
 		$this->rules = $rules;
+		$this->origBaseDir = $origBaseDir;
+		$this->newBaseDir = $newBaseDir;
 		$this->valueParser = $valueParser;
 		$this->pseudoMatcher = $pseudoMatcher;
 		$this->functionSet = $functionSet;
 	}
 
-	public function run(\DomElement $element) {	
+	public function run(\DomElement $element) {
 		$this->functionSet->setElement($element);
+		$this->origBaseDir = $this->newBaseDir;
 		//Don't run if there's a pseudo element like nth-child() and this element doesn't match it
 		if (!$this->pseudoMatcher->matches($element)) return;
 
@@ -39,7 +44,7 @@ class PropertyHook implements \Transphporm\Hook {
 		$this->properties[$name] = $property;
 	}
 
-	private function callProperty($name, $element, $value) {	
+	private function callProperty($name, $element, $value) {
 		if (empty($value[0])) $value[0] = [];
 		if (isset($this->properties[$name])) return $this->properties[$name]->run($value, $element, $this->rules, $this->pseudoMatcher, $this->properties);
 		return false;
