@@ -43,7 +43,7 @@ class Rule {
 		if ($time === null) $time = time();
 		$num = (int) $frequency;
 		$unit = strtoupper(trim(str_replace($num, '', $frequency)));
-			
+
 		$offset = $num * constant(self::class . '::' . $unit);
 
 		if ($time > $this->lastRun + $offset) return true;
@@ -52,7 +52,7 @@ class Rule {
 
 	public function shouldRun($time = null) {
 		if (isset($this->properties['update-frequency']) && $this->lastRun !== 0) {
-			$frequency = $this->properties['update-frequency'];
+			$frequency = $this->properties['update-frequency'][0]['value'];
 			$static = ['always' => true, 'never' => false];
 			if (isset($static[$frequency])) return $static[$frequency];
 			else return $this->timeFrequency($frequency, $time);

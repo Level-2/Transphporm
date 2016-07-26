@@ -63,10 +63,7 @@ class Value {
 	private function processComparator($token) {
 		$this->processLast();
 
-		if ($this->result->getMode() == Tokenizer::NOT && $token['type'] == Tokenizer::EQUALS) {
-			$this->result->setMode(Tokenizer::NOT);
-		}
-		else {
+		if (!(in_array($this->result->getMode(), array_keys($this->tokenFuncs, 'processComparator')) && $token['type'] == Tokenizer::EQUALS)) {
 			$this->result->setMode($token['type']);
 			$this->last = null;
 		}
@@ -103,8 +100,6 @@ class Value {
 
 	private function processSeparator($token) {
 		$this->result->setMode($token['type']);
-		//if ($this->last !== null) $this->result = $this->processValue($this->result, $this->mode, $this->last);
-		$this->processLast();
 	}
 
 	private function processScalar($token) {

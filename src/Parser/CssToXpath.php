@@ -52,19 +52,11 @@ class CssToXpath {
 		foreach ($comparators as $comparator) {
 			if (strpos($attr, $comparator) !== false) {
 				$parts = explode($comparator, $attr);
-				$parts = array_map(function($val) use ($valueParser) {
-						return $valueParser->parse($val)[0];
-				}, $parts);
 
-				return self::compare($comparator, $element[0]->getAttribute($parts[0]), $parts[1]);
+				return $valueParser->parse('attr(' . $parts[0] . ')' . $comparator . $parts[1])[0];
 			}
 		}
 		return $element[0]->getAttribute($attr) !== '';
-	}
-
-	private static function compare($comparator, $a, $b) {
-		if ($comparator == '=') return $a == $b;
-		else if ($comparator == '!=') return $a != $b;
 	}
 
 	//split the css into indivudal functions
@@ -102,8 +94,8 @@ class CssToXpath {
 		return count($this->split($css));
 	}
 
-	public function getPseudo() {
-		$parts = explode(':', $this->css);
+	public function getPseudo($css) {
+		$parts = explode(':', $css);
 		array_shift($parts);
 		return $parts;
 	}

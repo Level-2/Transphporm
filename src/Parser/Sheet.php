@@ -44,7 +44,7 @@ class Sheet {
 		foreach ($parts as $part) {
 			$rules[$part] = new \Transphporm\Rule($this->xPath->getXpath($part), $this->xPath->getPseudo($part), $this->xPath->getDepth($part), $index++);
 			$rules[$part]->properties = $properties;
-		}		
+		}
 		return $rules;
 	}
 
@@ -54,8 +54,8 @@ class Sheet {
 				$newRule->properties = array_merge($rules[$selector]->properties, $newRule->properties);
 			}
 			$rules[$selector] = $newRule;
-		}	
-		
+		}
+
 		return $rules;
 	}
 
@@ -70,8 +70,8 @@ class Sheet {
 				$rules = array_merge($rules, $this->$funcName($args, $indexStart));
 			}
 			else {
-				break;	
-			} 
+				break;
+			}
 		}
 
 		return empty($rules) ? false : ['endPos' => $pos, 'rules' => $rules];
@@ -111,7 +111,7 @@ class Sheet {
 			if (trim($rule) === '') continue;
 			$parts = explode(':', $rule, 2);
 			$parts[1] = $stringExtractor->rebuild($parts[1]);
-			$return[trim($parts[0])] = isset($parts[1]) ? trim($parts[1]) : '';
+			$return[trim($parts[0])] = (new Tokenizer(trim($parts[1])))->getTokens();
 		}
 
 		return $return;
