@@ -26,7 +26,7 @@ class PropertyHook implements \Transphporm\Hook {
 
 	public function run(\DomElement $element) {
 		$this->functionSet->setElement($element);
-		$this->origBaseDir = $this->newBaseDir;
+		if ($this->origBaseDir !== $this->newBaseDir) $this->origBaseDir = $this->newBaseDir;
 		//Don't run if there's a pseudo element like nth-child() and this element doesn't match it
 		if (!$this->pseudoMatcher->matches($element)) return;
 
