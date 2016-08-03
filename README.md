@@ -1186,5 +1186,8 @@ $template->output(['title' => 'About Me', 'page' => 'about.xml'])->body;
 This allows a top down approach. Most frameworks work on a bottom up approach where you build the layout, then build the content and put the output of one in the other. This presents a problem: How do you set the title per page? Or perhaps include a different sidebar on each page? Frameworks tend to do this using what are essentially global variables to store the page title and any layout options. TSS builds the entire page in one go, so any page can alter any part of the layout.
 
 
+# Credits
+
+Transphporm was originally developed by Tom Butler ( @TomBZombie ) with additional feature implementation, bugfixes and suggestions by Richard Solle ( @soller )
 
 
