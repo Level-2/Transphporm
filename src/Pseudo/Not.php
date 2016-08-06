@@ -6,34 +6,23 @@
  * @version         1.0                                                             */
 namespace Transphporm\Pseudo;
 class Not implements \Transphporm\Pseudo {
-	private $functionSet;
 	private $cssToXpath;
 
-	public function __construct(\Transphporm\FunctionSet $functionSet, \Transphporm\Parser\CssToXpath $cssToXpath) {
-		$this->functionSet = $functionSet;
+	public function __construct(\Transphporm\Parser\CssToXpath $cssToXpath) {
 		$this->cssToXpath = $cssToXpath;
 	}
 
-	public function match($pseudo, \DomElement $element) {
-		if (strpos($pseudo, 'not') === 0) {
-			$parser = new \Transphporm\Parser\Value($this->functionSet);
-			$tokenizer = new \Transphporm\Parser\Tokenizer($pseudo);
-			$tokens = $tokenizer->getTokens();
-			$this->functionSet->setElement($element);
+	public function match($name, $args, \DomElement $element) {
+		if ($name !== 'not') return true;
 
-			$css = $parser->parse($tokens[1]['string']);
-		
-	
-			$xpath = new \DomXpath($element->ownerDocument);
-			return $this->notElement($css, $xpath, $element);
-		}
-		return true;
+		$xpath = new \DomXpath($element->ownerDocument);
+		return $this->notElement($args, $xpath, $element);
 	}
 
 	private function notElement($css, $xpath, $element) {
 
 		foreach ($css as $selector) {
-			$xpathString = $this->cssToXpath->getXpath($selector);					
+			$xpathString = $this->cssToXpath->getXpath($selector);
 			//Find all nodes matched by the expressions in the brackets :not(EXPR)
 			foreach ($xpath->query($xpathString) as $matchedElement) {
 				//Check to see whether this node was matched by the not query

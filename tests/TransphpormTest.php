@@ -730,6 +730,18 @@ class TransphpormTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('<div class="classname">Test</div>', $template->output()->body);
 	}
 
+	public function testWriteAttributeParamFromData() {
+		$template = '
+			<div>Test</div>
+		';
+
+		$tss = 'div:attr(data()) {content: "classname"; }';
+
+		$template = new \Transphporm\Builder($template, $tss);
+
+		$this->assertEquals('<div class="classname">Test</div>', $template->output("class")->body);
+	}
+
 	public function testComments() {
 			$template = '
 			<div>Test</div>
@@ -1650,6 +1662,31 @@ div:after {content: 'bar' }
 
 	}
 
+	public function testNotWithMoreDepth() {
+		$xml = '
+		<div class="one">
+			<p></p>
+		</div>
+		<div class="two">
+			<p></p>
+		</div>
+		<div class="three">
+			<p></p>
+		</div>
+		';
+
+		$tss = 'p:not("div.two p") {content: "foo"; }';
+
+
+		$template = new \Transphporm\Builder($xml, $tss);
+
+		$this->assertEquals($this->stripTabs($template->output()->body), $this->stripTabs('
+			<div class="one"><p>foo</p></div>
+			<div class="two"><p></p></div>
+			<div class="three"><p>foo</p></div>
+		'));
+
+	}
 
 	public function testKeyChild() {
 		$xml = '<ul>
@@ -1776,6 +1813,16 @@ ul li span {
 
 		$this->assertEquals($this->stripTabs($template->output($obj)->body), $this->stripTabs('<div><p>foo</p></div>'));
 
+	}
+
+	public function testAttrPseudoSelectorAlternateSyntax() {
+		$xml = '<div></div>';
+
+		$tss = 'div:[data()=true] {content: "test" }';
+
+		$template = new \Transphporm\Builder($xml, $tss);
+
+		$this->assertEquals($this->stripTabs($template->output(true)->body), $this->stripTabs('<div>test</div>'));
 	}
 
 	public function testFunctionCallAsConditonal() {

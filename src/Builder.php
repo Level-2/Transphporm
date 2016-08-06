@@ -79,7 +79,12 @@ class Builder {
 	//Process a TSS rule e.g. `ul li {content: "foo"; format: bar}
 	private function executeTssRule($rule, $template, $config) {
 		$rule->touch();
-		$pseudoMatcher = $config->createPseudoMatcher($rule->pseudo);
+
+		// TODO: Once `Sheet` uses tokens this can be removed
+		$pseudo = [];
+		foreach ($rule->pseudo as $pseudoString) $pseudo[] = (new \Transphporm\Parser\Tokenizer($pseudoString))->getTokens();
+
+		$pseudoMatcher = $config->createPseudoMatcher($pseudo);
 
 		$hook = new Hook\PropertyHook($rule->properties, $this->baseDir, $rule->baseDir, $pseudoMatcher, $config->getValueParser(), $config->getFunctionSet());
 		$config->loadProperties($hook);

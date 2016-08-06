@@ -13,7 +13,7 @@ class Basics implements \Transphporm\Module {
 		$data = $config->getFunctionSet();
 		$headers = &$config->getHeaders();
 
-		$config->registerProperty('content', new \Transphporm\Property\Content($data, $headers, $config->getFormatter()));
+		$config->registerProperty('content', new \Transphporm\Property\Content($headers, $config->getFormatter()));
 		$config->registerProperty('repeat', new \Transphporm\Property\Repeat($data, $config->getElementData(), $config->getBaseDir()));
 		$config->registerProperty('display', new \Transphporm\Property\Display);
 		$config->registerProperty('bind', new \Transphporm\Property\Bind($config->getElementData()));

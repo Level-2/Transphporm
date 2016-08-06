@@ -9,10 +9,8 @@ namespace Transphporm\Module;
 class Pseudo implements \Transphporm\Module {
 
 	public function load(\Transphporm\Config $config) {
-		$data = $config->getFunctionSet();
-		$config->registerPseudo(new \Transphporm\Pseudo\Attribute($data));
+		$config->registerPseudo(new \Transphporm\Pseudo\Attribute());
 		$config->registerPseudo(new \Transphporm\Pseudo\Nth());
-		$config->registerPseudo(new \Transphporm\Pseudo\Not($data, $config->getCssToXpath()));
+		$config->registerPseudo(new \Transphporm\Pseudo\Not($config->getCssToXpath()));
 	}
 }
-

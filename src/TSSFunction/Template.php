@@ -12,10 +12,9 @@ class Template implements \Transphporm\TSSFunction {
 	private $functionSet;
 	private $xPath;
 
-	public function __construct(\Transphporm\Hook\ElementData $elementData, \Transphporm\Parser\CssToXpath $xPath, \Transphporm\FunctionSet $functionSet, &$baseDir) {
+	public function __construct(\Transphporm\Hook\ElementData $elementData, \Transphporm\Parser\CssToXpath $xPath, &$baseDir) {
 		$this->baseDir = &$baseDir;
 		$this->elementData = $elementData;
-		$this->functionSet = $functionSet;
 		$this->xPath = $xPath;
 	}
 
