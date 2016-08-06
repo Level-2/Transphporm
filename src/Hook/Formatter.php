@@ -16,14 +16,13 @@ class Formatter {
 	public function format($value, $rules) {
 		if (!isset($rules['format'])) return $value;
 
-		$tokenizer = new \Transphporm\Parser\Tokenizer($rules['format']);
-		$tokens = $tokenizer->getTokens();
+		$tokens = $rules['format'];
 
 		$functionName = $tokens[0]['value'];
 		$options = [];
 		for ($i = 1; $i < count($tokens); $i++) $options[] = $tokens[$i]['value'];
 
-		return $this->processFormat($options, $functionName, $value);		
+		return $this->processFormat($options, $functionName, $value);
 	}
 
 	private function processFormat($format, $functionName, $value) {

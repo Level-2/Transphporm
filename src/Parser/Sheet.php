@@ -112,7 +112,7 @@ class Sheet {
 			if (trim($rule) === '') continue;
 			$parts = explode(':', $rule, 2);
 			$parts[1] = $stringExtractor->rebuild($parts[1]);
-			$return[trim($parts[0])] = isset($parts[1]) ? trim($parts[1]) : '';
+			$return[trim($parts[0])] = (new Tokenizer(trim($parts[1])))->getTokens();
 		}
 
 		return $return;
