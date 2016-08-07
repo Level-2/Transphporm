@@ -111,7 +111,7 @@ class Sheet {
 		$i = 0;
 		foreach ($tokens as $token) {
 			if ($token['type'] === Tokenizer::SEMI_COLON) $i++;
-			else $rules[$i][] = $token;
+			else if ($token['type'] !== Tokenizer::WHITESPACE) $rules[$i][] = $token;
 		}
 
 		$return = [];

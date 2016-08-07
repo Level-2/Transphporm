@@ -53,7 +53,7 @@ class Value {
 		if (empty($tokens)) return [$data];
 
 		foreach ($tokens as $token) {
-			$this->{$this->tokenFuncs[$token['type']]}($token);
+			if ($token['type'] !== Tokenizer::WHITESPACE) $this->{$this->tokenFuncs[$token['type']]}($token);
 		}
 
 		$this->processLast();
