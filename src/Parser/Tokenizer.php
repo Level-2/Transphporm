@@ -24,6 +24,8 @@ class Tokenizer {
 	const OPEN_BRACE = 15;
 	const CLOSE_BRACE = 16;
 	const BOOL = 17;
+	const COLON = 18;
+	const SEMI_COLON = 19;
 
 	private $chars = [
 		'"' => self::STRING,
@@ -39,6 +41,8 @@ class Tokenizer {
 		'=' => self::EQUALS,
 		'{' => self::OPEN_BRACE,
 		'}' => self::CLOSE_BRACE,
+		':' => self::COLON,
+		';' => self::SEMI_COLON,
 		' ' => self::WHITESPACE,
 		"\n" => self::WHITESPACE,
 		"\r" => self::WHITESPACE,
@@ -64,7 +68,7 @@ class Tokenizer {
 	}
 
 	private function doSimpleTokens(&$tokens, $char) {
-		if (in_array($char, [Tokenizer::ARG, Tokenizer::CONCAT, Tokenizer::DOT, Tokenizer::NOT, Tokenizer::EQUALS])) {
+		if (in_array($char, [Tokenizer::ARG, Tokenizer::CONCAT, Tokenizer::DOT, Tokenizer::NOT, Tokenizer::EQUALS, Tokenizer::COLON, Tokenizer::SEMI_COLON])) {
 			$tokens[] = ['type' => $char];
 		}
 	}

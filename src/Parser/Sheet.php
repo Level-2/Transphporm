@@ -104,15 +104,19 @@ class Sheet {
 	}
 
 	private function getProperties($str) {
-		$stringExtractor = new StringExtractor($str);
-		$rules = explode(';', $stringExtractor);
-		$return = [];
+		$tokenizer = new Tokenizer($str);
+		$tokens = $tokenizer->getTokens();
 
+		$rules = [];
+		$i = 0;
+		foreach ($tokens as $token) {
+			if ($token['type'] === Tokenizer::SEMI_COLON) $i++;
+			else $rules[$i][] = $token;
+		}
+
+		$return = [];
 		foreach ($rules as $rule) {
-			if (trim($rule) === '') continue;
-			$parts = explode(':', $rule, 2);
-			$parts[1] = $stringExtractor->rebuild($parts[1]);
-			$return[trim($parts[0])] = (new Tokenizer(trim($parts[1])))->getTokens();
+			if ($rule[1]['type'] === Tokenizer::COLON) $return[$rule[0]['value']] = array_slice($rule, 2);
 		}
 
 		return $return;
