@@ -1411,6 +1411,21 @@ div {content: "bar"; }
 		$this->assertEquals($this->stripTabs($output), $this->stripTabs('<div><p>foo</p></div>'));
 	}
 
+	public function testPropertyOrderInsensitivity() {
+		$xml = '<div>
+			<span>Foo</span>
+		</div>';
+
+		$tss = 'span { content-mode: replace; content: "replaced";}';
+
+
+		$template = new \Transphporm\Builder($xml, $tss);
+
+		$output = $template->output()->body;
+
+		$this->assertEquals($this->stripTabs($output), $this->stripTabs('<div>replaced</div>'));
+	}
+
 	public function testSelectAttributeFromData() {
 		$data = ['test' => 'bar'];
 

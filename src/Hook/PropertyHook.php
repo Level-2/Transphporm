@@ -51,6 +51,5 @@ class PropertyHook implements \Transphporm\Hook {
 	private function callProperty($name, $element, $value) {
 		if (empty($value[0])) $value[0] = [];
 		if (isset($this->properties[$name])) return $this->properties[$name]->run($value, $element, $this->rules, $this->pseudoMatcher, $this->properties);
-		return false;
 	}
 }
