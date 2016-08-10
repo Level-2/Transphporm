@@ -28,6 +28,7 @@ class Tokenizer {
 	const SEMI_COLON = 19;
 	const NUM_SIGN = 20;
 	const GREATER_THAN = 21;
+	const AT_SIGN = 22;
 
 	private $chars = [
 		'"' => self::STRING,
@@ -47,6 +48,7 @@ class Tokenizer {
 		';' => self::SEMI_COLON,
 		'#' => self::NUM_SIGN,
 		'>' => self::GREATER_THAN,
+		'@' => self::AT_SIGN,
 		' ' => self::WHITESPACE,
 		"\n" => self::WHITESPACE,
 		"\r" => self::WHITESPACE,
@@ -74,7 +76,7 @@ class Tokenizer {
 	private function doSimpleTokens(&$tokens, $char) {
 		if (in_array($char, [Tokenizer::ARG, Tokenizer::CONCAT, Tokenizer::DOT, Tokenizer::NOT,
 			Tokenizer::EQUALS, Tokenizer::COLON, Tokenizer::SEMI_COLON, Tokenizer::WHITESPACE,
-			Tokenizer::NUM_SIGN, Tokenizer::GREATER_THAN])) {
+			Tokenizer::NUM_SIGN, Tokenizer::GREATER_THAN, Tokenizer::AT_SIGN])) {
 			$tokens[] = ['type' => $char];
 		}
 	}

@@ -8,7 +8,6 @@ namespace Transphporm\Parser;
 class CssToXpath {
 	private $specialChars = [Tokenizer::WHITESPACE, Tokenizer::DOT, Tokenizer::GREATER_THAN, '~', Tokenizer::NUM_SIGN, Tokenizer::COLON, Tokenizer::OPEN_SQUARE_BRACKET];
 	private $translators = [];
-	private $css;
 	private $valueParser;
 	private static $instances = [];
 	private $functionSet;
@@ -25,8 +24,7 @@ class CssToXpath {
 			Tokenizer::GREATER_THAN => function($string) use ($prefix) { return '/' . $prefix  . $string; },
 			Tokenizer::NUM_SIGN => function($string) { return '[@id=\'' . $string . '\']'; },
 			Tokenizer::DOT => function($string) { return '[contains(concat(\' \', normalize-space(@class), \' \'), \' ' . $string . ' \')]'; },
-			Tokenizer::OPEN_SQUARE_BRACKET => function($string) use ($hash) { return '[' .'php:function(\'\Transphporm\Parser\CssToXpath::processAttr\', \'' . json_encode($string) . '\', ., "' . $hash . '")' . ']';	},
-			//']' => function() {	return ''; }
+			Tokenizer::OPEN_SQUARE_BRACKET => function($string) use ($hash) { return '[' .'php:function(\'\Transphporm\Parser\CssToXpath::processAttr\', \'' . json_encode($string) . '\', ., "' . $hash . '")' . ']';	}
 		];
 	}
 
@@ -98,20 +96,9 @@ class CssToXpath {
 			if (isset($token['value'])) $selectors[count($selectors)-1]->string = $token['value'];
 		}
 		return $selectors;
-
-		for ($i = 0; $i < strlen($css); $i++) {
-			if (in_array($css[$i], $this->specialChars)) {
-				$selector = $this->createSelector();
-				$selector->type = $css[$i];
-				$selectors[] = $selector;
-			}
-			else $selector->string .= $css[$i];
-		}
-		return $selectors;
 	}
 
 	public function getXpath($css) {
-		//$this->css = str_replace([' >', '> '],['>', '>'], trim($css));
 		foreach ($css as $key => $token) {
 			if ($token['type'] === Tokenizer::WHITESPACE &&
 				(isset($css[$key+1]) && $css[$key+1]['type'] === Tokenizer::GREATER_THAN)) unset($css[$key]);

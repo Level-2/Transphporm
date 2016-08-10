@@ -787,6 +787,7 @@ div {content: "bar"; }
 		';
 
 		$file = __DIR__ . DIRECTORY_SEPARATOR . 'import.tss';
+		$file = str_replace('\\', '/', $file);
 		$tss = "
 			@import '$file';
 		";
@@ -823,6 +824,7 @@ div {content: "bar"; }
 		';
 
 		$file = __DIR__ . DIRECTORY_SEPARATOR . 'import.tss';
+		$file = str_replace('\\', '/', $file);
 		$tss = "
 			span {content: 'test1';}
 			@import '$file';
@@ -843,6 +845,8 @@ div {content: "bar"; }
 
 		$file = __DIR__ . DIRECTORY_SEPARATOR . 'import.tss';
 		$file2 = __DIR__ . DIRECTORY_SEPARATOR . 'import2.tss';
+		$file = str_replace('\\', '/', $file);
+		$file2 = str_replace('\\', '/', $file2);
 		$tss = "
 			span {content: 'test1';}
 			@import '$file';
@@ -866,6 +870,8 @@ div {content: "bar"; }
 
 		$file = __DIR__ . DIRECTORY_SEPARATOR . 'import.tss';
 		$file2 = __DIR__ . DIRECTORY_SEPARATOR . 'import2.tss';
+		$file = str_replace('\\', '/', $file);
+		$file2 = str_replace('\\', '/', $file2);
 		$tss = "
 			span {content: 'test1';}
 			@import '$file';
