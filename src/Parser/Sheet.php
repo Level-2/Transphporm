@@ -47,11 +47,9 @@ class Sheet {
 	}
 
 	private function CssToRules($selector, $index, $properties) {
-		//$parts = explode(',', $selector);
 		$parts = $this->splitOnToken($selector, Tokenizer::ARG);
 		$rules = [];
 		foreach ($parts as $part) {
-			//$tokenizer = new Tokenizer($part);
 			$tokenCss = $part;
 			$rules[json_encode($part)] = new \Transphporm\Rule($this->xPath->getXpath($tokenCss), $this->xPath->getPseudo($tokenCss), $this->xPath->getDepth($tokenCss), $this->baseDir, $index++);
 			$rules[json_encode($part)]->properties = $properties;
@@ -116,20 +114,20 @@ class Sheet {
 		return $splitTokens;
 	}
 
-	private function getProperties($str) {
-		//$tokenizer = new Tokenizer($str);
-		$tokens = $str;
-
-		$rules = [];
-		$i = 0;
+	private function removeWhitespace($tokens) {
+		$newTokens = [];
 		foreach ($tokens as $token) {
-			if ($token['type'] === Tokenizer::SEMI_COLON) $i++;
-			else if ($token['type'] !== Tokenizer::WHITESPACE) $rules[$i][] = $token;
+			if ($token['type'] !== Tokenizer::WHITESPACE) $newTokens[] = $token;
 		}
+		return $newTokens;
+	}
 
+	private function getProperties($tokens) {
+		$rules = $this->splitOnToken($tokens, Tokenizer::SEMI_COLON);
 		$return = [];
 		foreach ($rules as $rule) {
-			if ($rule[1]['type'] === Tokenizer::COLON) $return[$rule[0]['value']] = array_slice($rule, 2);
+			$rule = $this->removeWhitespace($rule);
+			if (isset($rule[1]) && $rule[1]['type'] === Tokenizer::COLON) $return[$rule[0]['value']] = array_slice($rule, 2);
 		}
 
 		return $return;
