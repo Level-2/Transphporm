@@ -22,7 +22,8 @@ class Not implements \Transphporm\Pseudo {
 	private function notElement($css, $xpath, $element) {
 
 		foreach ($css as $selector) {
-			$xpathString = $this->cssToXpath->getXpath($selector);
+			$tokenizer = new \Transphporm\Parser\Tokenizer($selector);
+			$xpathString = $this->cssToXpath->getXpath($tokenizer->getTokens());
 			//Find all nodes matched by the expressions in the brackets :not(EXPR)
 			foreach ($xpath->query($xpathString) as $matchedElement) {
 				//Check to see whether this node was matched by the not query

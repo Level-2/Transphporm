@@ -47,7 +47,8 @@ class Template implements \Transphporm\TSSFunction {
 	}
 
 	private function templateSubsection($doc, $selector) {
-		$xpathStr = $this->xPath->getXpath($selector);
+		$tokenizer = new \Transphporm\Parser\Tokenizer($selector);
+		$xpathStr = $this->xPath->getXpath($tokenizer->getTokens());
 		$xpath = new \DomXpath($doc);
 		$nodes = $xpath->query($xpathStr);
 		$result = [];

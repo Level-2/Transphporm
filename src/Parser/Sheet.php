@@ -43,7 +43,9 @@ class Sheet {
 		$parts = explode(',', $selector);
 		$rules = [];
 		foreach ($parts as $part) {
-			$rules[$part] = new \Transphporm\Rule($this->xPath->getXpath($part), $this->xPath->getPseudo($part), $this->xPath->getDepth($part), $this->baseDir, $index++);
+			$tokenizer = new Tokenizer($part);
+			$tokenCss = $tokenizer->getTokens();
+			$rules[$part] = new \Transphporm\Rule($this->xPath->getXpath($tokenCss), $this->xPath->getPseudo($tokenCss), $this->xPath->getDepth($tokenCss), $this->baseDir, $index++);
 			$rules[$part]->properties = $properties;
 		}
 		return $rules;

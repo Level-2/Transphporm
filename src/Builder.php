@@ -80,12 +80,7 @@ class Builder {
 	private function executeTssRule($rule, $template, $config) {
 		$rule->touch();
 
-		// TODO: Once `Sheet` uses tokens this can be removed
-		$pseudo = [];
-		foreach ($rule->pseudo as $pseudoString) $pseudo[] = (new \Transphporm\Parser\Tokenizer($pseudoString))->getTokens();
-
-		$pseudoMatcher = $config->createPseudoMatcher($pseudo);
-
+		$pseudoMatcher = $config->createPseudoMatcher($rule->pseudo);
 		$hook = new Hook\PropertyHook($rule->properties, $this->baseDir, $rule->baseDir, $pseudoMatcher, $config->getValueParser(), $config->getFunctionSet());
 		$config->loadProperties($hook);
 		$template->addHook($rule->query, $hook);
