@@ -17,6 +17,9 @@ class Template {
 		$this->document = new \DomDocument;
 		
 		$this->loadDocument($doc);
+		
+		/** Loads any XIncludes. */
+		$this->document->xinclude();
 
 		$this->xpath = new \DomXPath($this->document);
 		$this->xpath->registerNamespace('php', 'http://php.net/xpath');
