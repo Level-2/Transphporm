@@ -45,30 +45,18 @@ class CssToXpath {
 	public static function processAttr($attr, $element, $hash) {
 		$attr = json_decode($attr, true);
 		$valueParser = self::$instances[$hash]->valueParser;
-		self::$instances[$hash]->functionSet->setElement($element[0]);
+		$functionSet = self::$instances[$hash]->functionSet;
+		$functionSet->setElement($element[0]);
 
-		$parts = self::$instances[$hash]->splitOnToken($attr, Tokenizer::EQUALS);
+		$attributes = array();
+        foreach($element[0]->attributes as $attribute_name => $attribute_node) {
+            $attributes[$attribute_name] = $attribute_node->nodeValue;
+        }
 
-		if ($parts[0] === $attr) return $element[0]->getAttribute($valueParser->parseTokens($attr)[0]) !== '';
+        $parser = new \Transphporm\Parser\Value($functionSet, true);
+		$return = $parser->parseTokens($attr, $attributes);
 
-		if ($parts[0][count($parts[0])-1]['type'] === Tokenizer::NOT) {
-			$attr = [
-				['type' => Tokenizer::NAME, 'value' => 'attr'],
-				['type' => Tokenizer::OPEN_BRACKET, 'value' => $parts[0]],
-				['type' => Tokenizer::NOT],
-				['type' => Tokenizer::EQUALS]
-			];
-			$attr = array_merge($attr, $parts[1]);
-		}
-		else {
-			$attr = [
-				['type' => Tokenizer::NAME, 'value' => 'attr'],
-				['type' => Tokenizer::OPEN_BRACKET, 'value' => $parts[0]],
-				['type' => Tokenizer::EQUALS]
-			];
-			$attr = array_merge($attr, $parts[1]);
-		}
-		return $valueParser->parseTokens($attr)[0];
+		return $return[0] === '' ? false : $return[0];
 	}
 
 	private function splitOnToken($tokens, $splitOn) {

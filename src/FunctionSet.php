@@ -25,7 +25,6 @@ class FunctionSet {
 			return $this->functions[$name]->run($args[0], $this->element);
 		}
 		return true;
-		//else return \Transphporm\Parser\Value::IS_NOT_FUNCTION;
 	}
 
 	public function addFunction($name, \Transphporm\TSSFunction $function) {
