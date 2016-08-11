@@ -9,7 +9,6 @@ class Tokenizer {
 	private $str;
 	const NAME = 1;
 	const STRING = 2;
-	const STRING2 = 3;
 	const OPEN_BRACKET = 4;
 	const CLOSE_BRACKET = 5;
 	const OPEN_SQUARE_BRACKET = 6;
@@ -32,7 +31,7 @@ class Tokenizer {
 
 	private $chars = [
 		'"' => self::STRING,
-		'\'' => self::STRING2,
+		'\'' => self::STRING,
 		'(' => self::OPEN_BRACKET,
 		')' => self::CLOSE_BRACKET,
 		'[' => self::OPEN_SQUARE_BRACKET,
@@ -117,7 +116,7 @@ class Tokenizer {
 	}
 
 	private function doStrings(&$tokens, $char, $i) {
-		if (in_array($char, [self::STRING, self::STRING2])) {
+		if ($char === self::STRING) {
 			$string = $this->extractString($i);
 			$length = strlen($string)+1;
 			$char = $this->getChar($char);

@@ -50,8 +50,7 @@ class Sheet {
 		$parts = $this->splitOnToken($selector, Tokenizer::ARG);
 		$rules = [];
 		foreach ($parts as $part) {
-			$tokenCss = $part;
-			$rules[json_encode($part)] = new \Transphporm\Rule($this->xPath->getXpath($tokenCss), $this->xPath->getPseudo($tokenCss), $this->xPath->getDepth($tokenCss), $this->baseDir, $index++);
+			$rules[json_encode($part)] = new \Transphporm\Rule($this->xPath->getXpath($part), $this->xPath->getPseudo($part), $this->xPath->getDepth($part), $this->baseDir, $index++);
 			$rules[json_encode($part)]->properties = $properties;
 		}
 		return $rules;
