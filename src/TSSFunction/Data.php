@@ -21,7 +21,6 @@ class Data implements \Transphporm\TSSFunction{
 		if ($this->dataKey === "root") $data = $this->data->getData(null, 'data');
 		else $data = $this->data->getData($element, $this->dataKey);
 		$parser = new \Transphporm\Parser\Value($this->functionSet, true);
-		$parser->debug = true;
 		$return = $parser->parseTokens($args, $data);
 		return $return[0];
 	}

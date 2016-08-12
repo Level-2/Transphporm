@@ -10,7 +10,6 @@ use \Transphporm\Parser\Tokenizer;
 class PseudoMatcher {
 	private $pseudo;
 	private $valueParser;
-	private $functionSet;
 	private $functions = [];
 
 	public function __construct($pseudo, \Transphporm\Parser\Value $valueParser) {

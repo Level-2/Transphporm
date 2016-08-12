@@ -9,7 +9,6 @@ namespace Transphporm\TSSFunction;
 class Template implements \Transphporm\TSSFunction {
 	private $elementData;
 	private $baseDir;
-	private $functionSet;
 	private $xPath;
 
 	public function __construct(\Transphporm\Hook\ElementData $elementData, \Transphporm\Parser\CssToXpath $xPath, &$baseDir) {

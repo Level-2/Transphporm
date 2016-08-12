@@ -6,7 +6,6 @@
  * @version         1.0                                                             */
 namespace Transphporm\Property;
 class Content implements \Transphporm\Property {
-	private $data;
 	private $headers;
 	private $formatter;
 

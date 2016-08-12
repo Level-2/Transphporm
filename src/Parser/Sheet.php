@@ -69,13 +69,12 @@ class Sheet {
 
 	private function processingInstructions($key, $indexStart) {
 		if (isset($this->tss[$key]) && $this->tss[$key]['type'] !== Tokenizer::AT_SIGN) return false;
-		$rules = [];
 		$tokens = array_slice($this->tss, $key+1);
 		$tokens = $this->splitOnToken($tokens, Tokenizer::SEMI_COLON)[0];
 		$pos = $key+count($tokens)+1;
 		$funcName = array_shift($tokens)['value'];
 		$args = $this->valueParser->parseTokens($tokens);
-		$rules = array_merge($rules, $this->$funcName($args, $indexStart));
+		$rules = $this->$funcName($args, $indexStart);
 		return ['endPos' => $pos, 'rules' => $rules];
 	}
 

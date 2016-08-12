@@ -9,7 +9,6 @@ namespace Transphporm\Parser;
 class Value {
 	private $baseData;
 	private $autoLookup;
-	private $tokens;
 	/*
 		Stores the last value e.g.
 			"a" + "b"

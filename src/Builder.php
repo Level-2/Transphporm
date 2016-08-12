@@ -49,7 +49,7 @@ class Builder {
 		//To be a valid XML document it must have a root element, automatically wrap it in <template> to ensure it does
 		$template = new Template($this->isValidDoc($cachedOutput['body']) ? str_ireplace('<!doctype', '<!DOCTYPE', $cachedOutput['body']) : '<template>' . $cachedOutput['body'] . '</template>' );
 		$valueParser = new Parser\Value($data);
-		$config = new Config($data, $valueParser, $elementData, new Hook\Formatter(), new Parser\CssToXpath($valueParser, $data, $template->getPrefix()), $headers, $this->baseDir);
+		$config = new Config($data, $valueParser, $elementData, new Hook\Formatter(), new Parser\CssToXpath($data, $template->getPrefix()), $headers, $this->baseDir);
 
 		foreach ($this->modules as $module) $module->load($config);
 

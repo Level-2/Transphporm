@@ -6,16 +6,15 @@
  * @version         1.0                                                             */
 namespace Transphporm\Parser;
 class CssToXpath {
-	private $specialChars = [Tokenizer::WHITESPACE, Tokenizer::DOT, Tokenizer::GREATER_THAN, '~', Tokenizer::NUM_SIGN, Tokenizer::COLON, Tokenizer::OPEN_SQUARE_BRACKET];
+	private $specialChars = [Tokenizer::WHITESPACE, Tokenizer::DOT, Tokenizer::GREATER_THAN,
+		'~', Tokenizer::NUM_SIGN, Tokenizer::COLON, Tokenizer::OPEN_SQUARE_BRACKET];
 	private $translators = [];
-	private $valueParser;
 	private static $instances = [];
 	private $functionSet;
 
 
-	public function __construct(Value $valueParser, \Transphporm\FunctionSet $functionSet, $prefix = '') {
+	public function __construct(\Transphporm\FunctionSet $functionSet, $prefix = '') {
 		$hash = $this->registerInstance();
-		$this->valueParser = $valueParser;
 		$this->functionSet = $functionSet;
 
 		$this->translators = [
@@ -44,7 +43,6 @@ class CssToXpath {
 	//XPath only allows registering of static functions... this is a hacky workaround for that
 	public static function processAttr($attr, $element, $hash) {
 		$attr = json_decode($attr, true);
-		$valueParser = self::$instances[$hash]->valueParser;
 		$functionSet = self::$instances[$hash]->functionSet;
 		$functionSet->setElement($element[0]);
 

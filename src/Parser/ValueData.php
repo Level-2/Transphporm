@@ -33,11 +33,7 @@ class ValueData {
 	public function parseNested($parser, $token, $funcName) {
 		$args = $parser->parseTokens($token['value'], $this->data);
 		if ($args[0] == $this->data) $args = [];
-		return $this->callFunc($funcName, $args, $this->data);
-	}
-
-	private function callFunc($name, $args, $data) {
-		return $this->callFuncOnObject($this->data, $name, $args);
+		return $this->callFuncOnObject($this->data, $funcName, $args);
 	}
 
 	private function callFuncOnObject($obj, $func, $args) {
