@@ -7,7 +7,7 @@
 namespace Transphporm\Parser;
 class Tokens implements \Iterator, \ArrayAccess, \Countable {
     private $tokens;
-    public $iterator = 0;
+    private $iterator = 0;
     private $ignoreWhitespace = false;
 
     public function __construct(array $tokens) {
@@ -92,6 +92,7 @@ class Tokens implements \Iterator, \ArrayAccess, \Countable {
 
     public function to($tokenType, $inclusive = false) {
         $keys = $this->getKeysOfTokenType($tokenType);
+        if (empty($keys)) return new Tokens([]);
         $key = $keys[0];
         for ($i = 0; $key < $this->iterator; $i++) $key = $keys[$i];
         if ($inclusive) $key++;

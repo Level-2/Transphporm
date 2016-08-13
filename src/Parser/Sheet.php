@@ -32,13 +32,11 @@ class Sheet {
 				$rules = array_merge($rules, $processing['rules']);
 				continue;
 			}
-			$tokens = array_slice($this->tss->getTokens(), $this->tss->iterator);
-			$selector = $this->splitOnToken($tokens, Tokenizer::OPEN_BRACE)[0];
-			$this->tss->iterator += count($selector);
-			if ($selector[count($selector)-1]['type'] === Tokenizer::WHITESPACE) array_pop($selector);
-			if (!isset($this->tss[$this->tss->iterator])) break;
+			$selector = $this->tss->from($token['type'], true)->to(Tokenizer::OPEN_BRACE);
+			$this->tss->skip(count($selector));
+			if (!$this->tss->valid() || empty($selector->getTokens())) break;
 
-			$newRules = $this->cssToRules($selector, count($rules)+$indexStart, $this->getProperties($this->tss[$this->tss->iterator]['value']));
+			$newRules = $this->cssToRules($selector, count($rules)+$indexStart, $this->getProperties($this->tss->current()['value']));
 			$rules = $this->writeRule($rules, $newRules);
 		}
 		usort($rules, [$this, 'sortRules']);
@@ -47,10 +45,10 @@ class Sheet {
 	}
 
 	private function CssToRules($selector, $index, $properties) {
-		$parts = $this->splitOnToken($selector, Tokenizer::ARG);
+		$parts = $selector->trim()->splitOnToken(Tokenizer::ARG);
 		$rules = [];
 		foreach ($parts as $part) {
-			$part = (new Tokens($part))->trim()->getTokens();
+			$part = $part->trim()->getTokens();
 			$rules[json_encode($part)] = new \Transphporm\Rule($this->xPath->getXpath($part), $this->xPath->getPseudo($part), $this->xPath->getDepth($part), $index++, $this->baseDir);
 			$rules[json_encode($part)]->properties = $properties;
 		}
