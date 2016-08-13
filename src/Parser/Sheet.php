@@ -16,7 +16,7 @@ class Sheet {
 		$this->tss = $this->stripComments($tss, '//', "\n");
 		$this->tss = $this->stripComments($this->tss, '/*', '*/');
 		$tokenizer = new Tokenizer($this->tss);
-		$this->tss = $tokenizer->getTokens();
+		$this->tss = new Tokens($tokenizer->getTokens());
 		$this->baseDir = $baseDir;
 		$this->xPath = $xPath;
 		$this->valueParser = $valueParser;
@@ -24,25 +24,25 @@ class Sheet {
 
 	public function parse($indexStart = 0) {
 		$rules = [];
-		$numOfTokens = count($this->tss);
-		for ($i = 0; isset($this->tss[$i]) && $i <= $numOfTokens; $i++) {
-			if ($this->tss[$i]['type'] === Tokenizer::WHITESPACE) continue;
-			if ($processing = $this->processingInstructions($i, count($rules)+$indexStart)) {
-				$i = $processing['endPos']+1;
+		//$numOfTokens = count($this->tss);
+		$this->tss->ignoreWhitespace(true);
+		foreach ($this->tss as $token) {
+			if ($processing = $this->processingInstructions($token, count($rules)+$indexStart)) {
+				$this->tss->skip($processing['skip']+1);
 				$rules = array_merge($rules, $processing['rules']);
 				continue;
 			}
-			$tokens = array_slice($this->tss, $i);
+			$tokens = array_slice($this->tss->getTokens(), $this->tss->iterator);
 			$selector = $this->splitOnToken($tokens, Tokenizer::OPEN_BRACE)[0];
-			$i += count($selector);
+			$this->tss->iterator += count($selector);
 			if ($selector[count($selector)-1]['type'] === Tokenizer::WHITESPACE) array_pop($selector);
-			if (!isset($this->tss[$i])) break;
+			if (!isset($this->tss[$this->tss->iterator])) break;
 
-			$newRules = $this->cssToRules($selector, count($rules)+$indexStart, $this->getProperties($this->tss[$i]['value']));
+			$newRules = $this->cssToRules($selector, count($rules)+$indexStart, $this->getProperties($this->tss[$this->tss->iterator]['value']));
 			$rules = $this->writeRule($rules, $newRules);
 		}
 		usort($rules, [$this, 'sortRules']);
-		if (empty($rules) && !empty($this->tss)) throw new \Exception("No TSS rules parsed");
+		if (empty($rules) && !empty($this->tss->getTokens())) throw new \Exception("No TSS rules parsed");
 		return $rules;
 	}
 
@@ -50,7 +50,8 @@ class Sheet {
 		$parts = $this->splitOnToken($selector, Tokenizer::ARG);
 		$rules = [];
 		foreach ($parts as $part) {
-			$rules[json_encode($part)] = new \Transphporm\Rule($this->xPath->getXpath($part), $this->xPath->getPseudo($part), $this->xPath->getDepth($part), $this->baseDir, $index++);
+			$part = (new Tokens($part))->trim()->getTokens();
+			$rules[json_encode($part)] = new \Transphporm\Rule($this->xPath->getXpath($part), $this->xPath->getPseudo($part), $this->xPath->getDepth($part), $index++, $this->baseDir);
 			$rules[json_encode($part)]->properties = $properties;
 		}
 		return $rules;
@@ -67,15 +68,14 @@ class Sheet {
 		return $rules;
 	}
 
-	private function processingInstructions($key, $indexStart) {
-		if (isset($this->tss[$key]) && $this->tss[$key]['type'] !== Tokenizer::AT_SIGN) return false;
-		$tokens = array_slice($this->tss, $key+1);
-		$tokens = $this->splitOnToken($tokens, Tokenizer::SEMI_COLON)[0];
-		$pos = $key+count($tokens)+1;
+	private function processingInstructions($token, $indexStart) {
+		if ($token['type'] !== Tokenizer::AT_SIGN) return false;
+		$tokens = $this->tss->from(Tokenizer::AT_SIGN, false)->to(Tokenizer::SEMI_COLON, false)->getTokens();
 		$funcName = array_shift($tokens)['value'];
 		$args = $this->valueParser->parseTokens($tokens);
 		$rules = $this->$funcName($args, $indexStart);
-		return ['endPos' => $pos, 'rules' => $rules];
+
+		return ['skip' => count($tokens)+1, 'rules' => $rules];
 	}
 
 	private function import($args, $indexStart) {
