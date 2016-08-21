@@ -15,7 +15,7 @@ class Nth implements \Transphporm\Pseudo {
 
 		$nodePath = $element->getNodePath();
 		$tokenizer = new \Transphporm\Parser\Tokenizer($nodePath);
-		$pseudo = $tokenizer->getTokens();
+		$pseudo = $tokenizer->getTokens(false);
 		$num = end($pseudo)['value'][0]['value'];
 
 		if (is_callable([$this, $criteria])) return $this->$criteria($num);

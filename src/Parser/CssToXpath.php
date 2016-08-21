@@ -23,7 +23,7 @@ class CssToXpath {
 			Tokenizer::GREATER_THAN => function($string) use ($prefix) { return '/' . $prefix  . $string; },
 			Tokenizer::NUM_SIGN => function($string) { return '[@id=\'' . $string . '\']'; },
 			Tokenizer::DOT => function($string) { return '[contains(concat(\' \', normalize-space(@class), \' \'), \' ' . $string . ' \')]'; },
-			Tokenizer::OPEN_SQUARE_BRACKET => function($string) use ($hash) { return '[' .'php:function(\'\Transphporm\Parser\CssToXpath::processAttr\', \'' . json_encode($string) . '\', ., "' . $hash . '")' . ']';	}
+			Tokenizer::OPEN_SQUARE_BRACKET => function($string) use ($hash) { return '[' .'php:function(\'\Transphporm\Parser\CssToXpath::processAttr\', \'' . base64_encode(serialize($string)) . '\', ., "' . $hash . '")' . ']';	}
 		];
 	}
 
@@ -42,7 +42,7 @@ class CssToXpath {
 
 	//XPath only allows registering of static functions... this is a hacky workaround for that
 	public static function processAttr($attr, $element, $hash) {
-		$attr = json_decode($attr, true);
+		$attr = unserialize(base64_decode($attr));
 		$functionSet = self::$instances[$hash]->functionSet;
 		$functionSet->setElement($element[0]);
 
@@ -85,6 +85,7 @@ class CssToXpath {
 	}
 
 	public function getXpath($css) {
+		$css = $css->getTokens();
 		foreach ($css as $key => $token) {
 			if ($token['type'] === Tokenizer::WHITESPACE &&
 				(isset($css[$key+1]) && $css[$key+1]['type'] === Tokenizer::GREATER_THAN)) unset($css[$key]);
@@ -104,10 +105,12 @@ class CssToXpath {
 	}
 
 	public function getDepth($css) {
+		$css = $css->getTokens();
 		return count($this->split($css));
 	}
 
 	public function getPseudo($css) {
+		$css = $css->getTokens();
 		$parts = $this->splitOnToken($css, Tokenizer::COLON);
 		array_shift($parts);
 		return $parts;

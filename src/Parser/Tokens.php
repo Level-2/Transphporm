@@ -86,7 +86,6 @@ class Tokens implements \Iterator, \ArrayAccess, \Countable {
         $key = $keys[0];
         for ($i = 0; $key < $this->iterator; $i++) $key = $keys[$i];
         if (!$inclusive) $key++;
-        //var_dump($keys);var_dump(array_column($this->tokens, 'type'));
         return new Tokens(array_slice($this->tokens, $key));
     }
 

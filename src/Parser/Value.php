@@ -49,7 +49,7 @@ class Value {
 		$this->data = new ValueData($data ? $data : $this->baseData);
 		$this->last = null;
 
-		if (empty($tokens)) return [$data];
+		if (count($tokens) <= 0) return [$data];
 
 		foreach ($tokens as $token) {
 			if ($token['type'] !== Tokenizer::WHITESPACE) $this->{$this->tokenFuncs[$token['type']]}($token);

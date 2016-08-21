@@ -16,7 +16,7 @@ class Sheet {
 		$this->tss = $this->stripComments($tss, '//', "\n");
 		$this->tss = $this->stripComments($this->tss, '/*', '*/');
 		$tokenizer = new Tokenizer($this->tss);
-		$this->tss = new Tokens($tokenizer->getTokens());
+		$this->tss = $tokenizer->getTokens();
 		$this->baseDir = $baseDir;
 		$this->xPath = $xPath;
 		$this->valueParser = $valueParser;
@@ -48,9 +48,9 @@ class Sheet {
 		$parts = $selector->trim()->splitOnToken(Tokenizer::ARG);
 		$rules = [];
 		foreach ($parts as $part) {
-			$part = $part->trim()->getTokens();
-			$rules[json_encode($part)] = new \Transphporm\Rule($this->xPath->getXpath($part), $this->xPath->getPseudo($part), $this->xPath->getDepth($part), $index++, $this->baseDir);
-			$rules[json_encode($part)]->properties = $properties;
+			$part = $part->trim();
+			$rules[json_encode($part->getTokens())] = new \Transphporm\Rule($this->xPath->getXpath($part), $this->xPath->getPseudo($part), $this->xPath->getDepth($part), $this->baseDir, $index++);
+			$rules[json_encode($part->getTokens())]->properties = $properties;
 		}
 		return $rules;
 	}
@@ -119,7 +119,7 @@ class Sheet {
 	}
 
 	private function getProperties($tokens) {
-		$rules = $this->splitOnToken($tokens, Tokenizer::SEMI_COLON);
+		$rules = $tokens->splitOnToken(Tokenizer::SEMI_COLON);
 		$return = [];
 		foreach ($rules as $rule) {
 			$rule = $this->removeWhitespace($rule);

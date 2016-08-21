@@ -58,7 +58,7 @@ class Tokenizer {
 		$this->str = $str;
 	}
 
-	public function getTokens() {
+	public function getTokens($returnObj = true) {
 		$tokens = [];
 
 		for ($i = 0; $i < strlen($this->str); $i++) {
@@ -69,7 +69,8 @@ class Tokenizer {
 			$i += $this->doStrings($tokens, $char, $i);
 			$i += $this->doBrackets($tokens, $char, $i);
 		}
-		return $tokens;
+		if ($returnObj) return new Tokens($tokens);
+		else return $tokens;
 	}
 
 	private function doSimpleTokens(&$tokens, $char) {

@@ -21,6 +21,9 @@ class FunctionSet {
 			$parser = new \Transphporm\Parser\Value($this);
 			$args[0] = $parser->parseTokens($tokens, $this->elementData->getData($this->element));
 		}
+		else if ($args[0] instanceof Parser\Tokens) {
+			$args[0] = $args[0]->getTokens();
+		}
 		if (isset($this->functions[$name])) {
 			return $this->functions[$name]->run($args[0], $this->element);
 		}
