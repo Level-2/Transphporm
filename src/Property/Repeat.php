@@ -17,6 +17,7 @@ class Repeat implements \Transphporm\Property {
 	}
 
 	public function run(array $values, \DomElement $element, array $rules, \Transphporm\Hook\PseudoMatcher $pseudoMatcher, array $properties = []) {
+		$values = $this->fixEmpty($values);
 		if ($element->getAttribute('transphporm') === 'added') return $element->parentNode->removeChild($element);
 		$max = $this->getMax($values);
 		$count = 0;
@@ -43,6 +44,11 @@ class Repeat implements \Transphporm\Property {
 		$element->parentNode->insertBefore($clone, $element);
 		return $clone;
 	}
+
+	private function fixEmpty($value) {
+ 		if (empty($value[0])) $value[0] = [];
+ 		return $value;
+ 	}
 
 	private function tagElement($element, $count) {
 		//Mark all but one of the nodes as having been added by transphporm, when the hook is run again, these are removed
