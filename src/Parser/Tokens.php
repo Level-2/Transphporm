@@ -5,13 +5,14 @@
  * @license         http://www.opensource.org/licenses/bsd-license.php  BSD License *
  * @version         1.0                                                             */
 namespace Transphporm\Parser;
-class Tokens implements \Iterator, \ArrayAccess, \Countable {
+class Tokens implements \Iterator, \Countable {
     private $tokens;
     private $iterator = 0;
     private $ignoreWhitespace = false;
 
-    public function __construct(array $tokens) {
+    public function __construct(array $tokens, $ignoreWhitespace = false) {
         $this->tokens = $tokens;
+        $this->ignoreWhitespace = $ignoreWhitespace;
     }
 
     public function count() {
@@ -48,33 +49,9 @@ class Tokens implements \Iterator, \ArrayAccess, \Countable {
         }
 	}
 
-    // ArrayAccess Functions
-    public function offsetSet($offset, $value) {
-        if (is_null($offset)) {
-            $this->tokens[] = $value;
-        }
-        else {
-            $this->tokens[$offset] = $value;
-        }
-        //throw new \Exception('Can\'t set offest in Tokens');
-    }
-
-    public function offsetExists($offset) {
-        return isset($this->tokens[$offset]);
-    }
-
-    public function offsetUnset($offset) {
-        unset($this->tokens[$offset]);
-        //throw new \Exception('Can\'t unset offest in Tokens');
-    }
-
-    public function offsetGet($offset) {
-        return isset($this->tokens[$offset]) ? $this->tokens[$offset] : null;
-    }
-
     // Helpful Functions
     public function ignoreWhitespace($ignore = false) {
-        $this->ignoreWhitespace = $ignore;
+        return new Tokens($this->tokens, $ignore);
     }
 
     private function getKeysOfTokenType($tokenType) {
@@ -83,6 +60,7 @@ class Tokens implements \Iterator, \ArrayAccess, \Countable {
 
     public function from($tokenType, $inclusive = false) {
         $keys = $this->getKeysOfTokenType($tokenType);
+        if (count($keys) === 0) return new Tokens([]);
         $key = $keys[0];
         for ($i = 0; $key < $this->iterator; $i++) $key = $keys[$i];
         if (!$inclusive) $key++;
@@ -110,7 +88,7 @@ class Tokens implements \Iterator, \ArrayAccess, \Countable {
 			else $splitTokens[$i][] = $token;
 		}
         return array_map(function ($tokens) {
-            return new Tokens($tokens);
+            return new Tokens($tokens, $this->ignoreWhitespace);
         }, $splitTokens);
 		//return $splitTokens;
     }
@@ -129,6 +107,16 @@ class Tokens implements \Iterator, \ArrayAccess, \Countable {
     }
 
     public function getTokens() {
-        return $this->tokens;
+    //    throw new \Exception();
+        $tokens = [];
+        //Loop through $this to account for $ignoreWhitespace
+        foreach ($this as $token) {
+            $tokens[] = $token;
+        }
+        return $tokens;
+    }
+
+    public function read() {
+        return isset($this->tokens[0]) ? $this->tokens[0]['value'] : false;
     }
 }

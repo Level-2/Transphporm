@@ -36,7 +36,7 @@ class Content implements \Transphporm\Property {
 	}
 
 	private function getContentMode($rules) {
-		return (isset($rules['content-mode'])) ? $rules['content-mode'][0]['value'] : 'append';
+		return (isset($rules['content-mode'])) ? $rules['content-mode']->read() : 'append';
 	}
 
 	private function processPseudo($value, $element, $pseudoMatcher) {
