@@ -22,7 +22,7 @@ class FunctionSet {
 			$args[0] = $parser->parseTokens($tokens, $this->elementData->getData($this->element));
 		}
 		else if ($args[0] instanceof Parser\Tokens) {
-			$args[0] = $args[0]->getTokens();
+			$args[0] = iterator_to_array($args[0]);
 		}
 		if (isset($this->functions[$name])) {
 			return $this->functions[$name]->run($args[0], $this->element);
@@ -41,4 +41,5 @@ class FunctionSet {
 	public function setElement(\DomElement $element) {
 		$this->element = $element;
 	}
+
 }

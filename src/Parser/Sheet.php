@@ -69,9 +69,9 @@ class Sheet {
 
 	private function processingInstructions($token, $indexStart) {
 		if ($token['type'] !== Tokenizer::AT_SIGN) return false;
-		$tokens = $this->tss->from(Tokenizer::AT_SIGN, false)->to(Tokenizer::SEMI_COLON, false)->getTokens();
-		$funcName = array_shift($tokens)['value'];
-		$args = $this->valueParser->parseTokens($tokens);
+		$tokens = $this->tss->from(Tokenizer::AT_SIGN, false)->to(Tokenizer::SEMI_COLON, false);
+		$funcName = $tokens->from(Tokenizer::NAME, true)->read();
+		$args = $this->valueParser->parseTokens($tokens->from(Tokenizer::NAME));
 		$rules = $this->$funcName($args, $indexStart);
 
 		return ['skip' => count($tokens)+1, 'rules' => $rules];

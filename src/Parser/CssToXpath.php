@@ -96,7 +96,6 @@ class CssToXpath {
 	}
 
 	public function getDepth($css) {
-		$css = $css->getTokens();
 		return count($this->split($css));
 	}
 
