@@ -57,16 +57,6 @@ class CssToXpath {
 		return $return[0] === '' ? false : $return[0];
 	}
 
-	private function splitOnToken($tokens, $splitOn) {
-		$splitTokens = [];
-		$i = 0;
-		foreach ($tokens as $token) {
-			if ($token['type'] === $splitOn) $i++;
-			else $splitTokens[$i][] = $token;
-		}
-		return $splitTokens;
-	}
-
 	//split the css into indivudal functions
 	private function split($css) {
 		$selectors = [];
@@ -84,15 +74,16 @@ class CssToXpath {
 		return $selectors;
 	}
 
-	public function getXpath($css) {
-		$css = $css->getTokens();
-		foreach ($css as $key => $token) {
-			if ($token['type'] === Tokenizer::WHITESPACE &&
-				(isset($css[$key+1]) && $css[$key+1]['type'] === Tokenizer::GREATER_THAN)) unset($css[$key]);
-			else if ($token['type'] === Tokenizer::WHITESPACE &&
-				(isset($css[$key-1]) && $css[$key-1]['type'] === Tokenizer::GREATER_THAN)) unset($css[$key]);
+	public function getXpath($css) {		
+		$tokens = [];
+
+		foreach ($css->splitOnToken(Tokenizer::GREATER_THAN) as $token) {
+			foreach ($token->trim() as $t) $tokens[]  = $t;
+			$tokens[] = ['type' => Tokenizer::GREATER_THAN];
 		}
-		$css = $this->splitOnToken(array_values($css), Tokenizer::COLON)[0];
+		$tokens = new Tokens(array_slice($tokens, 0, -1));
+
+		$css = $tokens->splitOnToken(Tokenizer::COLON)[0];
 		$selectors = $this->split($css);
 		$xpath = '/';
 		foreach ($selectors as $selector) {
@@ -110,8 +101,7 @@ class CssToXpath {
 	}
 
 	public function getPseudo($css) {
-		$css = $css->getTokens();
-		$parts = $this->splitOnToken($css, Tokenizer::COLON);
+		$parts = $css->splitOnToken(Tokenizer::COLON);
 		array_shift($parts);
 		return $parts;
 	}

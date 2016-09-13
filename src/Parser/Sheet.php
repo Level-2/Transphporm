@@ -17,7 +17,7 @@ class Sheet {
 		$this->tss = $this->stripComments($tss, '//', "\n");
 		$this->tss = $this->stripComments($this->tss, '/*', '*/');
 		$this->tokenizer = new Tokenizer($this->tss);
-		$this->tss = $this->tokenizer->getTokens()->ignoreWhitespace(true);
+		$this->tss = $this->tokenizer->getTokens();
 		$this->baseDir = $baseDir;
 		$this->xPath = $xPath;
 		$this->valueParser = $valueParser;
@@ -26,7 +26,7 @@ class Sheet {
 	public function parse($indexStart = 0) {
 		$rules = [];
 
-		foreach ($this->tss as $token) {
+		foreach (new TokenFilterIterator($this->tss, [Tokenizer::WHITESPACE]) as $token) {
 			if ($processing = $this->processingInstructions($token, count($rules)+$indexStart)) {
 				$this->tss->skip($processing['skip']+1);
 				$rules = array_merge($rules, $processing['rules']);
@@ -102,7 +102,7 @@ class Sheet {
 	}
 
 	private function getProperties($tokens) {
-        $rules = $tokens->ignoreWhiteSpace(true)->splitOnToken(Tokenizer::SEMI_COLON);
+        $rules = $tokens->splitOnToken(Tokenizer::SEMI_COLON);
 
         $return = [];
         foreach ($rules as $rule) {

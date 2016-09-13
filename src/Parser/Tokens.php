@@ -5,14 +5,46 @@
  * @license         http://www.opensource.org/licenses/bsd-license.php  BSD License *
  * @version         1.0                                                             */
 namespace Transphporm\Parser;
+
+class TokenFilterIterator implements \Iterator {
+    private $ignore;
+    private $tokens;
+
+    public function __construct(Tokens $tokens, array $ignore) {
+        $this->ignore = $ignore;
+        $this->tokens = $tokens;
+    }
+
+    public function current() {
+        return $this->tokens->current();
+    }
+
+    public function key() {
+        return $this->tokens->key();
+    }
+
+    public function valid() {
+        return $this->tokens->valid();
+    }
+
+    public function next() {
+        do {
+            $this->tokens->next();
+        }
+        while ($this->tokens->valid() && in_array($this->tokens->current()['type'], $this->ignore));
+    }
+
+    public function rewind() {
+        $this->tokens->rewind();
+        while ($this->tokens->valid() && in_array($this->tokens->current()['type'], $this->ignore)) $this->tokens->next();
+    }
+}
 class Tokens implements \Iterator, \Countable {
     private $tokens;
     private $iterator = 0;
-    private $ignoreWhitespace = false;
 
-    public function __construct(array $tokens, $ignoreWhitespace = false) {
+    public function __construct(array $tokens) {
         $this->tokens = $tokens;
-        $this->ignoreWhitespace = $ignoreWhitespace;
     }
 
     public function count() {
@@ -29,13 +61,7 @@ class Tokens implements \Iterator, \Countable {
     }
 
     public function next() {
-        if ($this->ignoreWhitespace) {
-            do {
-                ++$this->iterator;
-            }
-            while (isset($this->tokens[$this->iterator]) && $this->tokens[$this->iterator]['type'] === Tokenizer::WHITESPACE);
-        }
-        else ++$this->iterator;
+        ++$this->iterator;
 	}
 
 	public function valid() {
@@ -44,14 +70,13 @@ class Tokens implements \Iterator, \Countable {
 
 	public function rewind() {
 		$this->iterator = 0;
-        if ($this->ignoreWhitespace) {
-            while (isset($this->tokens[$this->iterator]) && $this->tokens[$this->iterator]['type'] === Tokenizer::WHITESPACE) ++$this->iterator;
-        }
 	}
 
     // Helpful Functions
     public function ignoreWhitespace($ignore = false) {
-        return new Tokens($this->tokens, $ignore);
+      // throw new \Exception();
+       return new Tokens($this->tokens, $ignore);
+
     }
 
     private function getKeysOfTokenType($tokenType) {
@@ -88,7 +113,7 @@ class Tokens implements \Iterator, \Countable {
 			else $splitTokens[$i][] = $token;
 		}
         return array_map(function ($tokens) {
-            return new Tokens($tokens, $this->ignoreWhitespace);
+            return new Tokens($tokens);
         }, $splitTokens);
 		//return $splitTokens;
     }
@@ -116,7 +141,11 @@ class Tokens implements \Iterator, \Countable {
         return $tokens;
     }
 
-    public function read() {
-        return isset($this->tokens[0]) ? $this->tokens[0]['value'] : false;
+    public function read($offset = 0) {
+        return isset($this->tokens[$offset]) ? $this->tokens[$offset]['value'] : false;
+    }
+
+    public function type($offset = 0) {
+        return isset($this->tokens[$offset]) ? $this->tokens[$offset]['type'] : false;   
     }
 }

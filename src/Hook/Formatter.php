@@ -20,7 +20,7 @@ class Formatter {
 		$functionName = $tokens->from(\Transphporm\Parser\Tokenizer::NAME, true)->read();
 
 		$options = [];
-		foreach ($tokens->from(\Transphporm\Parser\Tokenizer::NAME)->ignoreWhitespace(true) as $token) {
+		foreach (new \Transphporm\Parser\TokenFilterIterator($tokens->from(\Transphporm\Parser\Tokenizer::NAME), [\Transphporm\Parser\Tokenizer::WHITESPACE]) as $token) {
 			$options[] = $token['value'];
 		}
 		return $this->processFormat($options, $functionName, $value);

@@ -34,18 +34,23 @@ class PseudoMatcher {
 	}
 
 	private function getFuncParts($tokens) {
+	
 		$parts = [];
 		$parts['name'] = $this->getFuncName($tokens);
 		if ($parts['name'] === null || in_array($parts['name'], ['data', 'iteration', 'root'])) {
 			$parts['args'] = $this->valueParser->parseTokens($tokens);
 		}
-		elseif (isset($tokens[1])) $parts['args'] = $this->valueParser->parseTokens($tokens[1]['value']);
+		else if (count($tokens) > 1) {
+			$tokens->rewind();
+			$tokens->next();
+			$parts['args'] = $this->valueParser->parseTokens($tokens->current()['value']);
+		}
 		else $parts['args'] = [['']];
 		return $parts;
 	}
 
 	private function getFuncName($tokens) {
-		if ($tokens[0]['type'] === Tokenizer::NAME) return $tokens[0]['value'];
+		if ($tokens->type() === Tokenizer::NAME) return $tokens->read();
 		return null;
 	}
 
