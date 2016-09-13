@@ -25,7 +25,6 @@ class Sheet {
 
 	public function parse($indexStart = 0) {
 		$rules = [];
-
 		foreach (new TokenFilterIterator($this->tss, [Tokenizer::WHITESPACE]) as $token) {
 			if ($processing = $this->processingInstructions($token, count($rules)+$indexStart)) {
 				$this->tss->skip($processing['skip']+1);
@@ -34,14 +33,18 @@ class Sheet {
 			}
 			$selector = $this->tss->from($token['type'], true)->to(Tokenizer::OPEN_BRACE);
 			$this->tss->skip(count($selector));
-			if (!$this->tss->valid() || count($selector) === 0) break;
+			if (count($selector) === 0) break;
 
 			$newRules = $this->cssToRules($selector, count($rules)+$indexStart, $this->getProperties($this->tss->current()['value']));
 			$rules = $this->writeRule($rules, $newRules);
 		}
 		usort($rules, [$this, 'sortRules']);
-		if (empty($rules) && count($this->tss) > 0) throw new \Exception("No TSS rules parsed");
+		$this->checkError($rules);
 		return $rules;
+	}
+
+	private function checkError($rules) {
+		if (empty($rules) && count($this->tss) > 0) throw new \Exception('No TSS rules parsed');
 	}
 
 	private function CssToRules($selector, $index, $properties) {
