@@ -162,12 +162,15 @@ class Tokenizer {
 			if (isset($chars[$token['type']])) {
 				$str .= $chars[$token['type']];
 			}
-			if (isset($token['value'])) {
-				if ($token['value'] instanceof Tokens) $str.= $this->serialize($token['value']);
-				else $str .= $token['value'];	
-			}			
+			$str .= $this->serializeValue($token);
 		}
-
 		return $str;
+	}
+
+	private function serializeValue($token) {
+		if (isset($token['value'])) {
+			if ($token['value'] instanceof Tokens) return $this->serialize($token['value']);
+			else return $token['value'];	
+		}			
 	}
 }

@@ -75,15 +75,7 @@ class CssToXpath {
 	}
 
 	public function getXpath($css) {		
-		$tokens = [];
-
-		foreach ($css->splitOnToken(Tokenizer::GREATER_THAN) as $token) {
-			foreach ($token->trim() as $t) $tokens[]  = $t;
-			$tokens[] = ['type' => Tokenizer::GREATER_THAN];
-		}
-		$tokens = new Tokens(array_slice($tokens, 0, -1));
-
-		$css = $tokens->splitOnToken(Tokenizer::COLON)[0];
+		$css = $this->removeSpacesFromDirectDecend($css)->splitOnToken(Tokenizer::COLON)[0];
 		$selectors = $this->split($css);
 		$xpath = '/';
 		foreach ($selectors as $selector) {
@@ -94,6 +86,16 @@ class CssToXpath {
 
 		return $xpath;
 	}
+
+	private function removeSpacesFromDirectDecend($css) {
+		$tokens = [];
+		foreach ($css->splitOnToken(Tokenizer::GREATER_THAN) as $token) {
+			foreach ($token->trim() as $t) $tokens[]  = $t;
+			$tokens[] = ['type' => Tokenizer::GREATER_THAN];
+		}
+		return new Tokens(array_slice($tokens, 0, -1));
+	}
+
 
 	public function getDepth($css) {
 		return count($this->split($css));

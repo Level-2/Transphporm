@@ -51,8 +51,8 @@ class Value {
 
 		if (count($tokens) <= 0) return [$data];
 
-		foreach ($tokens as $token) {
-			if ($token['type'] !== Tokenizer::WHITESPACE) $this->{$this->tokenFuncs[$token['type']]}($token);
+		foreach (new TokenFilterIterator($tokens, [Tokenizer::WHITESPACE]) as $token) {
+			$this->{$this->tokenFuncs[$token['type']]}($token);
 		}
 
 		$this->processLast();
