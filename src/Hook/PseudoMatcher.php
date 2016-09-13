@@ -46,7 +46,7 @@ class PseudoMatcher {
 
 	private function getFuncName($tokens) {
 		if ($tokens[0]['type'] === Tokenizer::NAME) return $tokens[0]['value'];
-		return null;
+		return false;
 	}
 
 	public function hasFunction($name) {

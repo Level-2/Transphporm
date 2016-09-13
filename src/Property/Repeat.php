@@ -17,6 +17,7 @@ class Repeat implements \Transphporm\Property {
 	}
 
 	public function run(array $values, \DomElement $element, array $rules, \Transphporm\Hook\PseudoMatcher $pseudoMatcher, array $properties = []) {
+		$values = $this->fixEmpty($values);
 		if ($element->getAttribute('transphporm') === 'added') return $element->parentNode->removeChild($element);
 		$max = $this->getMax($values);
 		$count = 0;
@@ -32,6 +33,11 @@ class Repeat implements \Transphporm\Property {
 		//Remove the original element
 		$element->parentNode->removeChild($element);
 		return false;
+	}
+
+	private function fixEmpty($value) {
+		if (empty($value[0])) $value[0] = [];
+		return $value;
 	}
 
 	private function cloneElement($element, $iteration, $key, $count) {
