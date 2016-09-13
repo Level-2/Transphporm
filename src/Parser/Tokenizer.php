@@ -158,8 +158,7 @@ class Tokenizer {
 		$str = '';
 		$chars = array_flip($this->chars);
 
-	//	var_dump($tokens);
-		foreach ($tokens->ignoreWhitespace(false) as $token) {
+		foreach ($tokens as $token) {
 			if (isset($chars[$token['type']])) {
 				$str .= $chars[$token['type']];
 			}
@@ -169,7 +168,6 @@ class Tokenizer {
 			}			
 		}
 
-	//	var_dump($str);
 		return $str;
 	}
 }

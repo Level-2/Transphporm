@@ -38,13 +38,6 @@ class Tokens implements \Iterator, \Countable {
 		$this->iterator = 0;
 	}
 
-    // Helpful Functions
-    public function ignoreWhitespace($ignore = false) {
-      // throw new \Exception();
-       return new Tokens($this->tokens, $ignore);
-
-    }
-
     private function getKeysOfTokenType($tokenType) {
         return array_keys(array_column($this->tokens, 'type'), $tokenType);
     }
