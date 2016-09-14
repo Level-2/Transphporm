@@ -42,20 +42,24 @@ class Tokens implements \Iterator, \Countable {
         return array_keys(array_column($this->tokens, 'type'), $tokenType);
     }
 
-    public function from($tokenType, $inclusive = false) {
+    private function getKeyToSlice($tokenType) {
         $keys = $this->getKeysOfTokenType($tokenType);
-        if (count($keys) === 0) return new Tokens([]);
+        if (empty($keys)) return false;
         $key = $keys[0];
         for ($i = 0; $key < $this->iterator; $i++) $key = $keys[$i];
+        return $key;
+    }
+
+    public function from($tokenType, $inclusive = false) {
+        $key = $this->getKeyToSlice($tokenType);
+        if ($key === false) return new Tokens([]);
         if (!$inclusive) $key++;
         return new Tokens(array_slice($this->tokens, $key));
     }
 
     public function to($tokenType, $inclusive = false) {
-        $keys = $this->getKeysOfTokenType($tokenType);
-        if (empty($keys)) return new Tokens([]);
-        $key = $keys[0];
-        for ($i = 0; $key < $this->iterator; $i++) $key = $keys[$i];
+        $key = $this->getKeyToSlice($tokenType);
+        if ($key === false) return new Tokens([]);
         if ($inclusive) $key++;
         return new Tokens(array_slice($this->tokens, 0, $key));
     }
@@ -95,6 +99,6 @@ class Tokens implements \Iterator, \Countable {
     }
 
     public function type($offset = 0) {
-        return isset($this->tokens[$offset]) ? $this->tokens[$offset]['type'] : false;   
+        return isset($this->tokens[$offset]) ? $this->tokens[$offset]['type'] : false;
     }
 }

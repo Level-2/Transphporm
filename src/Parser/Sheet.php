@@ -11,7 +11,7 @@ class Sheet {
 	private $baseDir;
 	private $valueParser;
 	private $xPath;
-	private $tokenizer; 
+	private $tokenizer;
 
 	public function __construct($tss, $baseDir, CssToXpath $xPath, Value $valueParser) {
 		$this->tss = $this->stripComments($tss, '//', "\n");
@@ -52,7 +52,7 @@ class Sheet {
 		$rules = [];
 		foreach ($parts as $part) {
 			$part = $part->trim();
-			$rules[$this->tokenizer->serialize($part)] = new \Transphporm\Rule($this->xPath->getXpath($part), $this->xPath->getPseudo($part), $this->xPath->getDepth($part), $this->baseDir, $index++);
+			$rules[$this->tokenizer->serialize($part)] = new \Transphporm\Rule($this->xPath->getXpath($part), $this->xPath->getPseudo($part), $this->xPath->getDepth($part), $index++, $this->baseDir);
 			$rules[$this->tokenizer->serialize($part)]->properties = $properties;
 		}
 		return $rules;

@@ -30,11 +30,15 @@ class TokenFilterIterator implements \Iterator {
         do {
             $this->tokens->next();
         }
-        while ($this->tokens->valid() && in_array($this->tokens->current()['type'], $this->ignore));
+        while ($this->shouldContinue());
     }
 
     public function rewind() {
         $this->tokens->rewind();
-        while ($this->tokens->valid() && in_array($this->tokens->current()['type'], $this->ignore)) $this->tokens->next();
+        while ($this->shouldContinue()) $this->tokens->next();
+    }
+
+    private function shouldContinue() {
+        return $this->tokens->valid() && in_array($this->tokens->current()['type'], $this->ignore);
     }
 }

@@ -15,7 +15,7 @@ class Template {
 	/** Takes an XML string and loads it into a DomDocument object */
 	public function __construct($doc) {
 		$this->document = new \DomDocument;
-		
+
 		$this->loadDocument($doc);
 
 		$this->xpath = new \DomXPath($this->document);
@@ -28,7 +28,7 @@ class Template {
 		}
 	}
 
-	/** Loads a HTML or XML document */ 	
+	/** Loads a HTML or XML document */
 	private function loadDocument($doc) {
 		libxml_use_internal_errors(true);
 		if ($this->document->loadXml($doc) === false) {
@@ -46,7 +46,7 @@ class Template {
 	public function getPrefix() {
 		return $this->prefix;
 	}
-	
+
 	/** Assigns a $hook which will be run on any element that matches the given $xpath query */
 	public function addHook($xpath, $hook) {
 		$this->hooks[] = [$xpath, $hook];
