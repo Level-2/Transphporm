@@ -2146,6 +2146,22 @@ ul li span {
 		$template = new \Transphporm\Builder("<div></div>", "NONEXISTANT_FILE");
 		$template->output();
 	}
+
+	public function testNthChild4() {
+		$xml = '
+		<h2 class="name">Test</h2>
+		<h3 class="name">Test</h3>
+		<h4 class="name">Test</h4>
+		';
+
+		$tss = '.name:nth-child(2) { display: none; }
+
+		.name:nth-child(3) { display: none; }';
+
+		$template = new \Transphporm\Builder($xml, $tss);
+
+		$this->assertEquals($template->output()->body, $this->stripTabs('<h2 class="name">Test</h2>'));
+	}
 }
 
 

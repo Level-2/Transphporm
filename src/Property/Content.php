@@ -37,7 +37,7 @@ class Content implements \Transphporm\Property {
 	}
 
 	private function getContentMode($rules) {
-		return (isset($rules['content-mode'])) ? $rules['content-mode'][0]['value'] : 'append';
+		return (isset($rules['content-mode'])) ? $rules['content-mode']->read() : 'append';
 	}
 
 	private function processPseudo($value, $element, $pseudoMatcher) {
@@ -57,21 +57,25 @@ class Content implements \Transphporm\Property {
 				foreach ($this->getNode($n, $document) as $new) yield $new;
 			}
 			else {
-				if ($n instanceof \DomElement) {
-					$new = $document->importNode($n, true);
-					//Removing this might cause problems with caching...
-					//$new->setAttribute('transphporm', 'added');
-				}
-				else {
-					if ($n instanceof \DomText) $n = $n->nodeValue;
-					$new = $document->createElement('text');
-
-					$new->appendChild($document->createTextNode($n));
-					$new->setAttribute('transphporm', 'text');
-				}
-				yield $new;
+				yield $this->convertNode($n, $document);
 			}
 		}
+	}
+
+	private function convertNode($node, $document) {
+		if ($node instanceof \DomElement) {
+			$new = $document->importNode($node, true);
+			//Removing this might cause problems with caching...
+			//$new->setAttribute('transphporm', 'added');
+		}
+		else {
+			if ($node instanceof \DomText) $node = $node->nodeValue;
+			$new = $document->createElement('text');
+
+			$new->appendChild($document->createTextNode($node));
+			$new->setAttribute('transphporm', 'text');
+		}
+		return $new;
 	}
 
 	/** Functions for writing to pseudo elements, attr, before, after, header */

@@ -50,6 +50,11 @@ class Repeat implements \Transphporm\Property {
 		return $clone;
 	}
 
+	private function fixEmpty($value) {
+ 		if (empty($value[0])) $value[0] = [];
+ 		return $value;
+ 	}
+
 	private function tagElement($element, $count) {
 		//Mark all but one of the nodes as having been added by transphporm, when the hook is run again, these are removed
 		if ($count > 0) $element->setAttribute('transphporm', 'added');

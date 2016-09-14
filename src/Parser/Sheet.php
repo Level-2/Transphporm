@@ -11,12 +11,13 @@ class Sheet {
 	private $baseDir;
 	private $valueParser;
 	private $xPath;
+	private $tokenizer; 
 
 	public function __construct($tss, $baseDir, CssToXpath $xPath, Value $valueParser) {
 		$this->tss = $this->stripComments($tss, '//', "\n");
 		$this->tss = $this->stripComments($this->tss, '/*', '*/');
-		$tokenizer = new Tokenizer($this->tss);
-		$this->tss = $tokenizer->getTokens();
+		$this->tokenizer = new Tokenizer($this->tss);
+		$this->tss = $this->tokenizer->getTokens();
 		$this->baseDir = $baseDir;
 		$this->xPath = $xPath;
 		$this->valueParser = $valueParser;
@@ -24,40 +25,42 @@ class Sheet {
 
 	public function parse($indexStart = 0) {
 		$rules = [];
-		$numOfTokens = count($this->tss);
-		for ($i = 0; isset($this->tss[$i]) && $i <= $numOfTokens; $i++) {
-			if ($this->tss[$i]['type'] === Tokenizer::WHITESPACE) continue;
-			if ($processing = $this->processingInstructions($i, count($rules)+$indexStart)) {
-				$i = $processing['endPos']+1;
+		foreach (new TokenFilterIterator($this->tss, [Tokenizer::WHITESPACE]) as $token) {
+			if ($processing = $this->processingInstructions($token, count($rules)+$indexStart)) {
+				$this->tss->skip($processing['skip']+1);
 				$rules = array_merge($rules, $processing['rules']);
 				continue;
 			}
-			$tokens = array_slice($this->tss, $i);
-			$selector = $this->splitOnToken($tokens, Tokenizer::OPEN_BRACE)[0];
-			$i += count($selector);
-			if ($selector[count($selector)-1]['type'] === Tokenizer::WHITESPACE) array_pop($selector);
-			if (!isset($this->tss[$i])) break;
+			$selector = $this->tss->from($token['type'], true)->to(Tokenizer::OPEN_BRACE);
+			$this->tss->skip(count($selector));
+			if (count($selector) === 0) break;
 
-			$newRules = $this->cssToRules($selector, count($rules)+$indexStart, $this->getProperties($this->tss[$i]['value']));
+			$newRules = $this->cssToRules($selector, count($rules)+$indexStart, $this->getProperties($this->tss->current()['value']));
 			$rules = $this->writeRule($rules, $newRules);
 		}
 		usort($rules, [$this, 'sortRules']);
-		if (empty($rules) && !empty($this->tss)) throw new \Exception("No TSS rules parsed");
+		$this->checkError($rules);
 		return $rules;
 	}
 
+	private function checkError($rules) {
+		if (empty($rules) && count($this->tss) > 0) throw new \Exception('No TSS rules parsed');
+	}
+
 	private function CssToRules($selector, $index, $properties) {
-		$parts = $this->splitOnToken($selector, Tokenizer::ARG);
+		$parts = $selector->trim()->splitOnToken(Tokenizer::ARG);
 		$rules = [];
 		foreach ($parts as $part) {
-			$rules[json_encode($part)] = new \Transphporm\Rule($this->xPath->getXpath($part), $this->xPath->getPseudo($part), $this->xPath->getDepth($part), $this->baseDir, $index++);
-			$rules[json_encode($part)]->properties = $properties;
+			$part = $part->trim();
+			$rules[$this->tokenizer->serialize($part)] = new \Transphporm\Rule($this->xPath->getXpath($part), $this->xPath->getPseudo($part), $this->xPath->getDepth($part), $this->baseDir, $index++);
+			$rules[$this->tokenizer->serialize($part)]->properties = $properties;
 		}
 		return $rules;
 	}
 
 	private function writeRule($rules, $newRules) {
 		foreach ($newRules as $selector => $newRule) {
+
 			if (isset($rules[$selector])) {
 				$newRule->properties = array_merge($rules[$selector]->properties, $newRule->properties);
 			}
@@ -67,15 +70,14 @@ class Sheet {
 		return $rules;
 	}
 
-	private function processingInstructions($key, $indexStart) {
-		if (isset($this->tss[$key]) && $this->tss[$key]['type'] !== Tokenizer::AT_SIGN) return false;
-		$tokens = array_slice($this->tss, $key+1);
-		$tokens = $this->splitOnToken($tokens, Tokenizer::SEMI_COLON)[0];
-		$pos = $key+count($tokens)+1;
-		$funcName = array_shift($tokens)['value'];
-		$args = $this->valueParser->parseTokens($tokens);
+	private function processingInstructions($token, $indexStart) {
+		if ($token['type'] !== Tokenizer::AT_SIGN) return false;
+		$tokens = $this->tss->from(Tokenizer::AT_SIGN, false)->to(Tokenizer::SEMI_COLON, false);
+		$funcName = $tokens->from(Tokenizer::NAME, true)->read();
+		$args = $this->valueParser->parseTokens($tokens->from(Tokenizer::NAME));
 		$rules = $this->$funcName($args, $indexStart);
-		return ['endPos' => $pos, 'rules' => $rules];
+
+		return ['skip' => count($tokens)+1, 'rules' => $rules];
 	}
 
 	private function import($args, $indexStart) {
@@ -102,32 +104,15 @@ class Sheet {
 		return $str;
 	}
 
-	private function splitOnToken($tokens, $splitOn) {
-		$splitTokens = [];
-		$i = 0;
-		foreach ($tokens as $token) {
-			if ($token['type'] === $splitOn) $i++;
-			else $splitTokens[$i][] = $token;
-		}
-		return $splitTokens;
-	}
-
-	private function removeWhitespace($tokens) {
-		$newTokens = [];
-		foreach ($tokens as $token) {
-			if ($token['type'] !== Tokenizer::WHITESPACE) $newTokens[] = $token;
-		}
-		return $newTokens;
-	}
-
 	private function getProperties($tokens) {
-		$rules = $this->splitOnToken($tokens, Tokenizer::SEMI_COLON);
-		$return = [];
-		foreach ($rules as $rule) {
-			$rule = $this->removeWhitespace($rule);
-			if (isset($rule[1]) && $rule[1]['type'] === Tokenizer::COLON) $return[$rule[0]['value']] = array_slice($rule, 2);
-		}
+        $rules = $tokens->splitOnToken(Tokenizer::SEMI_COLON);
 
-		return $return;
-	}
+        $return = [];
+        foreach ($rules as $rule) {
+            $name = $rule->from(Tokenizer::NAME, true)->to(Tokenizer::COLON)->read();
+            $return[$name] = $rule->from(Tokenizer::COLON)->trim();
+        }
+
+        return $return;
+    }
 }

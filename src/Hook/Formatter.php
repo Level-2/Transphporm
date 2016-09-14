@@ -15,13 +15,14 @@ class Formatter {
 
 	public function format($value, $rules) {
 		if (!isset($rules['format'])) return $value;
-
 		$tokens = $rules['format'];
+		
+		$functionName = $tokens->from(\Transphporm\Parser\Tokenizer::NAME, true)->read();
 
-		$functionName = $tokens[0]['value'];
 		$options = [];
-		for ($i = 1; $i < count($tokens); $i++) $options[] = $tokens[$i]['value'];
-
+		foreach (new \Transphporm\Parser\TokenFilterIterator($tokens->from(\Transphporm\Parser\Tokenizer::NAME), [\Transphporm\Parser\Tokenizer::WHITESPACE]) as $token) {
+			$options[] = $token['value'];
+		}
 		return $this->processFormat($options, $functionName, $value);
 	}
 

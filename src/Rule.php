@@ -54,7 +54,7 @@ class Rule {
 
 	public function shouldRun($time = null) {
 		if (isset($this->properties['update-frequency']) && $this->lastRun !== 0) {
-			$frequency = $this->properties['update-frequency'][0]['value'];
+			$frequency = $this->properties['update-frequency']->read();
 			$static = ['always' => true, 'never' => false];
 			if (isset($static[$frequency])) return $static[$frequency];
 			else return $this->timeFrequency($frequency, $time);

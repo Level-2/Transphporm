@@ -7,27 +7,27 @@
 namespace Transphporm\Parser;
 class Tokenizer {
 	private $str;
-	const NAME = 1;
-	const STRING = 2;
-	const OPEN_BRACKET = 4;
-	const CLOSE_BRACKET = 5;
-	const OPEN_SQUARE_BRACKET = 6;
-	const CLOSE_SQUARE_BRACKET = 7;
-	const CONCAT = 8;
-	const ARG = 9;
-	const WHITESPACE = 10;
-	const DOT = 11;
-	const NUMERIC = 12;
-	const EQUALS = 13;
-	const NOT = 14;
-	const OPEN_BRACE = 15;
-	const CLOSE_BRACE = 16;
-	const BOOL = 17;
-	const COLON = 18;
-	const SEMI_COLON = 19;
-	const NUM_SIGN = 20;
-	const GREATER_THAN = 21;
-	const AT_SIGN = 22;
+	const NAME = 'LITERAL';
+	const STRING = 'STRING';
+	const OPEN_BRACKET = 'OPEN_BRACKET';
+	const CLOSE_BRACKET = 'CLOSE_BRACKET';
+	const OPEN_SQUARE_BRACKET = 'SQUARE_BRACKET';
+	const CLOSE_SQUARE_BRACKET = 'CLOSE_SQUARE_BRACKET';
+	const CONCAT = 'CONCAT';
+	const ARG = 'ARG';
+	const WHITESPACE = 'WHITESPACE';
+	const DOT = 'DOT';
+	const NUMERIC = 'NUMERIC';
+	const EQUALS = 'EQUALS';
+	const NOT = 'NOT';
+	const OPEN_BRACE = 'OPEN_BRACE';
+	const CLOSE_BRACE = 'CLOSE_BRACE';
+	const BOOL = 'BOOL';
+	const COLON = 'COLON';
+	const SEMI_COLON = 'SEMI_COLON';
+	const NUM_SIGN = 'NUM_SIGN';
+	const GREATER_THAN = 'GREATER_THAN';
+	const AT_SIGN = 'AT_SIGN';
 
 	private $chars = [
 		'"' => self::STRING,
@@ -58,7 +58,7 @@ class Tokenizer {
 		$this->str = $str;
 	}
 
-	public function getTokens() {
+	public function getTokens($returnObj = true) {
 		$tokens = [];
 
 		for ($i = 0; $i < strlen($this->str); $i++) {
@@ -69,7 +69,8 @@ class Tokenizer {
 			$i += $this->doStrings($tokens, $char, $i);
 			$i += $this->doBrackets($tokens, $char, $i);
 		}
-		return $tokens;
+		if ($returnObj) return new Tokens($tokens);
+		else return $tokens;
 	}
 
 	private function doSimpleTokens(&$tokens, $char) {
@@ -151,5 +152,25 @@ class Tokenizer {
 		$chars = array_reverse($this->chars);
 		if (isset($chars[$num])) return $chars[$num];
 		else return false;
+	}
+
+	public function serialize($tokens) {
+		$str = '';
+		$chars = array_flip($this->chars);
+
+		foreach ($tokens as $token) {
+			if (isset($chars[$token['type']])) {
+				$str .= $chars[$token['type']];
+			}
+			$str .= $this->serializeValue($token);
+		}
+		return $str;
+	}
+
+	private function serializeValue($token) {
+		if (isset($token['value'])) {
+			if ($token['value'] instanceof Tokens) return $this->serialize($token['value']);
+			else return $token['value'];	
+		}			
 	}
 }

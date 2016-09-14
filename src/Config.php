@@ -72,7 +72,7 @@ class Config {
 
 	public function createPseudoMatcher($pseudo) {
 		$pseudoMatcher = new Hook\PseudoMatcher($pseudo, $this->valueParser);
-		foreach ($this->pseudo as $pseudoFunction) $pseudoMatcher->registerFunction($pseudoFunction);
+		foreach ($this->pseudo as $pseudoFunction) $pseudoMatcher->registerFunction(clone $pseudoFunction);
 		return $pseudoMatcher;
 	}
 
