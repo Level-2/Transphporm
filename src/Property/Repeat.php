@@ -35,6 +35,11 @@ class Repeat implements \Transphporm\Property {
 		return false;
 	}
 
+	private function fixEmpty($value) {
+		if (empty($value[0])) $value[0] = [];
+		return $value;
+	}
+
 	private function cloneElement($element, $iteration, $key, $count) {
 		$clone = $element->cloneNode(true);
 		$this->tagElement($clone, $count);

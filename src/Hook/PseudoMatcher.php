@@ -34,7 +34,6 @@ class PseudoMatcher {
 	}
 
 	private function getFuncParts($tokens) {
-	
 		$parts = [];
 		$parts['name'] = $this->getFuncName($tokens);
 		if ($parts['name'] === null || in_array($parts['name'], ['data', 'iteration', 'root'])) {

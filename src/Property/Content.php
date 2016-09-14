@@ -16,6 +16,7 @@ class Content implements \Transphporm\Property {
 
 	public function run(array $values, \DomElement $element, array $rules, \Transphporm\Hook\PseudoMatcher $pseudoMatcher, array $properties = []) {
 		if (!$this->shouldRun($element)) return false;
+
 		$values = $this->formatter->format($values, $rules);
 
 		if (!$this->processPseudo($values, $element, $pseudoMatcher)) {
@@ -79,6 +80,7 @@ class Content implements \Transphporm\Property {
 
 	/** Functions for writing to pseudo elements, attr, before, after, header */
 	private function attr($value, $pseudoArgs, $element) {
+
 		$element->setAttribute($pseudoArgs, implode('', $value));
 	}
 
