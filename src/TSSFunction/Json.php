@@ -10,7 +10,7 @@ class Json implements \Transphporm\TSSFunction {
     public function run(array $args, \DomElement $element = null) {
         $json = $args[0];
 
-        if (trim($json)[0] != '{') {
+        if (trim($json)[0] != '{' && trim($json)[0] != '[') {
             $path = $this->baseDir . $json;
             if (!file_exists($path)) throw new \Exception('File does not exist at: ' . $path);
             $json = file_get_contents($json);
