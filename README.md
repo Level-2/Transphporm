@@ -1188,6 +1188,6 @@ This allows a top down approach. Most frameworks work on a bottom up approach wh
 
 # Credits
 
-Transphporm was originally developed by Tom Butler ( @TomBZombie ) with additional feature implementation, bugfixes and suggestions by Richard Solle ( @soller )
+Transphporm was originally developed by Tom Butler ( @TomBZombie ) with additional feature implementation, bugfixes and suggestions by Richard Solle ( @solleer )
 
 
