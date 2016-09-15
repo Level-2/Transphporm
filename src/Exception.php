@@ -6,10 +6,9 @@ class Exception extends \Exception {
     const PSEUDO = 'pseudo';
     const FORMATTER = 'formatter';
 
-    public function __construct($operationType, $operationName, $file = null, $line = 0, \Exception $previous) {
-        $message = 'TSS Error: Problem carrying out ' . $operationType . ' \'' . $operationName
-            . '\' on Line ' . $line . ' of ' . ($file === null ? 'tss' : $file);
+    public function __construct(RunException $runException, $file, $line) {
+        $message = $runException->getMessage() . ' on Line ' . $line . ' of ' . ($file === null ? 'tss' : $file);
 
-        parent::__construct($message, 0, $previous);
+        parent::__construct($message, 0, $runException->getPrevious());
     }
 }

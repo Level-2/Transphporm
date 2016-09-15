@@ -30,7 +30,7 @@ class FunctionSet {
 			}
 		}
 		catch (\Exception $e) {
-			throw new Exception(Exception::TSS_FUNCTION, $name, null, 0, $e);
+			throw new RunException(Exception::TSS_FUNCTION, $name, $e);
 		}
 		return true;
 	}

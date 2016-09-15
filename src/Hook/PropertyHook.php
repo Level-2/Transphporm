@@ -35,7 +35,13 @@ class PropertyHook implements \Transphporm\Hook {
 		// TODO: Allow `update-frequency` to be parsed before it is accessed in rule (might need to switch location of rule check)
 
 		foreach ($this->rules as $name => $value) {
-			$result = $this->callProperty($name, $element, $this->getArgs($value));
+			try {
+				$result = $this->callProperty($name, $element, $this->getArgs($value));
+			}
+			catch (\Transphporm\RunException $e) {
+				class_parents($e);
+				throw new \Transphporm\Exception($e, $this->file, '');
+			}
 			if ($result === false) break;
 		}
 	}
