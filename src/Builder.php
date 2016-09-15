@@ -81,7 +81,7 @@ class Builder {
 		$rule->touch();
 
 		$pseudoMatcher = $config->createPseudoMatcher($rule->pseudo);
-		$hook = new Hook\PropertyHook($rule->properties, $this->baseDir, $rule->baseDir, $pseudoMatcher, $config->getValueParser(), $config->getFunctionSet());
+		$hook = new Hook\PropertyHook($rule->properties, $this->baseDir, $rule->file, $pseudoMatcher, $config->getValueParser(), $config->getFunctionSet());
 		$config->loadProperties($hook);
 		$template->addHook($rule->query, $hook);
 	}
@@ -107,7 +107,7 @@ class Builder {
 			//Try to load the cached rules, if not set in the cache (or expired) parse the supplied sheet
 			$rules = $this->cache->load($key, filemtime($this->tss));
 
-			if (!$rules) return $this->cache->write($key, (new Parser\Sheet(file_get_contents($this->tss), $this->baseDir, $config->getCssToXpath(), $config->getValueParser()))->parse());
+			if (!$rules) return $this->cache->write($key, (new Parser\Sheet(file_get_contents($this->tss), $this->tss, $config->getCssToXpath(), $config->getValueParser()))->parse());
 			else return $rules;
 		}
 		else return (new Parser\Sheet($this->tss, $this->baseDir, $config->getCssToXpath(), $config->getValueParser()))->parse();

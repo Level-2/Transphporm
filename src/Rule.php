@@ -10,7 +10,7 @@ class Rule {
 	private $pseudo;
 	private $depth;
 	private $index;
-    private $baseDir;
+    private $file;
 	private $properties = [];
 	private $lastRun = 0;
 
@@ -20,12 +20,13 @@ class Rule {
 	const D = 86400;
 
 
-	public function __construct($query, $pseudo, $depth, $index, $baseDir, array $properties = []) {
+	public function __construct($query, $pseudo, $depth, $index, $file, $line = 0, array $properties = []) {
 		$this->query = $query;
 		$this->pseudo = $pseudo;
 		$this->depth = $depth;
 		$this->index = $index;
-        $this->baseDir = $baseDir;
+        $this->file = $file;
+		$this->line = $line;
 		$this->properties = $properties;
 	}
 

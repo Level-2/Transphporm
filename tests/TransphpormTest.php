@@ -2162,6 +2162,18 @@ ul li span {
 
 		$this->assertEquals($template->output()->body, $this->stripTabs('<h2 class="name">Test</h2>'));
 	}
+
+	public function testTransphpormException() {
+		$this->expectException("Transphporm\\Exception");
+		$this->expectExceptionMessage("TSS error: Problem carrying out function 'data' on Line 1 of tss");
+
+		$xml = '<div></div>';
+		$tss = '
+		div { content: data(getTest()); }
+		';
+		$template = new \Transphporm\Builder($xml, $tss);
+		$template->output();
+	}
 }
 
 

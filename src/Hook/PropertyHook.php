@@ -8,17 +8,17 @@ namespace Transphporm\Hook;
 /** Hooks into the template system, gets assigned as `ul li` or similar and `run()` is called with any elements that match */
 class PropertyHook implements \Transphporm\Hook {
 	private $rules;
-	private $origBaseDir;
-	private $newBaseDir;
+	private $baaseDir;
+	private $file;
 	private $valueParser;
 	private $pseudoMatcher;
 	private $properties = [];
 	private $functionSet;
 
-	public function __construct(array $rules, &$origBaseDir, $newBaseDir, PseudoMatcher $pseudoMatcher, \Transphporm\Parser\Value $valueParser, \Transphporm\FunctionSet $functionSet) {
+	public function __construct(array $rules, &$baseDir, $file, PseudoMatcher $pseudoMatcher, \Transphporm\Parser\Value $valueParser, \Transphporm\FunctionSet $functionSet) {
 		$this->rules = $rules;
-		$this->origBaseDir = $origBaseDir;
-		$this->newBaseDir = $newBaseDir;
+		$this->baseDir = $baseDir;
+		$this->file = $file;
 		$this->valueParser = $valueParser;
 		$this->pseudoMatcher = $pseudoMatcher;
 		$this->functionSet = $functionSet;
@@ -26,7 +26,7 @@ class PropertyHook implements \Transphporm\Hook {
 
 	public function run(\DomElement $element) {
 		$this->functionSet->setElement($element);
-		$this->origBaseDir = $this->newBaseDir;
+		$this->origBaseDir = dirname(realpath($this->file)) . DIRECTORY_SEPARATOR;
 		//Don't run if there's a pseudo element like nth-child() and this element doesn't match it
 		if (!$this->pseudoMatcher->matches($element)) return;
 
