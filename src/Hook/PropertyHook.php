@@ -39,7 +39,6 @@ class PropertyHook implements \Transphporm\Hook {
 				$result = $this->callProperty($name, $element, $this->getArgs($value));
 			}
 			catch (\Transphporm\RunException $e) {
-				class_parents($e);
 				throw new \Transphporm\Exception($e, $this->file, '');
 			}
 			if ($result === false) break;
@@ -55,6 +54,13 @@ class PropertyHook implements \Transphporm\Hook {
 	}
 
 	private function callProperty($name, $element, $value) {
-		if (isset($this->properties[$name])) return $this->properties[$name]->run($value, $element, $this->rules, $this->pseudoMatcher, $this->properties);
+		if (isset($this->properties[$name])) {
+			try {
+				return $this->properties[$name]->run($value, $element, $this->rules, $this->pseudoMatcher, $this->properties);
+			}
+			catch (\Exception $e) {
+				throw new RunException(Exception::PROPERTY, $name, $e);
+			}
+		}
 	}
 }
