@@ -23,7 +23,7 @@ class CacheTest extends PHPUnit_Framework_TestCase {
 
 	private function makeXml($xml) {
 		$this->writeFile(__DIR__ . DIRECTORY_SEPARATOR . 'temp.xml', $xml);
-		return __DIR__ . DIRECTORY_SEPARATOR . 'temp.xml';	
+		return __DIR__ . DIRECTORY_SEPARATOR . 'temp.xml';
 	}
 
 	private function createFiles($frequency) {
@@ -59,7 +59,7 @@ class CacheTest extends PHPUnit_Framework_TestCase {
 
 		$cache = new \ArrayObject;
 		$random = new RandomGenerator;
-		
+
 		$o1 = $this->buildTemplate('never', $cache)->output($random)->body;
 		$o2 = $this->buildTemplate('never', $cache)->output($random)->body;
 
@@ -73,14 +73,14 @@ class CacheTest extends PHPUnit_Framework_TestCase {
 
 
 	public function testCacheMinutes() {
-		
+
 		$cache = new \ArrayObject;
 		$random = new RandomGenerator;
-	
+
 		$o1 = $this->buildTemplate('10m', $cache)->output($random)->body;
 		$o2 = $this->buildTemplate('10m', $cache)->output($random)->body;
 
-		
+
 		// If the cache is working, the content should not be updated the second time
 		$this->assertEquals($o1, $o2);
 
@@ -117,7 +117,7 @@ class CacheTest extends PHPUnit_Framework_TestCase {
 
 		//Hide the span
 		$o1 = $template->output(['show' => false])->body;
-		
+
 		$this->assertFalse(strpos($o1, '<span>'));
 
 
@@ -126,10 +126,10 @@ class CacheTest extends PHPUnit_Framework_TestCase {
 		$template->setCache($cache);
 
 		$o1 = $template->output(['show' => true])->body;
-		
+
 		$this->assertFalse(strpos($o1, '<span>'));
 
-	
+
 		//Expire the cache by advancing time 10 mintes
 		$date = new \DateTime();
 		$date->modify('+11 minutes');
@@ -139,7 +139,7 @@ class CacheTest extends PHPUnit_Framework_TestCase {
 		$template->setTime($date->format('U'));
 
 		$o1 = $template->output(['show' => true])->body;
-		
+
 		//This time the span should be visible
 		$this->assertTrue((bool) strpos($o1, '<span>'));
 	}
@@ -198,6 +198,22 @@ class CacheTest extends PHPUnit_Framework_TestCase {
 
 	}
 
+	public function testCacheImport() {
+		$xml = $this->makeXml('<div></div>');
+
+		$tss = $this->makeTss('div { content: "foo"; }');
+
+		$cache = new \ArrayObject();
+
+		$template = new \Transphporm\Builder($xml, __DIR__ . DIRECTORY_SEPARATOR . "cacheImport.tss");
+		$template->setCache($cache);
+
+		$this->assertEquals($this->stripTabs($template->output()->body), $this->stripTabs("<div>foo</div>"));
+
+		$this->makeTss('div { content: "test"; }');
+
+		$this->assertEquals($this->stripTabs($template->output()->body), $this->stripTabs("<div>test</div>"));
+	}
 }
 
 class RandomGenerator {
