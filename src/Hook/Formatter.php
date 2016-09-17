@@ -29,18 +29,21 @@ class Formatter {
 			return $this->processFormat($options, $functionName, $value);
 		}
 		catch (\Exception $e) {
-			throw new RunException(Exception::FORMATTER, $functionName, $e);
+			throw new \Transphporm\RunException(\Transphporm\Exception::FORMATTER, $functionName, $e);
 		}
 	}
 
 	private function processFormat($format, $functionName, $value) {
+		$functionExists = false;
 		foreach ($value as &$val) {
 			foreach ($this->formatters as $formatter) {
 				if (is_callable([$formatter, $functionName])) {
 					$val = call_user_func_array([$formatter, $functionName], array_merge([$val], $format));
+					$functionExists = true;
 				}
 			}
 		}
+		if (!$functionExists) throw new \Exception("Formatter '$functionName' does not exist");
 		return $value;
 	}
 }

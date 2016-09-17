@@ -23,18 +23,17 @@ class PseudoMatcher {
 
 	public function matches($element) {
 		$matches = true;
-		try {
-			foreach ($this->pseudo as $tokens) {
-				foreach ($this->functions as $function) {
-					try {
-						$parts = $this->getFuncParts($tokens);
-						$matches = $matches && $function->match($parts['name'], $parts['args'], $element);
-					}
-					catch (\Exception $e) {
-						throw new RunException(Exception::PSEUDO, $parts['name'], $e);
-					}
+		foreach ($this->pseudo as $tokens) {
+			foreach ($this->functions as $function) {
+				try {
+					$parts = $this->getFuncParts($tokens);
+					$matches = $matches && $function->match($parts['name'], $parts['args'], $element);
+				}
+				catch (\Exception $e) {
+					throw new \Transphporm\RunException(\Transphporm\Exception::PSEUDO, $parts['name'], $e);
 				}
 			}
+		}
 		return $matches;
 	}
 

@@ -28,20 +28,21 @@ class PropertyHook implements \Transphporm\Hook {
 		$this->functionSet->setElement($element);
 		$this->origBaseDir = dirname(realpath($this->file)) . DIRECTORY_SEPARATOR;
 		//Don't run if there's a pseudo element like nth-child() and this element doesn't match it
-		if (!$this->pseudoMatcher->matches($element)) return;
+		try {
+			if (!$this->pseudoMatcher->matches($element)) return;
 
-		// TODO: Have all rule values parsed before running them so that things like `content-append` are not expecting tokens
-		// problem with this is that anything in data changed by run properties is not shown
-		// TODO: Allow `update-frequency` to be parsed before it is accessed in rule (might need to switch location of rule check)
+			// TODO: Have all rule values parsed before running them so that things like `content-append` are not expecting tokens
+			// problem with this is that anything in data changed by run properties is not shown
+			// TODO: Allow `update-frequency` to be parsed before it is accessed in rule (might need to switch location of rule check)
 
-		foreach ($this->rules as $name => $value) {
-			try {
-				$result = $this->callProperty($name, $element, $this->getArgs($value));
+			foreach ($this->rules as $name => $value) {
+
+					$result = $this->callProperty($name, $element, $this->getArgs($value));
+				if ($result === false) break;
 			}
-			catch (\Transphporm\RunException $e) {
-				throw new \Transphporm\Exception($e, $this->file, '');
-			}
-			if ($result === false) break;
+		}
+		catch (\Transphporm\RunException $e) {
+			throw new \Transphporm\Exception($e, $this->file, '');
 		}
 	}
 
@@ -59,7 +60,8 @@ class PropertyHook implements \Transphporm\Hook {
 				return $this->properties[$name]->run($value, $element, $this->rules, $this->pseudoMatcher, $this->properties);
 			}
 			catch (\Exception $e) {
-				throw new RunException(Exception::PROPERTY, $name, $e);
+				if ($e instanceof \Transphporm\RunException) throw $e;
+				throw new \Transphporm\RunException(\Transphporm\Exception::PROPERTY, $name, $e);
 			}
 		}
 	}
