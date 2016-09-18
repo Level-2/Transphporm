@@ -76,7 +76,7 @@ class Tokenizer {
 
 	private function doSimpleTokens(&$tokens, $char) {
 		if (in_array($char, [Tokenizer::ARG, Tokenizer::CONCAT, Tokenizer::DOT, Tokenizer::NOT,
-			Tokenizer::EQUALS, Tokenizer::COLON, Tokenizer::SEMI_COLON, Tokenizer::WHITESPACE,
+			Tokenizer::EQUALS, Tokenizer::COLON, Tokenizer::SEMI_COLON, Tokenizer::WHITESPACE, Tokenizer::NEW_LINE,
 			Tokenizer::NUM_SIGN, Tokenizer::GREATER_THAN, Tokenizer::AT_SIGN])) {
 			$tokens[] = ['type' => $char];
 		}

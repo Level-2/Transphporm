@@ -32,7 +32,10 @@ class Sheet {
 				$rules = array_merge($rules, $processing['rules']);
 				continue;
 			}
-			else if ($token['type'] === Tokenizer::NEW_LINE) $line++;
+			else if ($token['type'] === Tokenizer::NEW_LINE) {
+				$line++;
+				continue;
+			}
 			$selector = $this->tss->from($token['type'], true)->to(Tokenizer::OPEN_BRACE);
 			$this->tss->skip(count($selector));
 			if (count($selector) === 0) break;
