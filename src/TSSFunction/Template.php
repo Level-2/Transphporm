@@ -21,11 +21,14 @@ class Template implements \Transphporm\TSSFunction {
 		return isset($array[$index]) ? $array[$index] : null;
 	}
 
-	public function run(array $args, \DomElement $element) {
+	public function run(array $args, \DomElement $element = null) {
 		$selector = $this->readArray($args, 1);
 		$tss = $this->readArray($args, 2);
 
-		$newTemplate = new \Transphporm\Builder($this->baseDir . $args[0], $tss ? $this->baseDir . $tss : null);
+		if (trim($args[0])[0] === '<') $xml = $args[0];
+		else $xml = $this->baseDir . $args[0];
+
+		$newTemplate = new \Transphporm\Builder($xml, $tss ? $this->baseDir . $tss : null);
 
 		$doc = $newTemplate->output($this->elementData->getData($element), true)->body;
 		if ($selector != '') return $this->templateSubsection($doc, $selector);

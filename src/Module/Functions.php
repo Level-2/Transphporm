@@ -17,7 +17,11 @@ class Functions implements \Transphporm\Module {
 		$functionSet->addFunction('root', new \Transphporm\TSSFunction\Data($config->getElementData(), $functionSet, 'root'));
 		$functionSet->addFunction('key', new \Transphporm\TSSFunction\Data($config->getElementData(), $functionSet, 'key'));
 		$functionSet->addFunction('iteration', new \Transphporm\TSSFunction\Data($config->getElementData(), $functionSet, 'iteration'));
-		$functionSet->addFunction('template', new \Transphporm\TSSFunction\Template($config->getElementData(), $config->getCssToXpath(), $baseDir));
+		$templateFunction = new \Transphporm\TSSFunction\Template($config->getElementData(), $config->getCssToXpath(), $baseDir);
+		$functionSet->addFunction('template', $templateFunction);
 		$functionSet->addFunction('json', new \Transphporm\TSSFunction\Json($baseDir));
+
+		// Register HTML formatter here because it uses the template function
+		$config->registerFormatter(new \Transphporm\Formatter\HTMLFormatter($templateFunction));
 	}
 }

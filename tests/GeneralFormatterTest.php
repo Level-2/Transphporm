@@ -126,6 +126,15 @@ class GeneralFormatTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals($this->stripTabs('<div><span>foobar</span></div>'), $this->stripTabs($template->output()->body));
 	}
 
+	public function testHTMLFormatWithLooseFormat() {
+		$xml = '<div></div>';
+		$tss = 'div { content: "<span></span><p></p>"; format: html; }';
+
+		$template = new \Transphporm\Builder($xml, $tss);
+
+		$this->assertEquals($template->output()->body, $this->stripTabs('<div><span></span><p></p></div>'));
+	}
+
     /*
      * Date Formatter Tests
      */
