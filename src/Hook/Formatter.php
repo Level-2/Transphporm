@@ -16,24 +16,34 @@ class Formatter {
 	public function format($value, $rules) {
 		if (!isset($rules['format'])) return $value;
 		$tokens = $rules['format'];
-		
+
 		$functionName = $tokens->from(\Transphporm\Parser\Tokenizer::NAME, true)->read();
 
 		$options = [];
-		foreach (new \Transphporm\Parser\TokenFilterIterator($tokens->from(\Transphporm\Parser\Tokenizer::NAME), [\Transphporm\Parser\Tokenizer::WHITESPACE]) as $token) {
+		foreach (new \Transphporm\Parser\TokenFilterIterator($tokens->from(\Transphporm\Parser\Tokenizer::NAME),
+					[\Transphporm\Parser\Tokenizer::WHITESPACE]) as $token) {
 			$options[] = $token['value'];
 		}
-		return $this->processFormat($options, $functionName, $value);
+
+		try {
+			return $this->processFormat($options, $functionName, $value);
+		}
+		catch (\Exception $e) {
+			throw new \Transphporm\RunException(\Transphporm\Exception::FORMATTER, $functionName, $e);
+		}
 	}
 
 	private function processFormat($format, $functionName, $value) {
+		$functionExists = false;
 		foreach ($value as &$val) {
 			foreach ($this->formatters as $formatter) {
 				if (is_callable([$formatter, $functionName])) {
 					$val = call_user_func_array([$formatter, $functionName], array_merge([$val], $format));
+					$functionExists = true;
 				}
 			}
 		}
+		if (!$functionExists) throw new \Exception("Formatter '$functionName' does not exist");
 		return $value;
 	}
 }

@@ -10,14 +10,14 @@ class Nth implements \Transphporm\Pseudo {
 	private $count = 0;
 
 	public function match($name, $args, \DomElement $element) {
-		
+
 		if ($name !== 'nth-child') return true;
 
 		$this->count++;
 		$criteria = $args[0];
 
-
 		if (is_callable([$this, $criteria])) return $this->$criteria($this->count);
+		else if (!is_numeric($criteria)) throw new \Exception("Argument passed to 'nth-child' must be 'odd', 'even', or of type int");
 		else return $this->count == $criteria;
 	}
 

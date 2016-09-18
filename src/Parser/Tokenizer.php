@@ -16,6 +16,7 @@ class Tokenizer {
 	const CONCAT = 'CONCAT';
 	const ARG = 'ARG';
 	const WHITESPACE = 'WHITESPACE';
+	const NEW_LINE = 'NEW_LINE';
 	const DOT = 'DOT';
 	const NUMERIC = 'NUMERIC';
 	const EQUALS = 'EQUALS';
@@ -49,7 +50,7 @@ class Tokenizer {
 		'>' => self::GREATER_THAN,
 		'@' => self::AT_SIGN,
 		' ' => self::WHITESPACE,
-		"\n" => self::WHITESPACE,
+		"\n" => self::NEW_LINE,
 		"\r" => self::WHITESPACE,
 		"\t" => self::WHITESPACE
 	];
@@ -75,7 +76,7 @@ class Tokenizer {
 
 	private function doSimpleTokens(&$tokens, $char) {
 		if (in_array($char, [Tokenizer::ARG, Tokenizer::CONCAT, Tokenizer::DOT, Tokenizer::NOT,
-			Tokenizer::EQUALS, Tokenizer::COLON, Tokenizer::SEMI_COLON, Tokenizer::WHITESPACE,
+			Tokenizer::EQUALS, Tokenizer::COLON, Tokenizer::SEMI_COLON, Tokenizer::WHITESPACE, Tokenizer::NEW_LINE,
 			Tokenizer::NUM_SIGN, Tokenizer::GREATER_THAN, Tokenizer::AT_SIGN])) {
 			$tokens[] = ['type' => $char];
 		}
@@ -170,7 +171,7 @@ class Tokenizer {
 	private function serializeValue($token) {
 		if (isset($token['value'])) {
 			if ($token['value'] instanceof Tokens) return $this->serialize($token['value']);
-			else return $token['value'];	
-		}			
+			else return $token['value'];
+		}
 	}
 }

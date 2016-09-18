@@ -8,34 +8,39 @@ namespace Transphporm\Parser;
 /** Parses a .tss file into individual rules, each rule has a query e,g, `ul li` and a set of rules e.g. `display: none; bind: iteration(id);` */
 class Sheet {
 	private $tss;
-	private $baseDir;
+	private $file;
 	private $valueParser;
 	private $xPath;
 	private $tokenizer;
 
-	public function __construct($tss, $baseDir, CssToXpath $xPath, Value $valueParser) {
+	public function __construct($tss, $file, CssToXpath $xPath, Value $valueParser) {
 		$this->tss = $this->stripComments($tss, '//', "\n");
 		$this->tss = $this->stripComments($this->tss, '/*', '*/');
 		$this->tokenizer = new Tokenizer($this->tss);
 		$this->tss = $this->tokenizer->getTokens();
-		$this->baseDir = $baseDir;
+		$this->file = $file;
 		$this->xPath = $xPath;
 		$this->valueParser = $valueParser;
 	}
 
 	public function parse($indexStart = 0) {
 		$rules = [];
+		$line = 1;
 		foreach (new TokenFilterIterator($this->tss, [Tokenizer::WHITESPACE]) as $token) {
 			if ($processing = $this->processingInstructions($token, count($rules)+$indexStart)) {
 				$this->tss->skip($processing['skip']+1);
 				$rules = array_merge($rules, $processing['rules']);
 				continue;
 			}
+			else if ($token['type'] === Tokenizer::NEW_LINE) {
+				$line++;
+				continue;
+			}
 			$selector = $this->tss->from($token['type'], true)->to(Tokenizer::OPEN_BRACE);
 			$this->tss->skip(count($selector));
 			if (count($selector) === 0) break;
 
-			$newRules = $this->cssToRules($selector, count($rules)+$indexStart, $this->getProperties($this->tss->current()['value']));
+			$newRules = $this->cssToRules($selector, count($rules)+$indexStart, $this->getProperties($this->tss->current()['value']), $line);
 			$rules = $this->writeRule($rules, $newRules);
 		}
 		usort($rules, [$this, 'sortRules']);
@@ -47,12 +52,12 @@ class Sheet {
 		if (empty($rules) && count($this->tss) > 0) throw new \Exception('No TSS rules parsed');
 	}
 
-	private function CssToRules($selector, $index, $properties) {
+	private function CssToRules($selector, $index, $properties, $line) {
 		$parts = $selector->trim()->splitOnToken(Tokenizer::ARG);
 		$rules = [];
 		foreach ($parts as $part) {
 			$part = $part->trim();
-			$rules[$this->tokenizer->serialize($part)] = new \Transphporm\Rule($this->xPath->getXpath($part), $this->xPath->getPseudo($part), $this->xPath->getDepth($part), $index++, $this->baseDir);
+			$rules[$this->tokenizer->serialize($part)] = new \Transphporm\Rule($this->xPath->getXpath($part), $this->xPath->getPseudo($part), $this->xPath->getDepth($part), $index++, $this->file, $line);
 			$rules[$this->tokenizer->serialize($part)]->properties = $properties;
 		}
 		return $rules;
@@ -81,8 +86,9 @@ class Sheet {
 	}
 
 	private function import($args, $indexStart) {
-		$fileName = $args[0];
-		$sheet = new Sheet(file_get_contents($this->baseDir . $fileName), dirname(realpath($this->baseDir . $fileName)) . DIRECTORY_SEPARATOR, $this->xPath, $this->valueParser);
+		if ($this->file !== null) $fileName = dirname(realpath($this->file)) . DIRECTORY_SEPARATOR . $args[0];
+		else $fileName = $args[0];
+		$sheet = new Sheet(file_get_contents($fileName), $fileName, $this->xPath, $this->valueParser);
 		return $sheet->parse($indexStart);
 	}
 

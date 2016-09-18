@@ -41,47 +41,47 @@ class DateFormatTest extends PHPUnit_Framework_TestCase {
 	}
 
 	public function testSecondsAgo() {
-		$this->assertEquals('28 seconds ago', $this->relative('-28 seconds'));	
+		$this->assertEquals('28 seconds ago', $this->relative('-28 seconds'));
 	}
 
 	public function testSecondsin() {
-		$this->assertEquals('in 33 seconds', $this->relative('+33 seconds'));	
+		$this->assertEquals('in 33 seconds', $this->relative('+33 seconds'));
 	}
 
 	public function testMinutesAgo() {
-		$this->assertEquals('13 minutes ago', $this->relative('-13 minutes'));	
+		$this->assertEquals('13 minutes ago', $this->relative('-13 minutes'));
 	}
 
 	public function testMinutesin() {
-		$this->assertEquals('in 40 minutes', $this->relative('+40 minutes'));	
+		$this->assertEquals('in 40 minutes', $this->relative('+40 minutes'));
 	}
 
 	public function testHoursAgo() {
-		$this->assertEquals('22 hours ago', $this->relative('-22 hours'));	
+		$this->assertEquals('22 hours ago', $this->relative('-22 hours'));
 	}
 
 	public function testHoursin() {
-		$this->assertEquals('in 3 hours', $this->relative('+3 hours'));	
+		$this->assertEquals('in 3 hours', $this->relative('+3 hours'));
 	}
 
 	public function testDaysAgo() {
-		$this->assertEquals('6 days ago', $this->relative('-6 days'));	
+		$this->assertEquals('6 days ago', $this->relative('-6 days'));
 	}
 
 	public function testDaysin() {
-		$this->assertEquals('in 3 days', $this->relative('+3 days'));	
+		$this->assertEquals('in 3 days', $this->relative('+3 days'));
 	}
 
 	public function testWeeksAgo() {
-		$this->assertEquals('3 weeks ago', $this->relative('-3 weeks'));	
+		$this->assertEquals('3 weeks ago', $this->relative('-3 weeks'));
 	}
 
 	public function testWeeksin() {
-		$this->assertEquals('in 2 weeks', $this->relative('+2 weeks'));	
+		$this->assertEquals('in 2 weeks', $this->relative('+2 weeks'));
 	}
 
 	public function testMonthsAgo() {
-		$this->assertEquals('5 months ago', $this->relative('-5 months'));	
+		$this->assertEquals('5 months ago', $this->relative('-5 months'));
 	}
 
 	public function testMonthsin() {
@@ -103,11 +103,10 @@ class DateFormatTest extends PHPUnit_Framework_TestCase {
 	public function testDayBeforeYesterdaySet() {
 		$locale = json_decode(file_get_contents('src/Formatter/Locale/enGB.json'), true);
 		$locale['offset_strings']['day_before_yesterday'] = 'custom day before yesterday string';
-		$formatter = new \Transphporm\Formatter\Date($locale);	
+		$formatter = new \Transphporm\Formatter\Date($locale);
 
 		$this->assertEquals('custom day before yesterday string', $this->relative('-2 days', $formatter));
 	}
-
 
 	public function testDayAfterTomorrowNotSet() {
 		$this->assertEquals('in 2 days', $this->relative('+2 days'));
@@ -116,7 +115,7 @@ class DateFormatTest extends PHPUnit_Framework_TestCase {
 	public function testDayAfterTomorrowSet() {
 		$locale = json_decode(file_get_contents('src/Formatter/Locale/enGB.json'), true);
 		$locale['offset_strings']['day_after_tomorrow'] = 'custom day after tomorrow string';
-		$formatter = new \Transphporm\Formatter\Date($locale);	
+		$formatter = new \Transphporm\Formatter\Date($locale);
 
 		$this->assertEquals('custom day after tomorrow string', $this->relative('+2 days', $formatter));
 	}

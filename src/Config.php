@@ -12,6 +12,7 @@ class Config {
 	private $headers;
 	private $formatter;
 	private $baseDir;
+	private $line = 0;
 	private $elementData;
 	private $xPath;
 	private $valueParser;
@@ -36,6 +37,10 @@ class Config {
 
 	public function &getBaseDir() {
 		return $this->baseDir;
+	}
+
+	public function &getLine() {
+		return $this->line;
 	}
 
 	public function registerFormatter($formatter) {
