@@ -20,7 +20,7 @@ class Rule {
 	const D = 86400;
 
 
-	public function __construct($query, $pseudo, $depth, $index, $file, $line = 0, array $properties = []) {
+	public function __construct($query, $pseudo, $depth, $index, $file, $line, array $properties = []) {
 		$this->query = $query;
 		$this->pseudo = $pseudo;
 		$this->depth = $depth;

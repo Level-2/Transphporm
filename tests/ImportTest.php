@@ -117,7 +117,7 @@ class ImportTest extends PHPUnit_Framework_TestCase {
 	}
 
 	public function testBaseDirChangeWithImport() {
-		$template = new \Transphporm\Builder("tests/test.xml", "tests/other/templateFromImport.tss");
+		$template = new \Transphporm\Builder("tests/test.xml", "tests/other/importTemplateFromImport.tss");
 
 		$this->assertEquals('<!DOCTYPE html><html><body><p>foo</p></body></html>', $this->stripTabs($template->output()->body));
 	}

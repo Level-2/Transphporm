@@ -81,7 +81,7 @@ class Builder {
 		$rule->touch();
 
 		$pseudoMatcher = $config->createPseudoMatcher($rule->pseudo);
-		$hook = new Hook\PropertyHook($rule->properties, $this->baseDir, $rule->file, $pseudoMatcher, $config->getValueParser(), $config->getFunctionSet());
+		$hook = new Hook\PropertyHook($rule->properties, $this->baseDir, $config->getLine(), $rule->file, $rule->line, $pseudoMatcher, $config->getValueParser(), $config->getFunctionSet());
 		$config->loadProperties($hook);
 		$template->addHook($rule->query, $hook);
 	}

@@ -16,6 +16,7 @@ class Tokenizer {
 	const CONCAT = 'CONCAT';
 	const ARG = 'ARG';
 	const WHITESPACE = 'WHITESPACE';
+	const NEW_LINE = 'NEW_LINE';
 	const DOT = 'DOT';
 	const NUMERIC = 'NUMERIC';
 	const EQUALS = 'EQUALS';
@@ -49,7 +50,7 @@ class Tokenizer {
 		'>' => self::GREATER_THAN,
 		'@' => self::AT_SIGN,
 		' ' => self::WHITESPACE,
-		"\n" => self::WHITESPACE,
+		"\n" => self::NEW_LINE,
 		"\r" => self::WHITESPACE,
 		"\t" => self::WHITESPACE
 	];
@@ -170,7 +171,7 @@ class Tokenizer {
 	private function serializeValue($token) {
 		if (isset($token['value'])) {
 			if ($token['value'] instanceof Tokens) return $this->serialize($token['value']);
-			else return $token['value'];	
-		}			
+			else return $token['value'];
+		}
 	}
 }

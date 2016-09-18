@@ -25,17 +25,19 @@ class Sheet {
 
 	public function parse($indexStart = 0) {
 		$rules = [];
+		$line = 1;
 		foreach (new TokenFilterIterator($this->tss, [Tokenizer::WHITESPACE]) as $token) {
 			if ($processing = $this->processingInstructions($token, count($rules)+$indexStart)) {
 				$this->tss->skip($processing['skip']+1);
 				$rules = array_merge($rules, $processing['rules']);
 				continue;
 			}
+			else if ($token['type'] === Tokenizer::NEW_LINE) $line++;
 			$selector = $this->tss->from($token['type'], true)->to(Tokenizer::OPEN_BRACE);
 			$this->tss->skip(count($selector));
 			if (count($selector) === 0) break;
 
-			$newRules = $this->cssToRules($selector, count($rules)+$indexStart, $this->getProperties($this->tss->current()['value']));
+			$newRules = $this->cssToRules($selector, count($rules)+$indexStart, $this->getProperties($this->tss->current()['value']), $line);
 			$rules = $this->writeRule($rules, $newRules);
 		}
 		usort($rules, [$this, 'sortRules']);
@@ -47,12 +49,12 @@ class Sheet {
 		if (empty($rules) && count($this->tss) > 0) throw new \Exception('No TSS rules parsed');
 	}
 
-	private function CssToRules($selector, $index, $properties) {
+	private function CssToRules($selector, $index, $properties, $line) {
 		$parts = $selector->trim()->splitOnToken(Tokenizer::ARG);
 		$rules = [];
 		foreach ($parts as $part) {
 			$part = $part->trim();
-			$rules[$this->tokenizer->serialize($part)] = new \Transphporm\Rule($this->xPath->getXpath($part), $this->xPath->getPseudo($part), $this->xPath->getDepth($part), $index++, $this->file);
+			$rules[$this->tokenizer->serialize($part)] = new \Transphporm\Rule($this->xPath->getXpath($part), $this->xPath->getPseudo($part), $this->xPath->getDepth($part), $index++, $this->file, $line);
 			$rules[$this->tokenizer->serialize($part)]->properties = $properties;
 		}
 		return $rules;
