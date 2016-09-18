@@ -2162,6 +2162,15 @@ ul li span {
 
 		$this->assertEquals($template->output()->body, $this->stripTabs('<h2 class="name">Test</h2>'));
 	}
+
+	public function testHTMLFormatWithLooseFormat() {
+		$xml = '<div></div>';
+		$tss = 'div { content: "<span></span><p></p>"; format: html; }';
+
+		$template = new \Transphporm\Builder($xml, $tss);
+
+		$this->assertEquals($template->output()->body, $this->stripTabs('<div><span></span><p></p></div>'));
+	}
 }
 
 
