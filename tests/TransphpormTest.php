@@ -1335,7 +1335,7 @@ ul li span {
 
 		$template = new \Transphporm\Builder($xml, $tss);
 
-		$this->assertEquals('<div><p></p></div>', $this->stripTabs($template->output()->body));
+		$this->assertEquals('<div><!-- Comment --><p></p></div>', $this->stripTabs($template->output()->body));
 	}
 
 	public function testXmlCommentInTemplate2() {
@@ -1344,7 +1344,7 @@ ul li span {
 
 		$template = new \Transphporm\Builder($xml, $tss);
 
-		$this->assertEquals('<div><p></p></div>', $this->stripTabs($template->output()->body));
+		$this->assertEquals('<div><p></p><!-- Comment --></div>', $this->stripTabs($template->output()->body));
 	}
 }
 

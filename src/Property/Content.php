@@ -56,7 +56,6 @@ class Content implements \Transphporm\Property {
 			if (is_array($n)) {
 				foreach ($this->getNode($n, $document) as $new) yield $new;
 			}
-			else if ($n instanceof \DOMComment) continue;
 			else {
 				yield $this->convertNode($n, $document);
 			}
@@ -64,7 +63,7 @@ class Content implements \Transphporm\Property {
 	}
 
 	private function convertNode($node, $document) {
-		if ($node instanceof \DomElement) {
+		if ($node instanceof \DomElement || $node instanceof \DOMComment) {
 			$new = $document->importNode($node, true);
 			//Removing this might cause problems with caching...
 			//$new->setAttribute('transphporm', 'added');
