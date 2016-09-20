@@ -1319,6 +1319,33 @@ ul li span {
 
 		$this->assertEquals('<div>Test2</div>', $template->output()->body);
 	}
+
+	public function testXmlComment() {
+		$xml = "<div><!-- Comment --></div>";
+		$tss = "div {}";
+
+		$template = new \Transphporm\Builder($xml, $tss);
+
+		$this->assertEquals('<div><!-- Comment --></div>', $template->output()->body);
+	}
+
+	public function testXmlCommentInTemplate() {
+		$xml = "<div></div>";
+		$tss = "div { content: template('" . str_replace('\\', '/', __DIR__) . "/xmlComment.xml'); }";
+
+		$template = new \Transphporm\Builder($xml, $tss);
+
+		$this->assertEquals('<div><p></p></div>', $this->stripTabs($template->output()->body));
+	}
+
+	public function testXmlCommentInTemplate2() {
+		$xml = "<div></div>";
+		$tss = "div { content: template('" . str_replace('\\', '/', __DIR__) . "/xmlComment2.xml'); }";
+
+		$template = new \Transphporm\Builder($xml, $tss);
+
+		$this->assertEquals('<div><p></p></div>', $this->stripTabs($template->output()->body));
+	}
 }
 
 

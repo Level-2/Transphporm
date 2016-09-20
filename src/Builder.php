@@ -118,6 +118,6 @@ class Builder {
 	}
 
 	private function isValidDoc($xml) {
-		return strpos($xml, '<!') === 0 || strpos($xml, '<?') === 0;
+		return (strpos($xml, '<!') === 0 && strpos($xml, '<!--') !== 0) || strpos($xml, '<?') === 0;
 	}
 }

@@ -56,6 +56,7 @@ class Content implements \Transphporm\Property {
 			if (is_array($n)) {
 				foreach ($this->getNode($n, $document) as $new) yield $new;
 			}
+			else if ($n instanceof \DOMComment) continue;
 			else {
 				yield $this->convertNode($n, $document);
 			}
