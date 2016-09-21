@@ -8,8 +8,14 @@ namespace Transphporm\Pseudo;
 use \Transphporm\Parser\Tokenizer;
 class Nth implements \Transphporm\Pseudo {
 	private $count = 0;
+	private $lastParentNode;
 
 	public function match($name, $args, \DomElement $element) {
+		if ($element->parentNode !== $this->lastParentNode) $this->count = 0;
+
+		$this->lastParentNode = $element->parentNode;
+
+
 
 		if ($name !== 'nth-child') return true;
 
