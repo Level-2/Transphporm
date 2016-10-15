@@ -281,6 +281,14 @@ class ValueParserTest extends PHPUnit_Framework_TestCase {
 
 	}
 
+	public function testArrayLookupFromFuncResult() {
+		$value = new Value(new TestData);
+
+		$result = $value->parse('getArray()[0]');
+
+		$this->assertEquals(['test1Array'], $result);
+	}
+
 	//public fucntion testNested
 }
 
@@ -302,6 +310,12 @@ class TestData {
 
 	public function data($a) {
 		return $a;
+	}
+
+	public function getArray() {
+		return [
+			'test1Array'
+		];
 	}
 }
 

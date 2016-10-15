@@ -93,6 +93,10 @@ class Value {
 		}
 		else {
 			if ($this->last !== null) $this->data->traverse($this->last);
+			else {
+				$lastResult = $this->result->pop();
+				if ($lastResult) $this->data = new ValueData($lastResult);
+			}
 			$this->last = $parser->parseTokens($token['value'], null)[0];
 		}
 	}
