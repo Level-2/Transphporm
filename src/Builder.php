@@ -98,19 +98,7 @@ class Builder {
 	//Load the TSS rules either from a file or as a string
 	//N.b. only files can be cached
 	private function getRules($template, $config) {
-		if (is_file($this->tss)) {
-			$this->baseDir = dirname(realpath($this->tss)) . DIRECTORY_SEPARATOR;
-			//The cache for the key: the filename and template prefix
-			//Each template may have a different prefix which changes the parsed TSS,
-			//Because of this the cache needs to be generated for each template prefix.
-			$key = $this->tss . $template->getPrefix() . $this->baseDir;
-			//Try to load the cached rules, if not set in the cache (or expired) parse the supplied sheet
-			$rules = $this->cache->load($key, filemtime($this->tss));
-
-			if (!$rules) return $this->cache->write($key, (new Parser\Sheet(file_get_contents($this->tss), $this->tss, $config->getCssToXpath(), $config->getValueParser()))->parse());
-			else return $rules;
-		}
-		else return (new Parser\Sheet($this->tss, $this->baseDir, $config->getCssToXpath(), $config->getValueParser()))->parse();
+		return (new Parser\Sheet($this->tss, $template->getPrefix(), $this->baseDir, $config->getCssToXpath(), $config->getValueParser(), $this->cache))->parse();
 	}
 
 	public function setCache(\ArrayAccess $cache) {

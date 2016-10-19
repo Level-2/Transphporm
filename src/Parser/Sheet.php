@@ -8,22 +8,48 @@ namespace Transphporm\Parser;
 /** Parses a .tss file into individual rules, each rule has a query e,g, `ul li` and a set of rules e.g. `display: none; bind: iteration(id);` */
 class Sheet {
 	private $tss;
+	private $rules;
 	private $file;
+	private $baseDir;
 	private $valueParser;
 	private $xPath;
 	private $tokenizer;
 
-	public function __construct($tss, $file, CssToXpath $xPath, Value $valueParser) {
+	public function __construct($tss, $templatePrefix, &$baseDir, CssToXpath $xPath, Value $valueParser, \Transphporm\Cache $cache) {
+		$this->cache = $cache;
+		$this->prefix = $templatePrefix;
+		$this->baseDir = &$baseDir;
+		if (is_file($tss)) {
+			$this->file = $tss;
+			$this->rules = $this->getRulesFromCache($tss, $templatePrefix);
+			$baseDir = dirname(realpath($tss)) . DIRECTORY_SEPARATOR;
+			if (empty($this->rules)) $tss = file_get_contents($tss);
+			else return;
+		}
 		$this->tss = $this->stripComments($tss, '//', "\n");
 		$this->tss = $this->stripComments($this->tss, '/*', '*/');
 		$this->tokenizer = new Tokenizer($this->tss);
 		$this->tss = $this->tokenizer->getTokens();
-		$this->file = $file;
 		$this->xPath = $xPath;
 		$this->valueParser = $valueParser;
 	}
 
+	private function getRulesFromCache() {
+		//The cache for the key: the filename and template prefix
+		//Each template may have a different prefix which changes the parsed TSS,
+		//Because of this the cache needs to be generated for each template prefix.
+		$key = $this->getCacheKey();
+		//Try to load the cached rules, if not set in the cache (or expired) parse the supplied sheet
+		$rules = $this->cache->load($key, filemtime($this->file));
+		return $rules;
+	}
+
+	private function getCacheKey() {
+		return $this->file . $this->prefix . dirname(realpath($this->file)) . DIRECTORY_SEPARATOR;
+	}
+
 	public function parse($indexStart = 0) {
+		if (!empty($this->rules)) return $this->rules;
 		$rules = [];
 		$line = 1;
 		foreach (new TokenFilterIterator($this->tss, [Tokenizer::WHITESPACE]) as $token) {
@@ -45,6 +71,7 @@ class Sheet {
 		}
 		usort($rules, [$this, 'sortRules']);
 		$this->checkError($rules);
+		if (!empty($this->file)) $this->cache->write($this->getCacheKey(), $rules);
 		return $rules;
 	}
 
@@ -88,7 +115,7 @@ class Sheet {
 	private function import($args, $indexStart) {
 		if ($this->file !== null) $fileName = dirname(realpath($this->file)) . DIRECTORY_SEPARATOR . $args[0];
 		else $fileName = $args[0];
-		$sheet = new Sheet(file_get_contents($fileName), $fileName, $this->xPath, $this->valueParser);
+		$sheet = new Sheet($fileName, $this->prefix, $this->baseDir, $this->xPath, $this->valueParser, $this->cache);
 		return $sheet->parse($indexStart);
 	}
 

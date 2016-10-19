@@ -24,7 +24,7 @@ class DateFormatTest extends PHPUnit_Framework_TestCase {
 	}
 
 	private function relative($modify, $formatter = null) {
-		$date = new \DateTime();
+		$date = new \DateTime(json_decode(file_get_contents('src/Formatter/Locale/enGB.json'), true)['timezone']);
 		$date->modify($modify);
 
 		$formatter = empty($formatter) ? $this->getFormatter() : $formatter;
