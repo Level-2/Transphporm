@@ -14,6 +14,7 @@ class Sheet {
 	private $valueParser;
 	private $xPath;
 	private $tokenizer;
+	private $import = [];
 
 	public function __construct($tss, $templatePrefix, &$baseDir, CssToXpath $xPath, Value $valueParser, \Transphporm\Cache $cache) {
 		$this->cache = $cache;
@@ -38,18 +39,31 @@ class Sheet {
 		//The cache for the key: the filename and template prefix
 		//Each template may have a different prefix which changes the parsed TSS,
 		//Because of this the cache needs to be generated for each template prefix.
-		$key = $this->getCacheKey();
+		$key = $this->getCacheKey($this->file);
 		//Try to load the cached rules, if not set in the cache (or expired) parse the supplied sheet
 		$rules = $this->cache->load($key, filemtime($this->file));
+		if ($rules) {
+			foreach ($rules['import'] as $file) {
+				if (!$this->cache->load($this->getCacheKey($file), filemtime($file))) return false;
+			}
+		}
 		return $rules;
 	}
 
-	private function getCacheKey() {
-		return $this->file . $this->prefix . dirname(realpath($this->file)) . DIRECTORY_SEPARATOR;
+	private function getCacheKey($file) {
+		return $file . $this->prefix . dirname(realpath($file)) . DIRECTORY_SEPARATOR;
 	}
 
 	public function parse($indexStart = 0) {
-		if (!empty($this->rules)) return $this->rules;
+		if (!empty($this->rules)) return $this->rules['rules'];
+		$rules = $this->parseTokens($indexStart);
+		usort($rules, [$this, 'sortRules']);
+		$this->checkError($rules);
+		if (!empty($this->file)) $this->cache->write($this->getCacheKey($this->file), ['rules' => $rules, 'import' => $this->import]);
+		return $rules;
+	}
+
+	private function parseTokens($indexStart) {
 		$rules = [];
 		$line = 1;
 		foreach (new TokenFilterIterator($this->tss, [Tokenizer::WHITESPACE]) as $token) {
@@ -69,9 +83,6 @@ class Sheet {
 			$newRules = $this->cssToRules($selector, count($rules)+$indexStart, $this->getProperties($this->tss->current()['value']), $line);
 			$rules = $this->writeRule($rules, $newRules);
 		}
-		usort($rules, [$this, 'sortRules']);
-		$this->checkError($rules);
-		if (!empty($this->file)) $this->cache->write($this->getCacheKey(), $rules);
 		return $rules;
 	}
 
@@ -115,6 +126,7 @@ class Sheet {
 	private function import($args, $indexStart) {
 		if ($this->file !== null) $fileName = dirname(realpath($this->file)) . DIRECTORY_SEPARATOR . $args[0];
 		else $fileName = $args[0];
+		$this->import[] = $fileName;
 		$sheet = new Sheet($fileName, $this->prefix, $this->baseDir, $this->xPath, $this->valueParser, $this->cache);
 		return $sheet->parse($indexStart);
 	}
