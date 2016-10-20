@@ -98,7 +98,8 @@ class Builder {
 	//Load the TSS rules either from a file or as a string
 	//N.b. only files can be cached
 	private function getRules($template, $config) {
-		return (new Parser\Sheet($this->tss, $template->getPrefix(), $this->baseDir, $config->getCssToXpath(), $config->getValueParser(), $this->cache))->parse();
+		$cache = new TSSCache($this->cache, $template->getPrefix());
+		return (new Parser\Sheet($this->tss, $this->baseDir, $config->getCssToXpath(), $config->getValueParser(), $cache))->parse();
 	}
 
 	public function setCache(\ArrayAccess $cache) {
