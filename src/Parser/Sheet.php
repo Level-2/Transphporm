@@ -7,6 +7,7 @@
 namespace Transphporm\Parser;
 /** Parses a .tss file into individual rules, each rule has a query e,g, `ul li` and a set of rules e.g. `display: none; bind: iteration(id);` */
 class Sheet {
+	private $cache;
 	private $tss;
 	private $rules;
 	private $file;
@@ -43,26 +44,29 @@ class Sheet {
 	}
 
 	private function parseTokens($indexStart) {
-		$rules = [];
+		$this->rules = [];
 		$line = 1;
 		foreach (new TokenFilterIterator($this->tss, [Tokenizer::WHITESPACE]) as $token) {
-			if ($processing = $this->processingInstructions($token, count($rules)+$indexStart)) {
-				$this->tss->skip($processing['skip']+1);
-				$rules = array_merge($rules, $processing['rules']);
+			if ($processing = $this->processingInstructions($token, count($this->rules)+$indexStart)) {
+				$this->rules = array_merge($this->rules, $processing);
 				continue;
 			}
 			else if ($token['type'] === Tokenizer::NEW_LINE) {
 				$line++;
 				continue;
 			}
-			$selector = $this->tss->from($token['type'], true)->to(Tokenizer::OPEN_BRACE);
-			$this->tss->skip(count($selector));
-			if (count($selector) === 0) break;
-
-			$newRules = $this->cssToRules($selector, count($rules)+$indexStart, $this->getProperties($this->tss->current()['value']), $line);
-			$rules = $this->writeRule($rules, $newRules);
+			else $this->addRules($token, $indexStart, $line);
 		}
-		return $rules;
+		return $this->rules;
+	}
+
+	private function addRules($token, $indexStart, $line) {
+		$selector = $this->tss->from($token['type'], true)->to(Tokenizer::OPEN_BRACE);
+		$this->tss->skip(count($selector));
+		if (count($selector) === 0) return;
+
+		$newRules = $this->cssToRules($selector, count($this->rules)+$indexStart, $this->getProperties($this->tss->current()['value']), $line);
+		$this->rules = $this->writeRule($this->rules, $newRules);
 	}
 
 	private function checkError($rules) {
@@ -99,7 +103,9 @@ class Sheet {
 		$args = $this->valueParser->parseTokens($tokens->from(Tokenizer::NAME));
 		$rules = $this->$funcName($args, $indexStart);
 
-		return ['skip' => count($tokens)+1, 'rules' => $rules];
+		$this->tss->skip(count($tokens)+2);
+
+		return $rules;
 	}
 
 	private function import($args, $indexStart) {

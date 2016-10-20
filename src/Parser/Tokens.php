@@ -61,7 +61,7 @@ class Tokens implements \Iterator, \Countable {
         $key = $this->getKeyToSlice($tokenType);
         if ($key === false) return new Tokens([]);
         if ($inclusive) $key++;
-        return new Tokens(array_slice($this->tokens, 0, $key));
+        return new Tokens(array_slice($this->tokens, $this->iterator, $key));
     }
 
     public function skip($count) {
