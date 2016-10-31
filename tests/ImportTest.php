@@ -121,4 +121,17 @@ class ImportTest extends PHPUnit_Framework_TestCase {
 
 		$this->assertEquals('<!DOCTYPE html><html><body><p>foo</p></body></html>', $this->stripTabs($template->output()->body));
 	}
+
+	public function testImportFromRoot() {
+		$template = new \Transphporm\Builder("<div>test</div>", __DIR__ . DIRECTORY_SEPARATOR . "other/rootImport.tss");
+
+		$this->assertEquals('<div>foo</div>', $this->stripTabs($template->output()->body));
+	}
+
+	public function testImportFromCustomRoot() {
+		$template = new \Transphporm\Builder("<div>test</div>", __DIR__ . DIRECTORY_SEPARATOR . "other/rootImportOverride.tss");
+		$template->setRootDir(getcwd() . "/tests");
+
+		$this->assertEquals('<div>foo</div>', $this->stripTabs($template->output()->body));
+	}
 }

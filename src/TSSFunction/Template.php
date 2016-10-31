@@ -11,8 +11,8 @@ class Template implements \Transphporm\TSSFunction {
 	private $baseDir;
 	private $xPath;
 
-	public function __construct(\Transphporm\Hook\ElementData $elementData, \Transphporm\Parser\CssToXpath $xPath, &$baseDir) {
-		$this->baseDir = &$baseDir;
+	public function __construct(\Transphporm\Hook\ElementData $elementData, \Transphporm\Parser\CssToXpath $xPath, \Transphporm\FilePath $filePath) {
+		$this->filePath = $filePath;
 		$this->elementData = $elementData;
 		$this->xPath = $xPath;
 	}
@@ -26,9 +26,9 @@ class Template implements \Transphporm\TSSFunction {
 		$tss = $this->readArray($args, 2);
 
 		if (trim($args[0])[0] === '<') $xml = $args[0];
-		else $xml = $this->baseDir . $args[0];
+		else $xml = $this->filePath->getFilePath($args[0]);
 
-		$newTemplate = new \Transphporm\Builder($xml, $tss ? $this->baseDir . $tss : null);
+		$newTemplate = new \Transphporm\Builder($xml, $tss ? $this->filePath->getFilePath($tss) : null);
 
 		$doc = $newTemplate->output($this->elementData->getData($element), true)->body;
 		if ($selector != '') return $this->templateSubsection($doc, $selector);

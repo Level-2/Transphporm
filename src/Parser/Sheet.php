@@ -15,9 +15,10 @@ class Sheet {
 	private $valueParser;
 	private $xPath;
 	private $tokenizer;
+	private $filePath;
 	private $import = [];
 
-	public function __construct($tss, &$baseDir, CssToXpath $xPath, Value $valueParser, \Transphporm\TSSCache $cache) {
+	public function __construct($tss, &$baseDir, CssToXpath $xPath, Value $valueParser, \Transphporm\TSSCache $cache, \Transphporm\FilePath $filePath) {
 		$this->cache = $cache;
 		$this->baseDir = &$baseDir;
 		if (is_file($tss)) {
@@ -33,6 +34,7 @@ class Sheet {
 		$this->tss = $this->tokenizer->getTokens();
 		$this->xPath = $xPath;
 		$this->valueParser = $valueParser;
+		$this->filePath = $filePath;
 	}
 
 	public function parse($indexStart = 0) {
@@ -109,10 +111,10 @@ class Sheet {
 	}
 
 	private function import($args, $indexStart) {
-		if ($this->file !== null) $fileName = dirname(realpath($this->file)) . DIRECTORY_SEPARATOR . $args[0];
+		if ($this->file !== null) $fileName = $fileName = $this->filePath->getFilePath($args[0]);
 		else $fileName = $args[0];
 		$this->import[] = $fileName;
-		$sheet = new Sheet($fileName, $this->baseDir, $this->xPath, $this->valueParser, $this->cache);
+		$sheet = new Sheet($fileName, $this->baseDir, $this->xPath, $this->valueParser, $this->cache, $this->filePath);
 		return $sheet->parse($indexStart);
 	}
 

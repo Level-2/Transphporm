@@ -17,10 +17,10 @@ class Config {
 	private $xPath;
 	private $valueParser;
 
-	public function __construct(Functionset $functionSet, Parser\Value $valueParser, Hook\ElementData $elementData, Hook\Formatter $formatter, Parser\CssToXpath $xPath, &$headers, &$baseDir) {
+	public function __construct(Functionset $functionSet, Parser\Value $valueParser, Hook\ElementData $elementData, Hook\Formatter $formatter, Parser\CssToXpath $xPath, FilePath $filePath, &$headers) {
 		$this->formatter = $formatter;
 		$this->headers = &$headers;
-		$this->baseDir = &$baseDir;
+		$this->filePath = $filePath;
 		$this->functionSet = $functionSet;
 		$this->elementData = $elementData;
 		$this->xPath = $xPath;
@@ -35,8 +35,8 @@ class Config {
 		return $this->headers;
 	}
 
-	public function &getBaseDir() {
-		return $this->baseDir;
+	public function getFilePath() {
+		return $this->filePath;
 	}
 
 	public function &getLine() {

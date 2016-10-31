@@ -10,7 +10,7 @@ class Functions implements \Transphporm\Module {
 
 	public function load(\Transphporm\Config $config) {
 		$functionSet = $config->getFunctionSet();
-		$baseDir = &$config->getBaseDir();
+		$baseDir = $config->getFilePath();
 
 		$functionSet->addFunction('attr', new \Transphporm\TSSFunction\Attr());
 		$functionSet->addFunction('data', new \Transphporm\TSSFunction\Data($config->getElementData(), $functionSet, 'data'));

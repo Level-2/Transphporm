@@ -3,15 +3,15 @@ namespace Transphporm\TSSFunction;
 class Json implements \Transphporm\TSSFunction {
     private $baseDir;
 
-    public function __construct(&$baseDir) {
-        $this->baseDir = &$baseDir;
+    public function __construct(\Transphporm\FilePath $filePath) {
+        $this->filePath = $filePath;
     }
 
     public function run(array $args, \DomElement $element = null) {
         $json = $args[0];
 
         if ($this->isJsonFile($json)) {
-            $path = $this->baseDir . $json;
+            $path = $this->filePath->getFilePath($json);
             if (!file_exists($path)) throw new \Exception('File does not exist at: ' . $path);
             $json = file_get_contents($path);
         }

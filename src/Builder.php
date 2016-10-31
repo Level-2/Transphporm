@@ -10,6 +10,7 @@ class Builder {
 	private $template;
 	private $tss;
 	private $baseDir;
+	private $rootDir;
 	private $cache;
 	private $time;
 	private $modules = [];
@@ -39,6 +40,10 @@ class Builder {
 		$this->modules[get_class($module)] = $module;
 	}
 
+	public function setRootDir($rootDir) {
+		$this->rootDir = $rootDir;
+	}
+
 	public function output($data = null, $document = false) {
 		$headers = [];
 
@@ -49,7 +54,7 @@ class Builder {
 		//To be a valid XML document it must have a root element, automatically wrap it in <template> to ensure it does
 		$template = new Template($this->isValidDoc($cachedOutput['body']) ? str_ireplace('<!doctype', '<!DOCTYPE', $cachedOutput['body']) : '<template>' . $cachedOutput['body'] . '</template>' );
 		$valueParser = new Parser\Value($data);
-		$config = new Config($data, $valueParser, $elementData, new Hook\Formatter(), new Parser\CssToXpath($data, $template->getPrefix()), $headers, $this->baseDir);
+		$config = new Config($data, $valueParser, $elementData, new Hook\Formatter(), new Parser\CssToXpath($data, $template->getPrefix()), new FilePath($this->baseDir, $this->rootDir), $headers);
 
 		foreach ($this->modules as $module) $module->load($config);
 
@@ -99,7 +104,7 @@ class Builder {
 	//N.b. only files can be cached
 	private function getRules($template, $config) {
 		$cache = new TSSCache($this->cache, $template->getPrefix());
-		return (new Parser\Sheet($this->tss, $this->baseDir, $config->getCssToXpath(), $config->getValueParser(), $cache))->parse();
+		return (new Parser\Sheet($this->tss, $this->baseDir, $config->getCssToXpath(), $config->getValueParser(), $cache, $config->getFilePath()))->parse();
 	}
 
 	public function setCache(\ArrayAccess $cache) {

@@ -8,13 +8,11 @@ namespace Transphporm\Property;
 class Repeat implements \Transphporm\Property {
 	private $functionSet;
 	private $elementData;
-	private $baseDir;
 	private $line;
 
-	public function __construct(\Transphporm\FunctionSet $functionSet, \Transphporm\Hook\ElementData $elementData, &$baseDir, &$line) {
+	public function __construct(\Transphporm\FunctionSet $functionSet, \Transphporm\Hook\ElementData $elementData, &$line) {
 		$this->functionSet = $functionSet;
 		$this->elementData = $elementData;
-		$this->baseDir = &$baseDir;
 		$this->line = &$line;
 	}
 
@@ -62,7 +60,9 @@ class Repeat implements \Transphporm\Property {
 	}
 
 	private function createHook($newRules, $pseudoMatcher, $properties) {
-		$hook = new \Transphporm\Hook\PropertyHook($newRules, $this->baseDir, $this->line, $this->baseDir, $this->line, $pseudoMatcher, new \Transphporm\Parser\Value($this->functionSet), $this->functionSet);
+		$var = ""; // PropertyHook requires that baseDir be passed by refrence
+		// and there is no reason to pass it so create $var to avoid errors
+		$hook = new \Transphporm\Hook\PropertyHook($newRules, $var, $this->line, "", $this->line, $pseudoMatcher, new \Transphporm\Parser\Value($this->functionSet), $this->functionSet);
 		foreach ($properties as $name => $property) $hook->registerProperty($name, $property);
 		return $hook;
 	}
