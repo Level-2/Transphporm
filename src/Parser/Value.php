@@ -17,7 +17,7 @@ class Value {
 	private $last;
 	private $data;
 	private $result;
-	private $accessingArray = false;
+	private $traversing = false;
 
 	private $tokenFuncs = [
 			Tokenizer::NOT => 'processComparator',
@@ -77,7 +77,10 @@ class Value {
 			//When . is not preceeded by anything, treat it as part of the string instead of an operator
 			// foo.bar is treated as looking up `bar` in `foo` whereas .foo is treated as the string ".foo"
 			$lastResult = $this->result->pop();
-			if ($lastResult) $this->data = new ValueData($lastResult);
+			if ($lastResult) {
+				$this->data = new ValueData($lastResult);
+				$this->traversing = true;
+			}
 			else {
 				$this->processString(['value' => '.']);
 				$this->result->setMode(Tokenizer::CONCAT);
@@ -99,7 +102,7 @@ class Value {
 				if ($lastResult) $this->data = new ValueData($lastResult);
 			}
 			$this->last = $parser->parseTokens($token['value'], null)[0];
-			if (!is_bool($this->last)) $this->accessingArray = true;
+			if (!is_bool($this->last)) $this->traversing = true;
 		}
 	}
 
@@ -150,7 +153,7 @@ class Value {
 				$this->result->processValue($value);
 			}
 			catch (\UnexpectedValueException $e) {
-				if (!($this->autoLookup || $this->accessingArray)) {
+				if (!($this->autoLookup || $this->traversing)) {
 					$this->result->processValue($this->last);
 				}
 				else {

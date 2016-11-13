@@ -38,7 +38,8 @@ class ValueData {
 
 	private function callFuncOnObject($obj, $func, $args) {
 		if (isset($obj->$func) && is_callable($obj->$func)) return call_user_func_array($obj->$func, $args);
-		else return call_user_func_array([$obj, $func], $args);
+		else if (is_callable([$obj, $func])) return call_user_func_array([$obj, $func], $args);
+		else return false;
 	}
 
 	public function extract($last, $autoLookup) {

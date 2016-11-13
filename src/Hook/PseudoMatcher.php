@@ -22,19 +22,19 @@ class PseudoMatcher {
 	}
 
 	public function matches($element) {
-		$matches = true;
 		foreach ($this->pseudo as $tokens) {
 			foreach ($this->functions as $function) {
 				try {
 					$parts = $this->getFuncParts($tokens);
-					$matches = $matches && $function->match($parts['name'], $parts['args'], $element);
+					$matches = $function->match($parts['name'], $parts['args'], $element);
+					if ($matches === false) return false;
 				}
 				catch (\Exception $e) {
 					throw new \Transphporm\RunException(\Transphporm\Exception::PSEUDO, $parts['name'], $e);
 				}
 			}
 		}
-		return $matches;
+		return true;
 	}
 
 	private function getFuncParts($tokens) {

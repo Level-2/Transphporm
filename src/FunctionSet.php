@@ -17,12 +17,12 @@ class FunctionSet {
 
 	public function __call($name, $args) {
 		try {
-			if (!($this->functions[$name] instanceof TSSFunction\Data)) {
+			if (isset($this->functions[$name]) && !($this->functions[$name] instanceof TSSFunction\Data)) {
 				$tokens = $args[0];
 				$parser = new \Transphporm\Parser\Value($this);
 				$args[0] = $parser->parseTokens($tokens, $this->elementData->getData($this->element));
 			}
-			else if ($args[0] instanceof Parser\Tokens) {
+			else if (isset($args[0]) && $args[0] instanceof Parser\Tokens) {
 				$args[0] = iterator_to_array($args[0]);
 			}
 			if (isset($this->functions[$name])) {

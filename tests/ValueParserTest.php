@@ -293,7 +293,7 @@ class ValueParserTest extends PHPUnit_Framework_TestCase {
 		$value = new Value(new TestData);
 
 		$result = $value->parse('getArrayObject()[0]');
-		
+
 		$this->assertEquals(['test1Array'], $result);
 	}
 
@@ -301,6 +301,14 @@ class ValueParserTest extends PHPUnit_Framework_TestCase {
 		$value = new Value(new TestData);
 
 		$result = $value->parse('getArray()[1]');
+
+		$this->assertEquals([false], $result);
+	}
+
+	public function testNonExistantPropertyLookup() {
+		$value = new Value(new TestData);
+
+		$result = $value->parse('getObj().foo');
 
 		$this->assertEquals([false], $result);
 	}
@@ -337,6 +345,12 @@ class TestData {
 	public function getArrayObject() {
 		$obj = new ArrayObject();
 		$obj[0] = 'test1Array';
+		return $obj;
+	}
+
+	public function getObj() {
+		$obj = new \stdClass;
+		$obj->test = "foo";
 		return $obj;
 	}
 }

@@ -218,6 +218,19 @@ class PseudoTest extends PHPUnit_Framework_TestCase {
 	    $this->assertEquals($this->stripTabs($template->output($obj)->body), $this->stripTabs('<div>test</div>'));
 	}
 
+	public function testFunctionCallAsConditonal5() {
+
+	    $xml = '<div></div>';
+
+	    $obj = new Foo();
+
+	    $tss = 'div:[data().notExistantFunction()=1] {content: "test" }';
+
+	    $template = new \Transphporm\Builder($xml, $tss);
+
+	    $this->assertEquals($this->stripTabs($template->output($obj)->body), $this->stripTabs('<div></div>'));
+	}
+
     public function testFilterDataArray() {
 		$data = [
 			'anArray' => [
