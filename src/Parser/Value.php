@@ -17,6 +17,7 @@ class Value {
 	private $last;
 	private $data;
 	private $result;
+	private $accessingArray = false;
 
 	private $tokenFuncs = [
 			Tokenizer::NOT => 'processComparator',
@@ -98,6 +99,7 @@ class Value {
 				if ($lastResult) $this->data = new ValueData($lastResult);
 			}
 			$this->last = $parser->parseTokens($token['value'], null)[0];
+			if (!is_bool($this->last)) $this->accessingArray = true;
 		}
 	}
 
@@ -148,7 +150,7 @@ class Value {
 				$this->result->processValue($value);
 			}
 			catch (\UnexpectedValueException $e) {
-				if (!$this->autoLookup) {
+				if (!($this->autoLookup || $this->accessingArray)) {
 					$this->result->processValue($this->last);
 				}
 				else {

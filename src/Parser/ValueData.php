@@ -15,11 +15,11 @@ class ValueData {
 
 	public function traverse($key) {
 		if (isset($this->data->{$key})) $this->data = $this->data->{$key};
-		else if (is_array($this->data) && isset($this->data[$key])) $this->data = $this->data[$key];
+		else if ((is_array($this->data) || $this->data instanceof \ArrayAccess) && isset($this->data[$key])) $this->data = $this->data[$key];
 	}
 
 	public function read($value) {
-		if (is_array($this->data)) {
+		if ((is_array($this->data) || $this->data instanceof \ArrayAccess)) {
 			if (isset($this->data[$value])) return $this->data[$value];
 		}
 		else if (isset($this->data->$value)) return $this->data->$value;
@@ -43,7 +43,7 @@ class ValueData {
 
 	public function extract($last, $autoLookup) {
 		$value = $this->read($last);
-		if ($value && ($autoLookup || is_array($this->data)) ) {
+		if ($value && ($autoLookup || is_array($this->data) || $this->data instanceof \ArrayAccess) ) {
 			return $value;
 		}
 		throw new \UnexpectedValueException('Not found');
