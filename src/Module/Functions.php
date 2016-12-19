@@ -5,6 +5,7 @@
  * @license         http://www.opensource.org/licenses/bsd-license.php  BSD License *
  * @version         1.0                                                             */
 namespace Transphporm\Module;
+use Transphporm\TSSFunction\Math;
 /** Assigns all the basic functions, data(), key(), iteration(), template(), etc    */
 class Functions implements \Transphporm\Module {
 
@@ -20,6 +21,12 @@ class Functions implements \Transphporm\Module {
 		$templateFunction = new \Transphporm\TSSFunction\Template($config->getElementData(), $config->getCssToXpath(), $baseDir);
 		$functionSet->addFunction('template', $templateFunction);
 		$functionSet->addFunction('json', new \Transphporm\TSSFunction\Json($baseDir));
+
+		// Add Math functions
+		$functionSet->addFunction('add', new Math(Math::ADD));
+		$functionSet->addFunction('sub', new Math(Math::SUBTRACT));
+		$functionSet->addFunction('mult', new Math(Math::MULTIPLY));
+		$functionSet->addFunction('div', new Math(Math::DIVIDE));
 
 		// Register HTML formatter here because it uses the template function
 		$config->registerFormatter(new \Transphporm\Formatter\HTMLFormatter($templateFunction));
