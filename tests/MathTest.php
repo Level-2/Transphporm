@@ -9,31 +9,37 @@ class MathTest extends PHPUnit_Framework_TestCase {
     }
 
     public function testAddFunc() {
-        $tss = "div { content: add(2, 4); }";
+        $tss = "div { content: 2+4; }";
 
         $template = new Builder($this->xml, $tss);
         $this->assertEquals($this->resultOfTest(6), $template->output()->body);
     }
 
     public function testSubtractFunc() {
-        $tss = "div { content: sub(2, 4); }";
+        $tss = "div { content: 2-4; }";
 
         $template = new Builder($this->xml, $tss);
         $this->assertEquals($this->resultOfTest(-2), $template->output()->body);
     }
 
     public function testMultiplyFunc() {
-        $tss = "div { content: mult(2, 4); }";
+        $tss = "div { content: 2*4; }";
 
         $template = new Builder($this->xml, $tss);
         $this->assertEquals($this->resultOfTest(8), $template->output()->body);
     }
 
     public function testDivideFunc() {
-        $tss = "div { content: div(2, 4); }";
+        $tss = "div { content: 2/4; }";
 
         $template = new Builder($this->xml, $tss);
         $this->assertEquals($this->resultOfTest(0.5), $template->output()->body);
     }
 
+    public function testMultipleAdd() {
+        $tss = "div { content: 2+4+10; }";
+
+        $template = new Builder($this->xml, $tss);
+        $this->assertEquals($this->resultOfTest(16), $template->output()->body);
+    }
 }

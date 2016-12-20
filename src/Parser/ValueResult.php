@@ -16,7 +16,7 @@ class ValueResult implements \ArrayAccess {
 			EQUALS - Boolean operation "a" = "b" becomes [false]
 	*/
 	private $mode = Tokenizer::ARG;
-	
+
 	//Processes $newValue using $mode. Either concats to the current argument, adds a new argument
 	//Or usess the two arguments for a boolean comparison
 	public function processValue($newValue) {
@@ -24,10 +24,16 @@ class ValueResult implements \ArrayAccess {
 			Tokenizer::ARG => 'arg',
 			Tokenizer::CONCAT => 'concat',
 			Tokenizer::EQUALS => 'equals',
-			Tokenizer::NOT => 'not' 
+			Tokenizer::NOT => 'not',
+			Tokenizer::SUBTRACT => 'sub',
+			Tokenizer::MULTIPLY => 'mult',
+			Tokenizer::DIVIDE => 'div'
 		];
 
-		$this->{$funcs[$this->mode]}($newValue);
+		if (is_numeric($newValue) && $funcs[$this->mode] === 'concat')
+			$this->add($newValue);
+		else
+			$this->{$funcs[$this->mode]}($newValue);
 	}
 
 	public function arg($value) {
@@ -39,15 +45,29 @@ class ValueResult implements \ArrayAccess {
 	}
 
 	public function not($value) {
-
 		$this->result[count($this->result)-1] = $this->result[count($this->result)-1] != $value;
 	}
-	
+
 	public function equals($value) {
 		$this->result[count($this->result)-1] = $this->result[count($this->result)-1] == $value;
 	}
 
-	
+	public function add($value) {
+		$this->result[count($this->result)-1] += $value;
+	}
+
+	public function sub($value) {
+		$this->result[count($this->result)-1] -= $value;
+	}
+
+	public function mult($value) {
+		$this->result[count($this->result)-1] *= $value;
+	}
+
+	public function div($value) {
+		$this->result[count($this->result)-1] /= $value;
+	}
+
 	public function setMode($mode) {
 		$this->mode = $mode;
 	}

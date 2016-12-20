@@ -22,12 +22,6 @@ class Functions implements \Transphporm\Module {
 		$functionSet->addFunction('template', $templateFunction);
 		$functionSet->addFunction('json', new \Transphporm\TSSFunction\Json($baseDir));
 
-		// Add Math functions
-		$functionSet->addFunction('add', new Math(Math::ADD));
-		$functionSet->addFunction('sub', new Math(Math::SUBTRACT));
-		$functionSet->addFunction('mult', new Math(Math::MULTIPLY));
-		$functionSet->addFunction('div', new Math(Math::DIVIDE));
-
 		// Register HTML formatter here because it uses the template function
 		$config->registerFormatter(new \Transphporm\Formatter\HTMLFormatter($templateFunction));
 	}

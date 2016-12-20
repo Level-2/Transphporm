@@ -29,6 +29,9 @@ class Tokenizer {
 	const NUM_SIGN = 'NUM_SIGN';
 	const GREATER_THAN = 'GREATER_THAN';
 	const AT_SIGN = 'AT_SIGN';
+	const SUBTRACT = 'SUBTRACT';
+	const MULTIPLY = 'MULTIPLY';
+	const DIVIDE = 'DIVIDE';
 
 	private $chars = [
 		'"' => self::STRING,
@@ -49,6 +52,9 @@ class Tokenizer {
 		'#' => self::NUM_SIGN,
 		'>' => self::GREATER_THAN,
 		'@' => self::AT_SIGN,
+		'-' => self::SUBTRACT,
+		'*' => self::MULTIPLY,
+		'/' => self::DIVIDE,
 		' ' => self::WHITESPACE,
 		"\n" => self::NEW_LINE,
 		"\r" => self::WHITESPACE,
@@ -75,9 +81,9 @@ class Tokenizer {
 	}
 
 	private function doSimpleTokens(&$tokens, $char) {
-		if (in_array($char, [Tokenizer::ARG, Tokenizer::CONCAT, Tokenizer::DOT, Tokenizer::NOT,
-			Tokenizer::EQUALS, Tokenizer::COLON, Tokenizer::SEMI_COLON, Tokenizer::WHITESPACE, Tokenizer::NEW_LINE,
-			Tokenizer::NUM_SIGN, Tokenizer::GREATER_THAN, Tokenizer::AT_SIGN])) {
+		if (in_array($char, [Tokenizer::ARG, Tokenizer::CONCAT, Tokenizer::DOT, Tokenizer::NOT, Tokenizer::EQUALS,
+			Tokenizer::COLON, Tokenizer::SEMI_COLON, Tokenizer::WHITESPACE, Tokenizer::NEW_LINE, Tokenizer::NUM_SIGN,
+			Tokenizer::GREATER_THAN, Tokenizer::AT_SIGN, Tokenizer::SUBTRACT, Tokenizer::MULTIPLY, Tokenizer::DIVIDE])) {
 			$tokens[] = ['type' => $char];
 		}
 	}
@@ -85,7 +91,8 @@ class Tokenizer {
 	private function doLiterals(&$tokens, $char, &$i) {
 		if ($char === self::NAME) {
 			$name = $this->str[$i];
-			while (isset($this->str[$i+1]) && $this->identifyChar($this->str[$i+1]) == self::NAME) {
+			while (isset($this->str[$i+1]) && ($this->identifyChar($this->str[$i+1]) == self::NAME
+					|| ($this->identifyChar($this->str[$i+1]) == self::SUBTRACT && !is_numeric($this->str[$i])))) {
 				$name .= $this->str[$i+1];
 				$i++;
 			}
