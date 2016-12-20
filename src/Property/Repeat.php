@@ -22,17 +22,35 @@ class Repeat implements \Transphporm\Property {
 		$max = $this->getMax($values);
 		$count = 0;
 
-		foreach ($values[0] as $key => $iteration) {
+		$repeat = $this->getRepeatValue($values, $max);
+
+		//Don't run repeat on the clones element or it will loop forever
+		unset($rules['repeat']);
+		$hook = $this->createHook($rules, $pseudoMatcher, $properties);
+
+		foreach ($repeat as $key => $iteration) {
 			if ($count+1 > $max) break;
 			$clone = $this->cloneElement($element, $iteration, $key, $count++);
 			//Re-run the hook on the new element, but use the iterated data
-			//Don't run repeat on the clones element or it will loop forever
-			unset($rules['repeat']);
-			$this->createHook($rules, $pseudoMatcher, $properties)->run($clone);
+			$hook->run($clone);
 		}
 		//Remove the original element
 		$element->parentNode->removeChild($element);
 		return false;
+	}
+
+	private function getRepeatValue($values, &$max) {
+		$mode = $this->getMode($values);
+		if ($mode === 'each') $repeat = $values[0];
+		else if ($mode === 'loop') {
+			$repeat = range($values[0], $max);
+			$max++;
+		}
+		return $repeat;
+	}
+
+	private function getMode($args) {
+		return isset($args[2]) ? $args[2] : 'each';
 	}
 
 	private function fixEmpty($value) {

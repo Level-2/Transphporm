@@ -1,7 +1,7 @@
 <?php
 namespace Transphporm\TSSFunction;
 class Json implements \Transphporm\TSSFunction {
-    private $baseDir;
+    private $filePath;
 
     public function __construct(\Transphporm\FilePath $filePath) {
         $this->filePath = $filePath;

@@ -5,10 +5,10 @@ namespace Transphporm\TSSFunction;
 class Math implements \Transphporm\TSSFunction {
     private $mode;
 
-    const ADD = 1;
-    const SUBTRACT = 2;
-    const MULTIPLY = 3;
-    const DIVIDE = 4;
+    const ADD = 'add';
+    const SUBTRACT = 'sub';
+    const MULTIPLY = 'mult';
+    const DIVIDE = 'div';
 
     public function __construct($mode) {
         $this->mode = $mode;
@@ -21,15 +21,22 @@ class Math implements \Transphporm\TSSFunction {
     }
 
     private function getModeResult($val, $prev) {
-        switch ($this->mode) {
-            case Math::ADD:
-                return $prev+$val;
-            case Math::SUBTRACT:
-                return $prev-$val;
-            case Math::MULTIPLY:
-                return $prev*$val;
-            case MATH::DIVIDE:
-                return $prev/$val;
-        }
+        return $this->{$this->mode}($val, $prev);
+    }
+
+    private function add($val, $prev) {
+        return $prev+$val;
+    }
+
+    private function sub($val, $prev) {
+        return $prev-$val;
+    }
+
+    private function mult($val, $prev) {
+        return $prev*$val;
+    }
+
+    private function div($val, $prev) {
+        return $prev/$val;
     }
 }

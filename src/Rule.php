@@ -11,6 +11,7 @@ class Rule {
 	private $depth;
 	private $index;
     private $file;
+	private $line;
 	private $properties = [];
 	private $lastRun = 0;
 

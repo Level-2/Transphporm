@@ -3,7 +3,7 @@ namespace Transphporm;
 
 class FilePath {
     private $baseDir;
-    private $cwd;
+    private $customBase;
 
     public function __construct(&$baseDir, $customBase = null) {
         $this->baseDir = &$baseDir;

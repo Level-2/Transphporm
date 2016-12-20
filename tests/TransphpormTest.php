@@ -252,6 +252,20 @@ class TransphpormTest extends PHPUnit_Framework_TestCase {
 
 	}
 
+	public function testRepeatLoopMode() {
+		$template = '
+				<ul><li>TEST1</li></ul>
+		';
+
+		//When using repeat to repeat some data, set the content to the data for the iteration
+		$css = 'ul li {repeat: 0, 2, loop; content: iteration()}';
+
+
+		$template = new \Transphporm\Builder($template, $css);
+
+		$this->assertEquals('<ul><li>0</li><li>1</li><li>2</li></ul>', $template->output()->body);
+	}
+
 
 	public function testQuotedContent() {
 		$template = '<h1>Heading</h1>';

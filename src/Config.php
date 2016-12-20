@@ -10,8 +10,8 @@ class Config {
 	private $pseudo = [];
 	private $functionSet;
 	private $headers;
+	private $filePath;
 	private $formatter;
-	private $baseDir;
 	private $line = 0;
 	private $elementData;
 	private $xPath;
