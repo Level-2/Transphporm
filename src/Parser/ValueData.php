@@ -30,6 +30,10 @@ class ValueData {
 		return $this->data->$func(...$args);
 	}
 
+	public function methodExists($name) {
+		return method_exists($this->data, $name);
+	}
+
 	public function parseNested($parser, $token, $funcName) {
 		$args = $parser->parseTokens($token['value'], $this->data);
 		if ($args[0] == $this->data) $args = [];

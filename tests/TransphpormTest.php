@@ -1360,6 +1360,15 @@ ul li span {
 
 		$this->assertEquals('<div><p></p><!-- Comment --></div>', $this->stripTabs($template->output()->body));
 	}
+
+	public function testObjFuncCallWithSameNameAsFunc() {
+		$xml = "<div>content</div>";
+		$tss = "div { bind: data(foo); content: data(root()) + root(test); }";
+
+		$template = new \Transphporm\Builder($xml, $tss);
+
+		$this->assertEquals('<div>test5bar</div>', $template->output(['foo' => new Foo, 'test' => 'bar'])->body);
+	}
 }
 
 
@@ -1387,6 +1396,10 @@ class Foo {
 
 	public function add($a, $b) {
 		return $a+$b;
+	}
+
+	public function root() {
+		return "test5";
 	}
 }
 

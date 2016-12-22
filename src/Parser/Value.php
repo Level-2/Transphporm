@@ -122,7 +122,8 @@ class Value {
 	}
 
 	private function processBrackets($token) {
-		if ($this->baseData instanceof \Transphporm\Functionset && $this->baseData->hasFunction($this->last)) {
+		if ($this->baseData instanceof \Transphporm\Functionset && $this->baseData->hasFunction($this->last)
+			&& !$this->data->methodExists($this->last)) {
 			$this->callTransphpormFunctions($token);
 		}
 		else {
