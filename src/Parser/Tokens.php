@@ -46,7 +46,7 @@ class Tokens implements \Iterator, \Countable {
         $keys = $this->getKeysOfTokenType($tokenType);
         if (empty($keys)) return false;
         $key = $keys[0];
-        for ($i = 0; $key < $this->iterator; $i++) $key = $keys[$i];
+        for ($i = 0; $key < $this->iterator && isset($keys[$i]); $i++) $key = $keys[$i];
         return $key;
     }
 

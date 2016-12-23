@@ -1369,6 +1369,44 @@ ul li span {
 
 		$this->assertEquals('<div>test5bar</div>', $template->output(['foo' => new Foo, 'test' => 'bar'])->body);
 	}
+
+	public function testNonexistantFieldResult1() {
+		$xml = "<textarea name='test'></textarea>";
+		$tss = "textarea { content: data(attr(name)); }";
+
+		$template = new \Transphporm\Builder($xml, $tss);
+
+		$this->assertEquals('<textarea name="test"></textarea>', $template->output([])->body);
+	}
+
+	public function testNonexistantFieldResult2() {
+		$xml = "<textarea name='test'></textarea>";
+		$tss = "textarea { content: data()[attr(name)]; }";
+
+		$template = new \Transphporm\Builder($xml, $tss);
+
+		$this->assertEquals('<textarea name="test"></textarea>', $template->output([])->body);
+	}
+
+	public function testNonexistantFieldResult3() {
+		$xml = "<textarea name='test'></textarea>";
+		$tss = "textarea { content: data(test); }";
+
+		$template = new \Transphporm\Builder($xml, $tss);
+
+		$this->assertEquals('<textarea name="test"></textarea>', $template->output([])->body);
+	}
+
+	public function testFieldResult1() {
+		$xml = "<textarea name='test'></textarea>";
+		$tss = "textarea { content: data()[attr(name)]; }";
+		$data = new stdClass;
+		$data->test = 'content';
+
+		$template = new \Transphporm\Builder($xml, $tss);
+
+		$this->assertEquals('<textarea name="test">content</textarea>', $template->output($data)->body);
+	}
 }
 
 

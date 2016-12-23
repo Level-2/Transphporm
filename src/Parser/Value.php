@@ -52,6 +52,7 @@ class Value {
 		$this->result = new ValueResult;
 		$this->data = new ValueData($data ? $data : $this->baseData);
 		$this->last = null;
+		$this->traversing = false;
 
 		if (count($tokens) <= 0) return [$data];
 
@@ -153,7 +154,7 @@ class Value {
 	private function processLast() {
 		if ($this->last !== null) {
 			try {
-				$value = $this->data->extract($this->last, $this->autoLookup);
+				$value = $this->data->extract($this->last, $this->autoLookup, $this->traversing);
 				$this->result->processValue($value);
 			}
 			catch (\UnexpectedValueException $e) {

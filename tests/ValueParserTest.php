@@ -10,7 +10,6 @@ use Transphporm\Hook\ElementData;
 
 class ValueParserTest extends PHPUnit_Framework_TestCase {
 
-
 	public function testBasicString() {
 		$value = new Value(new stdclass);
 
@@ -311,6 +310,16 @@ class ValueParserTest extends PHPUnit_Framework_TestCase {
 		$result = $value->parse('getObj().foo');
 
 		$this->assertEquals([false], $result);
+	}
+
+	public function testArrayLookupOnObj() {
+		
+		$value = new Value(new TestData);
+
+		$result = $value->parse('getObj()[data(test)]');
+
+		$this->assertEquals(['foo'], $result);
+
 	}
 
 	//public fucntion testNested

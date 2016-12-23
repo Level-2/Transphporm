@@ -46,9 +46,9 @@ class ValueData {
 		else return false;
 	}
 
-	public function extract($last, $autoLookup) {
+	public function extract($last, $autoLookup, $traversing) {
 		$value = $this->read($last);
-		if ($value && ($autoLookup || is_array($this->data) || $this->data instanceof \ArrayAccess) ) {
+		if ($value && ($autoLookup || $traversing) ) {
 			return $value;
 		}
 		throw new \UnexpectedValueException('Not found');
