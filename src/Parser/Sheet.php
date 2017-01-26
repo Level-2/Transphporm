@@ -114,7 +114,9 @@ class Sheet {
 		if ($this->file !== null) $fileName = $fileName = $this->filePath->getFilePath($args[0]);
 		else $fileName = $args[0];
 		$this->import[] = $fileName;
+		$baseDirTemp = $this->baseDir;
 		$sheet = new Sheet($fileName, $this->baseDir, $this->xPath, $this->valueParser, $this->cache, $this->filePath);
+		$this->baseDir = $baseDirTemp;
 		return $sheet->parse($indexStart);
 	}
 

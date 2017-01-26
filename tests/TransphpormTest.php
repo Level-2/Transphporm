@@ -1407,6 +1407,20 @@ ul li span {
 
 		$this->assertEquals('<textarea name="test">content</textarea>', $template->output($data)->body);
 	}
+
+	public function testAttrConcatWithNum() {
+		$template = '
+			<div class="test">Test</div>
+		';
+
+		$data = ['id' => 8];
+
+		$tss = 'div:attr(class) {content: attr(class) + data(id); }';
+
+		$template = new \Transphporm\Builder($template, $tss);
+
+		$this->assertEquals('<div class="test8">Test</div>', $template->output($data)->body);
+	}
 }
 
 

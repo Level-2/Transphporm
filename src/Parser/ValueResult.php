@@ -30,7 +30,8 @@ class ValueResult implements \ArrayAccess {
 			Tokenizer::DIVIDE => 'div'
 		];
 
-		if (is_numeric($newValue) && $funcs[$this->mode] === 'concat')
+		if ($funcs[$this->mode] === 'concat' && is_numeric($newValue)
+			&& is_numeric($this->result[count($this->result)-1]))
 			$this->add($newValue);
 		else
 			$this->{$funcs[$this->mode]}($newValue);
