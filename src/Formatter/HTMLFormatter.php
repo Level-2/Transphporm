@@ -8,9 +8,6 @@ class HTMLFormatter {
     }
 
     public function html($val) {
-    	if ($val[0] != '<') {
-    		$val = '<div>' . $val . '</div>';
-	    }
 		return $this->templateFunction->run([$val]);
 	}
 
