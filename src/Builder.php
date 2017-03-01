@@ -93,7 +93,7 @@ class Builder {
 
 	//Load a template, firstly check if it's a file or a valid string
 	private function loadTemplate() {
-		if (trim($this->template)[0] !== '<') {
+		if (file_exists($this->template)) {
 			$xml = $this->cache->load($this->template, filemtime($this->template));
 			return $xml ? $xml : ['body' => file_get_contents($this->template), 'headers' => []];
 		}
