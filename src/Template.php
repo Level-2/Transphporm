@@ -32,7 +32,7 @@ class Template {
 	private function loadDocument($doc) {
 		libxml_use_internal_errors(true);
 		if ($this->document->loadXml($doc) === false) {
-				$this->document->loadHtml($doc);
+				$this->document->loadHtml('<' . '?xml encoding="UTF-8">' .$doc);
 
 				if (strpos($doc, '<!') !== 0) {
 					$templateNode = $this->document->getElementsByTagName('template')[0];
