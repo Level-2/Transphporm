@@ -8,7 +8,7 @@ class HTMLFormatter {
     }
 
     public function html($val) {
-		return $this->templateFunction->run([$val]);
+		return $this->templateFunction->run(['<template>' . $val . '</template>']);
 	}
 
 	public function debug($val) {

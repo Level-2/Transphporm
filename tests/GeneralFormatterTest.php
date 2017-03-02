@@ -132,7 +132,16 @@ class GeneralFormatTest extends PHPUnit_Framework_TestCase {
 
 		$template = new \Transphporm\Builder($xml, $tss);
 
-		$this->assertEquals($template->output()->body, $this->stripTabs('<div><span></span><p></p></div>'));
+		$this->assertEquals($this->stripTabs('<div><span></span><p></p></div>'), $template->output()->body);
+	}
+
+    public function testHTMLFormatWithNoWrapping() {
+		$xml = '<div></div>';
+		$tss = 'div { content: "test<span>inside</span>text"; format: html; }';
+
+		$template = new \Transphporm\Builder($xml, $tss);
+
+		$this->assertEquals($this->stripTabs('<div>test<span>inside</span>text</div>'), $template->output()->body);
 	}
 
     /*
