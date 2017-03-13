@@ -74,7 +74,7 @@ class Template {
 	/** Prints out the current DomDocument as HTML */
 	private function printDocument() {
 		$output = '';
-		foreach ($this->document->documentElement->childNodes as $node) $output .= ($this->save)($node);
+		foreach ($this->document->documentElement->childNodes as $node) $output .= call_user_func($this->save, $node);
 		return $output;
 	}
 
@@ -88,9 +88,9 @@ class Template {
 		 //Either return a whole DomDocument or return the output HTML
 		if ($document) return $this->document;
 
-		$output = ($this->document->doctype) ? ($this->save)($this->document->doctype) . "\n" : '';
+		$output = ($this->document->doctype) ? call_user_func($this->save, $this->document->doctype) . "\n" : '';
 
-		if ($this->document->documentElement->tagName !== 'template') $output .= ($this->save)($this->document->documentElement);
+		if ($this->document->documentElement->tagName !== 'template') $output .= call_user_func($this->save, $this->document->documentElement);
 		else $output = $this->printDocument();
 
 		//repair empty tags. Browsers break on <script /> and <div /> so can't avoid LIBXML_NOEMPTYTAG but they also break on <base></base> so repair them
