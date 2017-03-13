@@ -47,14 +47,6 @@ class CacheTest extends PHPUnit_Framework_TestCase {
 		return  $template;
 	}
 
-	public function testCacheWrite() {
-				$cache = new \ArrayObject;
-		$random = new RandomGenerator;
-
-				$o1 = $this->buildTemplate('never', $cache)->output($random)->body;
-
-	}
-
 	public function testCacheBasic() {
 
 		$cache = new \ArrayObject;
