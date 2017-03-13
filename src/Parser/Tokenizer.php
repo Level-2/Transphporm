@@ -88,11 +88,17 @@ class Tokenizer {
 		}
 	}
 
+	private function isLiteral($n) {
+		//Is it a normal literal character
+		return isset($this->str[$n]) && ($this->identifyChar($this->str[$n]) == self::NAME
+		//but a subtract can be part of a class name or a mathematical operation
+				|| ($this->identifyChar($this->str[$n]) == self::SUBTRACT && !is_numeric($this->str[$n-1])));
+	}
+	
 	private function doLiterals(&$tokens, $char, &$i) {
 		if ($char === self::NAME) {
 			$name = $this->str[$i];
-			while (isset($this->str[$i+1]) && ($this->identifyChar($this->str[$i+1]) == self::NAME
-					|| ($this->identifyChar($this->str[$i+1]) == self::SUBTRACT && !is_numeric($this->str[$i])))) {
+			while ($this->isLiteral($i+1)) {
 				$name .= $this->str[$i+1];
 				$i++;
 			}
