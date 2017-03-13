@@ -17,22 +17,27 @@ class FunctionSet {
 
 	public function __call($name, $args) {
 		try {
-			if (isset($this->functions[$name]) && !($this->functions[$name] instanceof TSSFunction\Data)) {
-				$tokens = $args[0];
-				$parser = new \Transphporm\Parser\Value($this);
-				$args[0] = $parser->parseTokens($tokens, $this->elementData->getData($this->element));
-			}
-			else if (isset($args[0]) && $args[0] instanceof Parser\Tokens) {
-				$args[0] = iterator_to_array($args[0]);
-			}
 			if (isset($this->functions[$name])) {
-				return $this->functions[$name]->run($args[0], $this->element);
+				return $this->functions[$name]->run($this->getArgs0($name, $args), $this->element);
 			}
 		}
 		catch (\Exception $e) {
 			throw new RunException(Exception::TSS_FUNCTION, $name, $e);
 		}
 		return true;
+	}
+
+	private function getArgs0($name, $args) {
+		if (isset($this->functions[$name]) && !($this->functions[$name] instanceof TSSFunction\Data)) {
+			$tokens = $args[0];
+			$parser = new \Transphporm\Parser\Value($this);
+			return $parser->parseTokens($tokens, $this->elementData->getData($this->element));
+		}
+		else if (isset($args[0]) && $args[0] instanceof Parser\Tokens) {
+			return iterator_to_array($args[0]);
+		}
+
+		return $args[0];
 	}
 
 	public function addFunction($name, \Transphporm\TSSFunction $function) {
