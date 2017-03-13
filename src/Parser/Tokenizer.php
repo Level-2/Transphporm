@@ -161,24 +161,4 @@ class Tokenizer {
 		if (isset($chars[$num])) return $chars[$num];
 		else return false;
 	}
-
-	public function serialize($tokens) {
-		$str = '';
-		$chars = array_flip($this->chars);
-
-		foreach ($tokens as $token) {
-			if (isset($chars[$token['type']])) {
-				$str .= $chars[$token['type']];
-			}
-			$str .= $this->serializeValue($token);
-		}
-		return $str;
-	}
-
-	private function serializeValue($token) {
-		if (isset($token['value'])) {
-			if ($token['value'] instanceof Tokens) return $this->serialize($token['value']);
-			else return $token['value'];
-		}
-	}
 }

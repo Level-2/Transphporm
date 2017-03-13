@@ -79,9 +79,9 @@ class Sheet {
 		$parts = $selector->trim()->splitOnToken(Tokenizer::ARG);
 		$rules = [];
 		foreach ($parts as $part) {
-			$part = $part->trim();
-			$rules[$this->tokenizer->serialize($part)] = new \Transphporm\Rule($this->xPath->getXpath($part), $this->xPath->getPseudo($part), $this->xPath->getDepth($part), $index++, $this->file, $line);
-			$rules[$this->tokenizer->serialize($part)]->properties = $properties;
+			$serialized = serialize($part);
+			$rules[$serialized] = new \Transphporm\Rule($this->xPath->getXpath($part), $this->xPath->getPseudo($part), $this->xPath->getDepth($part), $index++, $this->file, $line);
+			$rules[$serialized]->properties = $properties;
 		}
 		return $rules;
 	}
