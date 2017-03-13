@@ -35,7 +35,7 @@ class Formatter {
 
 	//TODO: Abstract all error reporting externally with a method for turning it on/off
 	private function assert($condition, $error) {
-		if (!$functionExists) throw new \Exception($error);
+		if (!$condition) throw new \Exception($error);
 	}
 
 	private function processFormat($format, $functionName, $value) {
