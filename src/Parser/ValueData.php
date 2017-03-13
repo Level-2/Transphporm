@@ -15,15 +15,15 @@ class ValueData {
 
 	public function traverse($key) {
 		if (isset($this->data->{$key})) $this->data = $this->data->{$key};
-		else if ($this->isArrayTraversable($key)) $this->data = $this->data[$key];
+		else if ($this->isArray() && isset($this->data[$key])) $this->data = $this->data[$key];
 	}
 
-	private function isArrayTraversable($key) {
-		return (is_array($this->data) || $this->data instanceof \ArrayAccess) && isset($this->data[$key]);
+	private function isArray() {
+		return is_array($this->data) || $this->data instanceof \ArrayAccess;
 	}
-	
+
 	public function read($value) {
-		if ((is_array($this->data) || $this->data instanceof \ArrayAccess)) {
+		if ($this->isArray()) {
 			if (isset($this->data[$value])) return $this->data[$value];
 		}
 		else if (isset($this->data->$value)) return $this->data->$value;
