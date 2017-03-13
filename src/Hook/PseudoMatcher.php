@@ -24,19 +24,23 @@ class PseudoMatcher {
 	public function matches($element) {
 		foreach ($this->pseudo as $tokens) {
 			foreach ($this->functions as $function) {
-				try {
-					$parts = $this->getFuncParts($tokens);
-					$matches = $function->match($parts['name'], $parts['args'], $element);
-					if ($matches === false) return false;
-				}
-				catch (\Exception $e) {
-					throw new \Transphporm\RunException(\Transphporm\Exception::PSEUDO, $parts['name'], $e);
-				}
+				$matches = $this->match($tokens, $function, $element);
+				if ($matches === false) return false;
 			}
 		}
 		return true;
 	}
 
+	private function match($tokens, $function, $element) {
+		try {
+			$parts = $this->getFuncParts($tokens);
+			$matches = $function->match($parts['name'], $parts['args'], $element);
+			if ($matches === false) return false;
+		}
+		catch (\Exception $e) {
+			throw new \Transphporm\RunException(\Transphporm\Exception::PSEUDO, $parts['name'], $e);
+		}
+	}
 	private function getFuncParts($tokens) {
 		$parts = [];
 		$parts['name'] = $this->getFuncName($tokens);

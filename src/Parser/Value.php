@@ -73,22 +73,30 @@ class Value {
 		}
 	}
 
-	//Reads the last selected value from $data regardless if it's an array or object and overrides $this->data with the new value
-	//Dot moves $data to the next object in $data foo.bar moves the $data pointer from `foo` to `bar`
-	private function processDot($token) {
+	private function traverseLast() {
 		if ($this->last !== null) $this->data->traverse($this->last);
 		else {
-			//When . is not preceeded by anything, treat it as part of the string instead of an operator
-			// foo.bar is treated as looking up `bar` in `foo` whereas .foo is treated as the string ".foo"
 			$lastResult = $this->result->pop();
 			if ($lastResult) {
 				$this->data = new ValueData($lastResult);
-				$this->traversing = true;
+				return $lastResult;
 			}
-			else {
-				$this->processString(['value' => '.']);
-				$this->result->setMode(Tokenizer::CONCAT);
-			}
+		}
+	}
+
+	//Reads the last selected value from $data regardless if it's an array or object and overrides $this->data with the new value
+	//Dot moves $data to the next object in $data foo.bar moves the $data pointer from `foo` to `bar`
+	private function processDot($token) {
+		$lastResult = $this->traverseLast();
+
+		//When . is not preceeded by anything, treat it as part of the string instead of an operator
+		// foo.bar is treated as looking up `bar` in `foo` whereas .foo is treated as the string ".foo"
+		if ($lastResult) {
+			$this->traversing = true;
+		}
+		else if ($this->last === null)  {
+			$this->processString(['value' => '.']);
+			$this->result->setMode(Tokenizer::CONCAT);
 		}
 
 		$this->last = null;
@@ -104,11 +112,7 @@ class Value {
 			$this->callTransphpormFunctions($token);
 		}
 		else {
-			if ($this->last !== null) $this->data->traverse($this->last);
-			else {
-				$lastResult = $this->result->pop();
-				if ($lastResult) $this->data = new ValueData($lastResult);
-			}
+			$this->traverseLast();
 			$this->last = $parser->parseTokens($token['value'], null)[0];
 			if (!is_bool($this->last)) $this->traversing = true;
 		}
