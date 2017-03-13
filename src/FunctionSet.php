@@ -33,7 +33,7 @@ class FunctionSet {
 			$parser = new \Transphporm\Parser\Value($this);
 			return $parser->parseTokens($tokens, $this->elementData->getData($this->element));
 		}
-		else if (isset($args[0]) && $args[0] instanceof Parser\Tokens) {
+		else if ($args[0] instanceof Parser\Tokens) {
 			return iterator_to_array($args[0]);
 		}
 
