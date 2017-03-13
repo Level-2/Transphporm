@@ -94,9 +94,13 @@ class Value {
 		$this->last = null;
 	}
 
+	private function hasFunction($name) {
+		return $this->baseData instanceof \Transphporm\Functionset && $this->baseData->hasFunction($name);
+	}
+
 	private function processSquareBracket($token) {
 		$parser = new Value($this->baseData, $this->autoLookup);
-		if ($this->baseData instanceof \Transphporm\Functionset && $this->baseData->hasFunction($this->last)) {
+		if ($this->hasFunction($this->last)) {
 			$this->callTransphpormFunctions($token);
 		}
 		else {
@@ -123,7 +127,7 @@ class Value {
 	}
 
 	private function processBrackets($token) {
-		if ($this->baseData instanceof \Transphporm\Functionset && $this->baseData->hasFunction($this->last)
+		if ($this->hasFunction($this->last)
 			&& !$this->data->methodExists($this->last)) {
 			$this->callTransphpormFunctions($token);
 		}

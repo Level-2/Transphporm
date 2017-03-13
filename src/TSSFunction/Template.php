@@ -42,7 +42,7 @@ class Template implements \Transphporm\TSSFunction {
 		foreach ($newNode->childNodes as $node) {
             if (isset($node->tagName) && $node->tagName === 'template') $result[] = $this->getTemplateContent($node, $tss);
 			else $result[] = $this->getClonedElement($node, $tss);
-			}
+		}
 		return $result;
 	}
 
