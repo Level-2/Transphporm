@@ -162,14 +162,18 @@ class Value {
 				$this->result->processValue($value);
 			}
 			catch (\UnexpectedValueException $e) {
-				if (!($this->autoLookup || $this->traversing)) {
-					$this->result->processValue($this->last);
-				}
-				else {
-					$this->result->clear();
-					$this->result[0] = false;
-				}
+				$this->processLastUnexpected();
 			}
+		}
+	}
+
+	private function processLastUnexpected() {
+		if (!($this->autoLookup || $this->traversing)) {
+			$this->result->processValue($this->last);
+		}
+		else {
+			$this->result->clear();
+			$this->result[0] = false;
 		}
 	}
 }
