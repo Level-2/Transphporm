@@ -23,7 +23,7 @@ class TransphpormTest extends PHPUnit_Framework_TestCase {
 
 		$template = new Builder($template);
 
-		$this->assertEquals('<div><img src="foo.jpg" /></div>', $template->output()->body);
+		$this->assertEquals('<div><img src="foo.jpg"></div>', $template->output()->body);
 	}
 
 
@@ -1420,6 +1420,21 @@ ul li span {
 		$template = new \Transphporm\Builder($template, $tss);
 
 		$this->assertEquals('<div class="test8">Test</div>', $template->output($data)->body);
+	}
+
+	public function testLoadScriptTagFromHTML() {
+		$template = '<script>
+			$().ready(function() {});
+			</script>
+			<br>';
+
+		$template = new \Transphporm\Builder($template, '');
+
+		$this->assertEquals($this->stripTabs('<script>
+			$().ready(function() {});
+			</script>
+			<br>'), $this->stripTabs($template->output()->body));
+
 	}
 }
 
