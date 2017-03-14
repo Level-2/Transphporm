@@ -73,21 +73,10 @@ class Value {
 		}
 	}
 
-	private function traverseLast() {
-		if ($this->last !== null) $this->data->traverse($this->last);
-		else {
-			$lastResult = $this->result->pop();
-			if ($lastResult) {
-				$this->data = new ValueData($lastResult);
-				return $lastResult;
-			}
-		}
-	}
-
 	//Reads the last selected value from $data regardless if it's an array or object and overrides $this->data with the new value
 	//Dot moves $data to the next object in $data foo.bar moves the $data pointer from `foo` to `bar`
 	private function processDot($token) {
-		$lastResult = $this->traverseLast();
+		$lastResult = $this->data->traverse($this->last, $this->result);
 
 		//When . is not preceeded by anything, treat it as part of the string instead of an operator
 		// foo.bar is treated as looking up `bar` in `foo` whereas .foo is treated as the string ".foo"
@@ -112,7 +101,7 @@ class Value {
 			$this->callTransphpormFunctions($token);
 		}
 		else {
-			$this->traverseLast();
+			$this->data->traverse($this->last, $this->result);
 			$this->last = $parser->parseTokens($token['value'], null)[0];
 			if (!is_bool($this->last)) $this->traversing = true;
 		}
