@@ -21,10 +21,8 @@ class Repeat implements \Transphporm\Property {
 		if ($element->getAttribute('transphporm') === 'added') return $element->parentNode->removeChild($element);
 		$max = $this->getMax($values);
 		$count = 0;
-
 		$repeat = $this->getRepeatValue($values, $max);
-
-		//Don't run repeat on the clones element or it will loop forever
+		//Don't run repeat on the cloned element or it will loop forever
 		unset($rules['repeat']);
 		$hook = $this->createHook($rules, $pseudoMatcher, $properties);
 
