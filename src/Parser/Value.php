@@ -18,6 +18,7 @@ class Value {
 	private $data;
 	private $result;
 	private $traversing = false;
+	private $allowNullResult;
 
 	private $tokenFuncs = [
 			Tokenizer::NOT => 'processComparator',
@@ -36,9 +37,10 @@ class Value {
 			Tokenizer::OPEN_BRACKET => 'processBrackets'
 	];
 
-	public function __construct($data, $autoLookup = false) {
+	public function __construct($data, $autoLookup = false, $allowNullResult = false) {
 		$this->baseData = $data;
 		$this->autoLookup = $autoLookup;
+		$this->allowNullResult = $allowNullResult;
 	}
 
 	public function parse($str) {
@@ -49,7 +51,7 @@ class Value {
 	}
 
 	public function parseTokens($tokens, $data = null) {
-		$this->result = new ValueResult;
+		$this->result = new ValueResult();
 		$this->data = new ValueData($data ? $data : $this->baseData);
 		$this->last = null;
 		$this->traversing = false;
@@ -141,7 +143,8 @@ class Value {
 		foreach ($this->result->getResult() as $i => $value) {
 			if (is_scalar($value)) {
 				$val = $this->data->read($value);
-				if ($val) $this->result[$i] = $val;
+				$this->result->write($i, $val, $this->allowNullResult);
+
 			}
 		}
 		$this->last = null;
@@ -166,7 +169,7 @@ class Value {
 		}
 		else {
 			$this->result->clear();
-			$this->result[0] = false;
+			$this->result->write(0, false);
 		}
 	}
 }

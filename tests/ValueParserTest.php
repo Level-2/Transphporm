@@ -100,6 +100,9 @@ class ValueParserTest extends PHPUnit_Framework_TestCase {
         return $stub;
 	}
 
+
+	
+
 	public function testFunctionCallBasic() {
 
 		$stub = $this->getDataStub();
@@ -249,6 +252,18 @@ class ValueParserTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+
+	public function testMissingData() {
+		$stub = $this->getFunctionSet([]);
+
+        $value = new Value($stub, true, true);
+
+        $result = $value->parse('data("novaluehere")');
+
+        $this->assertNull($result[0]);
+
+	}
+
 	public function testConditionalAutoLookup() {
 		$value = new Value(new TestData, true);
 
@@ -324,6 +339,8 @@ class ValueParserTest extends PHPUnit_Framework_TestCase {
 
 	//public fucntion testNested
 }
+
+
 
 class TestData {
 

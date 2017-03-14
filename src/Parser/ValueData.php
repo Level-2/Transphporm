@@ -40,7 +40,7 @@ class ValueData {
 			if (isset($this->data[$value])) return $this->data[$value];
 		}
 		else if (isset($this->data->$value)) return $this->data->$value;
-		else return false;
+		else return null;
 	}
 
 	public function call($func, $args) {
