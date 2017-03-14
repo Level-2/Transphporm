@@ -1376,7 +1376,7 @@ ul li span {
 
 		$template = new \Transphporm\Builder($xml, $tss);
 
-		$this->assertEquals('<textarea name="test">test</textarea>', $template->output([])->body);
+		$this->assertEquals('<textarea name="test"></textarea>', $template->output([])->body);
 	}
 
 	public function testNonexistantFieldResult2() {
