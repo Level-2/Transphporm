@@ -14,7 +14,7 @@ class Basics implements \Transphporm\Module {
 		$headers = &$config->getHeaders();
 
 		$config->registerProperty('content', new \Transphporm\Property\Content($headers, $config->getFormatter()));
-		$config->registerProperty('repeat', new \Transphporm\Property\Repeat($data, $config->getElementData(), $config->getLine()));
+		$config->registerProperty('repeat', new \Transphporm\Property\Repeat($data, $config->getElementData(), $config->getLine(), $config->getFilePath()));
 		$config->registerProperty('display', new \Transphporm\Property\Display);
 		$config->registerProperty('bind', new \Transphporm\Property\Bind($config->getElementData()));
 	}

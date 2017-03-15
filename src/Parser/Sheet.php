@@ -11,20 +11,18 @@ class Sheet {
 	private $tss;
 	private $rules;
 	private $file;
-	private $baseDir;
 	private $valueParser;
 	private $xPath;
 	private $tokenizer;
 	private $filePath;
 	private $import = [];
 
-	public function __construct($tss, &$baseDir, CssToXpath $xPath, Value $valueParser, \Transphporm\TSSCache $cache, \Transphporm\FilePath $filePath) {
+	public function __construct($tss, CssToXpath $xPath, Value $valueParser, \Transphporm\TSSCache $cache, \Transphporm\FilePath $filePath) {
 		$this->cache = $cache;
-		$this->baseDir = &$baseDir;
 		if (is_file($tss)) {
 			$this->file = $tss;
 			$this->rules = $this->cache->load($tss);
-			$baseDir = dirname(realpath($tss)) . DIRECTORY_SEPARATOR;
+			$filePath->setBaseDir(dirname(realpath($tss)) . DIRECTORY_SEPARATOR);
 			if (empty($this->rules)) $tss = file_get_contents($tss);
 			else return;
 		}
@@ -114,9 +112,9 @@ class Sheet {
 		if ($this->file !== null) $fileName = $fileName = $this->filePath->getFilePath($args[0]);
 		else $fileName = $args[0];
 		$this->import[] = $fileName;
-		$baseDirTemp = $this->baseDir;
-		$sheet = new Sheet($fileName, $this->baseDir, $this->xPath, $this->valueParser, $this->cache, $this->filePath);
-		$this->baseDir = $baseDirTemp;
+		$baseDirTemp = $this->filePath->getFilePath();
+		$sheet = new Sheet($fileName, $this->xPath, $this->valueParser, $this->cache, $this->filePath);
+		$this->filePath->setBaseDir($baseDirTemp);
 		return $sheet->parse($indexStart);
 	}
 

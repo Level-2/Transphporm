@@ -9,7 +9,6 @@ namespace Transphporm;
 class Builder {
 	private $template;
 	private $tss;
-	private $baseDir;
 	private $rootDir;
 	private $cache;
 	private $time;
@@ -48,13 +47,13 @@ class Builder {
 		$headers = [];
 
 		$elementData = new \Transphporm\Hook\ElementData(new \SplObjectStorage(), $data);
-		$data = new FunctionSet($elementData);
+		$functionSet = new FunctionSet($elementData);
 
 		$cachedOutput = $this->loadTemplate();
 		//To be a valid XML document it must have a root element, automatically wrap it in <template> to ensure it does
 		$template = new Template($this->isValidDoc($cachedOutput['body']) ? str_ireplace('<!doctype', '<!DOCTYPE', $cachedOutput['body']) : '<template>' . $cachedOutput['body'] . '</template>' );
-		$valueParser = new Parser\Value($data);
-		$config = new Config($data, $valueParser, $elementData, new Hook\Formatter(), new Parser\CssToXpath($data, $template->getPrefix()), new FilePath($this->baseDir, $this->rootDir), $headers);
+		$valueParser = new Parser\Value($functionSet);
+		$config = new Config($functionSet, $valueParser, $elementData, new Hook\Formatter(), new Parser\CssToXpath($functionSet, $template->getPrefix()), new FilePath($this->rootDir), $headers);
 
 		foreach ($this->modules as $module) $module->load($config);
 
@@ -86,7 +85,7 @@ class Builder {
 		$rule->touch();
 
 		$pseudoMatcher = $config->createPseudoMatcher($rule->pseudo);
-		$hook = new Hook\PropertyHook($rule->properties, $this->baseDir, $config->getLine(), $rule->file, $rule->line, $pseudoMatcher, $config->getValueParser(), $config->getFunctionSet());
+		$hook = new Hook\PropertyHook($rule->properties, $config->getLine(), $rule->file, $rule->line, $pseudoMatcher, $config->getValueParser(), $config->getFunctionSet(), $config->getFilePath());
 		$config->loadProperties($hook);
 		$template->addHook($rule->query, $hook);
 	}
@@ -104,7 +103,7 @@ class Builder {
 	//N.b. only files can be cached
 	private function getRules($template, $config) {
 		$cache = new TSSCache($this->cache, $template->getPrefix());
-		return (new Parser\Sheet($this->tss, $this->baseDir, $config->getCssToXpath(), $config->getValueParser(), $cache, $config->getFilePath()))->parse();
+		return (new Parser\Sheet($this->tss, $config->getCssToXpath(), $config->getValueParser(), $cache, $config->getFilePath()))->parse();
 	}
 
 	public function setCache(\ArrayAccess $cache) {

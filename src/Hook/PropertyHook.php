@@ -8,7 +8,6 @@ namespace Transphporm\Hook;
 /** Hooks into the template system, gets assigned as `ul li` or similar and `run()` is called with any elements that match */
 class PropertyHook implements \Transphporm\Hook {
 	private $rules;
-	private $baseDir;
 	private $configLine;
 	private $file;
 	private $line;
@@ -17,20 +16,20 @@ class PropertyHook implements \Transphporm\Hook {
 	private $properties = [];
 	private $functionSet;
 
-	public function __construct(array $rules, &$baseDir, &$configLine, $file, $line, PseudoMatcher $pseudoMatcher, \Transphporm\Parser\Value $valueParser, \Transphporm\FunctionSet $functionSet) {
+	public function __construct(array $rules, &$configLine, $file, $line, PseudoMatcher $pseudoMatcher,
+            \Transphporm\Parser\Value $valueParser, \Transphporm\FunctionSet $functionSet, \Transphporm\FilePath $filePath) {
 		$this->rules = $rules;
-		$this->baseDir = &$baseDir;
 		$this->configLine = &$configLine;
 		$this->file = $file;
 		$this->line = $line;
 		$this->valueParser = $valueParser;
 		$this->pseudoMatcher = $pseudoMatcher;
 		$this->functionSet = $functionSet;
-		if ($this->file !== null) $this->baseDir = dirname(realpath($this->file)) . DIRECTORY_SEPARATOR;
+		if ($this->file !== null) $filePath->setBaseDir(dirname(realpath($this->file)) . DIRECTORY_SEPARATOR);
 	}
 
 	public function run(\DomElement $element) {
-		$this->functionSet->setElement($element);		
+		$this->functionSet->setElement($element);
 		$this->configLine = $this->line;
 		try {
 			//Don't run if there's a pseudo element like nth-child() and this element doesn't match it
