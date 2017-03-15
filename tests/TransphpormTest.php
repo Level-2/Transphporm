@@ -497,8 +497,7 @@ div {content: "bar"; }
 			<div>Test</div>
 		';
 
-		$includeFile = __DIR__ . DIRECTORY_SEPARATOR . 'include.xml';
-		$includeFile = str_replace(getcwd(), '/', $includeFile);
+		$includeFile = '/tests/include.xml';
 
 		$tss = "div {content: template('$includeFile'); }";
 		$template = new \Transphporm\Builder($template, $tss);
@@ -951,8 +950,7 @@ select option[value=data()]:attr(selected) { content: "selected"; }
 		</div>';
 
 
-		$includeFile = __DIR__ . DIRECTORY_SEPARATOR . 'include.xml';
-		$includeFile = str_replace(getcwd(), '/', $includeFile);
+		$includeFile = '/tests/include.xml';
 
 		$tss = "div:before {content: template('$includeFile'); }";
 		$template = new \Transphporm\Builder($xml, $tss);
