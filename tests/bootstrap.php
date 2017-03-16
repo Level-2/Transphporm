@@ -5,6 +5,12 @@
  * @license         http://www.opensource.org/licenses/bsd-license.php  BSD License *
  * @version         0.9                                                             */
 //Autoloader for Vision classes
+
+//Add support for PHPUnit 5 and 6
+if (!class_exists('PHPUnit_Framework_TestCase')) {
+	class PHPUnit_Framework_TestCase extends \PHPUnit\Framework\TestCase {}
+}
+
 spl_autoload_register(function($class) {
 	$parts = explode('\\', ltrim($class, '\\'));
 	if ($parts[0] === 'Transphporm') {

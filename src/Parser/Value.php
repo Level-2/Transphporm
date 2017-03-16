@@ -18,6 +18,7 @@ class Value {
 	private $data;
 	private $result;
 	private $traversing = false;
+	private $allowNullResult;
 
 	private $tokenFuncs = [
 			Tokenizer::NOT => 'processComparator',
@@ -36,9 +37,10 @@ class Value {
 			Tokenizer::OPEN_BRACKET => 'processBrackets'
 	];
 
-	public function __construct($data, $autoLookup = false) {
+	public function __construct($data, $autoLookup = false, $allowNullResult = false) {
 		$this->baseData = $data;
 		$this->autoLookup = $autoLookup;
+		$this->allowNullResult = $allowNullResult;
 	}
 
 	public function parse($str) {
@@ -49,7 +51,7 @@ class Value {
 	}
 
 	public function parseTokens($tokens, $data = null) {
-		$this->result = new ValueResult;
+		$this->result = new ValueResult();
 		$this->data = new ValueData($data ? $data : $this->baseData);
 		$this->last = null;
 		$this->traversing = false;
@@ -76,35 +78,32 @@ class Value {
 	//Reads the last selected value from $data regardless if it's an array or object and overrides $this->data with the new value
 	//Dot moves $data to the next object in $data foo.bar moves the $data pointer from `foo` to `bar`
 	private function processDot($token) {
-		if ($this->last !== null) $this->data->traverse($this->last);
-		else {
-			//When . is not preceeded by anything, treat it as part of the string instead of an operator
-			// foo.bar is treated as looking up `bar` in `foo` whereas .foo is treated as the string ".foo"
-			$lastResult = $this->result->pop();
-			if ($lastResult) {
-				$this->data = new ValueData($lastResult);
-				$this->traversing = true;
-			}
-			else {
-				$this->processString(['value' => '.']);
-				$this->result->setMode(Tokenizer::CONCAT);
-			}
+		$lastResult = $this->data->traverse($this->last, $this->result);
+
+		//When . is not preceeded by anything, treat it as part of the string instead of an operator
+		// foo.bar is treated as looking up `bar` in `foo` whereas .foo is treated as the string ".foo"
+		if ($lastResult) {
+			$this->traversing = true;
+		}
+		else if ($this->last === null)  {
+			$this->processString(['value' => '.']);
+			$this->result->setMode(Tokenizer::CONCAT);
 		}
 
 		$this->last = null;
 	}
 
+	private function hasFunction($name) {
+		return $this->baseData instanceof \Transphporm\Functionset && $this->baseData->hasFunction($name);
+	}
+
 	private function processSquareBracket($token) {
 		$parser = new Value($this->baseData, $this->autoLookup);
-		if ($this->baseData instanceof \Transphporm\Functionset && $this->baseData->hasFunction($this->last)) {
+		if ($this->hasFunction($this->last)) {
 			$this->callTransphpormFunctions($token);
 		}
 		else {
-			if ($this->last !== null) $this->data->traverse($this->last);
-			else {
-				$lastResult = $this->result->pop();
-				if ($lastResult) $this->data = new ValueData($lastResult);
-			}
+			$this->data->traverse($this->last, $this->result);
 			$this->last = $parser->parseTokens($token['value'], null)[0];
 			if (!is_bool($this->last)) $this->traversing = true;
 		}
@@ -123,7 +122,7 @@ class Value {
 	}
 
 	private function processBrackets($token) {
-		if ($this->baseData instanceof \Transphporm\Functionset && $this->baseData->hasFunction($this->last)
+		if ($this->hasFunction($this->last)
 			&& !$this->data->methodExists($this->last)) {
 			$this->callTransphpormFunctions($token);
 		}
@@ -144,7 +143,8 @@ class Value {
 		foreach ($this->result->getResult() as $i => $value) {
 			if (is_scalar($value)) {
 				$val = $this->data->read($value);
-				if ($val) $this->result[$i] = $val;
+				$this->result->write($i, $val, $this->allowNullResult);
+
 			}
 		}
 		$this->last = null;
@@ -158,14 +158,18 @@ class Value {
 				$this->result->processValue($value);
 			}
 			catch (\UnexpectedValueException $e) {
-				if (!($this->autoLookup || $this->traversing)) {
-					$this->result->processValue($this->last);
-				}
-				else {
-					$this->result->clear();
-					$this->result[0] = false;
-				}
+				$this->processLastUnexpected();
 			}
+		}
+	}
+
+	private function processLastUnexpected() {
+		if (!($this->autoLookup || $this->traversing)) {
+			$this->result->processValue($this->last);
+		}
+		else {
+			$this->result->clear();
+			$this->result->write(0, false);
 		}
 	}
 }

@@ -9,11 +9,13 @@ class Repeat implements \Transphporm\Property {
 	private $functionSet;
 	private $elementData;
 	private $line;
+    private $filePath;
 
-	public function __construct(\Transphporm\FunctionSet $functionSet, \Transphporm\Hook\ElementData $elementData, &$line) {
+	public function __construct(\Transphporm\FunctionSet $functionSet, \Transphporm\Hook\ElementData $elementData, &$line, \Transphporm\FilePath $filePath) {
 		$this->functionSet = $functionSet;
 		$this->elementData = $elementData;
 		$this->line = &$line;
+        $this->filePath = $filePath;
 	}
 
 	public function run(array $values, \DomElement $element, array $rules, \Transphporm\Hook\PseudoMatcher $pseudoMatcher, array $properties = []) {
@@ -21,10 +23,8 @@ class Repeat implements \Transphporm\Property {
 		if ($element->getAttribute('transphporm') === 'added') return $element->parentNode->removeChild($element);
 		$max = $this->getMax($values);
 		$count = 0;
-
 		$repeat = $this->getRepeatValue($values, $max);
-
-		//Don't run repeat on the clones element or it will loop forever
+		//Don't run repeat on the cloned element or it will loop forever
 		unset($rules['repeat']);
 		$hook = $this->createHook($rules, $pseudoMatcher, $properties);
 
@@ -78,9 +78,7 @@ class Repeat implements \Transphporm\Property {
 	}
 
 	private function createHook($newRules, $pseudoMatcher, $properties) {
-		$var = ""; // PropertyHook requires that baseDir be passed by refrence
-		// and there is no reason to pass it so create $var to avoid errors
-		$hook = new \Transphporm\Hook\PropertyHook($newRules, $var, $this->line, "", $this->line, $pseudoMatcher, new \Transphporm\Parser\Value($this->functionSet), $this->functionSet);
+		$hook = new \Transphporm\Hook\PropertyHook($newRules, $this->line, null, $this->line, $pseudoMatcher, new \Transphporm\Parser\Value($this->functionSet), $this->functionSet, $this->filePath);
 		foreach ($properties as $name => $property) $hook->registerProperty($name, $property);
 		return $hook;
 	}

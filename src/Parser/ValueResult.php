@@ -5,9 +5,8 @@
  * @license         http://www.opensource.org/licenses/bsd-license.php  BSD License *
  * @version         1.0                                                             */
 namespace Transphporm\Parser;
-class ValueResult implements \ArrayAccess {
+class ValueResult {
 	private $result = [];
-
 	/*
 		The next operation to perform. Will be one of the following:
 			ARG - A new value e.g,  "a","b"  becomes ["a", "b"]
@@ -85,20 +84,10 @@ class ValueResult implements \ArrayAccess {
 		return array_pop($this->result);
 	}
 
-	public function offsetSet($key, $value) {
-		$this->result[$key] = $value;
-	}
-
-	public function offsetGet($key) {
-		return $this->result[$key];
-	}
-
-	public function offsetUnset($key) {
-		unset($this->result[$key]);
-	}
-
-	public function offsetExists($key) {
-		return isset($this->result[$key]);
+	public function write($index, $value, $allowNull = false) {
+		if ($value !== null || $allowNull == true) {
+			$this->result[$index] = $value;
+		}
 	}
 
 	public function clear() {

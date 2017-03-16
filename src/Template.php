@@ -11,6 +11,7 @@ class Template {
 	private $document;
 	private $xpath;
 	private $prefix = '';
+	private $save;
 
 	/** Takes an XML string and loads it into a DomDocument object */
 	public function __construct($doc) {
@@ -32,13 +33,23 @@ class Template {
 	private function loadDocument($doc) {
 		libxml_use_internal_errors(true);
 		if ($this->document->loadXml($doc) === false) {
-				$this->document->loadHtml('<' . '?xml encoding="UTF-8">' .$doc);
+				//If HTML is loaded, make sure the document is also saved as HTML
+				$this->save = function($content = null) {
+					return $this->document->saveHtml($content);
+				};
+				$this->document->loadHtml('<' . '?xml encoding="UTF-8">' .$doc,  LIBXML_HTML_NODEFDTD | LIBXML_HTML_NOIMPLIED);
 
 				if (strpos($doc, '<!') !== 0) {
 					$templateNode = $this->document->getElementsByTagName('template')[0];
 					$this->document->replaceChild($templateNode, $this->document->documentElement);
 				}
+				return;
 		}
+
+		//XML was loaded, save as XML.
+		$this->save = function($content = null) {
+			return $this->document->saveXml($content, LIBXML_NOEMPTYTAG);
+		};		
 		libxml_clear_errors();
 	}
 
@@ -61,9 +72,9 @@ class Template {
 	}
 
 	/** Prints out the current DomDocument as HTML */
-	private function printDocument(\DomDocument $doc) {
+	private function printDocument() {
 		$output = '';
-		foreach ($doc->documentElement->childNodes as $node) $output .= $doc->saveXML($node, LIBXML_NOEMPTYTAG);
+		foreach ($this->document->documentElement->childNodes as $node) $output .= call_user_func($this->save, $node);
 		return $output;
 	}
 
@@ -77,14 +88,14 @@ class Template {
 		 //Either return a whole DomDocument or return the output HTML
 		if ($document) return $this->document;
 
+		$output = ($this->document->doctype) ? call_user_func($this->save, $this->document->doctype) . "\n" : '';
 
-		$output = ($this->document->doctype) ? $this->document->saveXml($this->document->doctype) . "\n" : '';
-
-		if ($this->document->documentElement->tagName !== 'template') $output .= $this->document->saveXml($this->document->documentElement, LIBXML_NOEMPTYTAG);
-		else $output = $this->printDocument($this->document);
+		if ($this->document->documentElement->tagName !== 'template') $output .= call_user_func($this->save, $this->document->documentElement);
+		else $output = $this->printDocument();
 
 		//repair empty tags. Browsers break on <script /> and <div /> so can't avoid LIBXML_NOEMPTYTAG but they also break on <base></base> so repair them
 		$output = str_replace(['></img>', '></br>', '></meta>', '></base>', '></link>', '></hr>', '></input>'], ' />', $output);
 		return trim($output);
 	}
+
 }

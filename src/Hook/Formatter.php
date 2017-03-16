@@ -33,6 +33,11 @@ class Formatter {
 		}
 	}
 
+	//TODO: Abstract all error reporting externally with a method for turning it on/off
+	private function assert($condition, $error) {
+		if (!$condition) throw new \Exception($error);
+	}
+
 	private function processFormat($format, $functionName, $value) {
 		$functionExists = false;
 		foreach ($value as &$val) {
@@ -43,7 +48,8 @@ class Formatter {
 				}
 			}
 		}
-		if (!$functionExists) throw new \Exception("Formatter '$functionName' does not exist");
+
+		$this->assert($functionExists, "Formatter '$functionName' does not exist");
 		return $value;
 	}
 }

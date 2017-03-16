@@ -13,17 +13,34 @@ class ValueData {
 		$this->data = $data;
 	}
 
-	public function traverse($key) {
+	//Read $key from array, $this->data = $this->data[$key] but also works for objects
+	private function traverseInto($key) {
 		if (isset($this->data->{$key})) $this->data = $this->data->{$key};
-		else if ((is_array($this->data) || $this->data instanceof \ArrayAccess) && isset($this->data[$key])) $this->data = $this->data[$key];
+		else if ($this->isArray() && isset($this->data[$key])) $this->data = $this->data[$key];
+	}
+
+	public function traverse($key, $result) {
+		if ($key !== null) $this->traverseInto($key);
+		else {
+			//But if the key is null, replace the data structure with the result of the last function call
+			$lastResult = $result->pop();
+			if ($lastResult) {
+				$this->data = $lastResult;
+				return $lastResult;
+			}
+		}
+	}
+
+	private function isArray() {
+		return is_array($this->data) || $this->data instanceof \ArrayAccess;
 	}
 
 	public function read($value) {
-		if ((is_array($this->data) || $this->data instanceof \ArrayAccess)) {
+		if ($this->isArray()) {
 			if (isset($this->data[$value])) return $this->data[$value];
 		}
 		else if (isset($this->data->$value)) return $this->data->$value;
-		else return false;
+		else return null;
 	}
 
 	public function call($func, $args) {

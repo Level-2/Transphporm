@@ -23,7 +23,7 @@ class TransphpormTest extends PHPUnit_Framework_TestCase {
 
 		$template = new Builder($template);
 
-		$this->assertEquals('<div><img src="foo.jpg" /></div>', $template->output()->body);
+		$this->assertEquals('<div><img src="foo.jpg"></div>', $template->output()->body);
 	}
 
 
@@ -497,8 +497,7 @@ div {content: "bar"; }
 			<div>Test</div>
 		';
 
-		$includeFile = __DIR__ . DIRECTORY_SEPARATOR . 'include.xml';
-		$includeFile = str_replace('\\', '/', $includeFile);
+		$includeFile = '/tests/include.xml';
 
 		$tss = "div {content: template('$includeFile'); }";
 		$template = new \Transphporm\Builder($template, $tss);
@@ -512,7 +511,7 @@ div {content: "bar"; }
 		';
 
 		$includeFile = __DIR__ . DIRECTORY_SEPARATOR . 'include.xml';
-		$includeFile = str_replace('\\', '/', $includeFile);
+		$includeFile = str_replace(getcwd(), '/', $includeFile);
 
 		$data = new \stdClass;
 		$data->includeFile = $includeFile;
@@ -855,7 +854,7 @@ div {content: "bar"; }
 		</div>';
 
 		$tpl = __DIR__ . '/include.xml';
-		$tpl = str_replace('\\', '/', $tpl);
+		$tpl = str_replace(getcwd(), '/', $tpl);
 
 		$tss = 'span {content: template(\'' . $tpl . '\'); content-mode: replace; }';
 
@@ -951,8 +950,7 @@ select option[value=data()]:attr(selected) { content: "selected"; }
 		</div>';
 
 
-		$includeFile = __DIR__ . DIRECTORY_SEPARATOR . 'include.xml';
-		$includeFile = str_replace('\\', '/', $includeFile);
+		$includeFile = '/tests/include.xml';
 
 		$tss = "div:before {content: template('$includeFile'); }";
 		$template = new \Transphporm\Builder($xml, $tss);
@@ -1127,7 +1125,7 @@ ul li span {
 		$obj = new Foo();
 
 		$includeFile = __DIR__ . '/include.xml';
-		$includeFile = str_replace('\\', '/', $includeFile);
+		$includeFile = str_replace(getcwd(), '/', $includeFile);
 		$tss = 'div {content: template("' . $includeFile  . '");  bind: data(model.getData()); }';
 
 		$template = new \Transphporm\Builder($xml, $tss);
@@ -1345,7 +1343,7 @@ ul li span {
 
 	public function testXmlCommentInTemplate() {
 		$xml = "<div></div>";
-		$tss = "div { content: template('" . str_replace('\\', '/', __DIR__) . "/xmlComment.xml'); }";
+		$tss = "div { content: template('" . str_replace(getcwd(), '/', __DIR__) . "/xmlComment.xml'); }";
 
 		$template = new \Transphporm\Builder($xml, $tss);
 
@@ -1354,7 +1352,7 @@ ul li span {
 
 	public function testXmlCommentInTemplate2() {
 		$xml = "<div></div>";
-		$tss = "div { content: template('" . str_replace('\\', '/', __DIR__) . "/xmlComment2.xml'); }";
+		$tss = "div { content: template('" . str_replace(getcwd(), '/', __DIR__) . "/xmlComment2.xml'); }";
 
 		$template = new \Transphporm\Builder($xml, $tss);
 
@@ -1371,7 +1369,7 @@ ul li span {
 	}
 
 	public function testNonexistantFieldResult1() {
-		$xml = "<textarea name='test'></textarea>";
+		$xml = '<textarea name="test"></textarea>';
 		$tss = "textarea { content: data(attr(name)); }";
 
 		$template = new \Transphporm\Builder($xml, $tss);
@@ -1420,6 +1418,21 @@ ul li span {
 		$template = new \Transphporm\Builder($template, $tss);
 
 		$this->assertEquals('<div class="test8">Test</div>', $template->output($data)->body);
+	}
+
+	public function testLoadScriptTagFromHTML() {
+		$template = '<script>
+			$().ready(function() {});
+			</script>
+			<br>';
+
+		$template = new \Transphporm\Builder($template, '');
+
+		$this->assertEquals($this->stripTabs('<script>
+			$().ready(function() {});
+			</script>
+			<br>'), $this->stripTabs($template->output()->body));
+
 	}
 }
 

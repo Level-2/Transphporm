@@ -23,8 +23,13 @@ class Nth implements \Transphporm\Pseudo {
 		$criteria = $args[0];
 
 		if (is_callable([$this, $criteria])) return $this->$criteria($this->count);
-		else if (!is_numeric($criteria)) throw new \Exception("Argument passed to 'nth-child' must be 'odd', 'even', or of type int");
-		else return $this->count == $criteria;
+		$this->assert(is_numeric($criteria), "Argument passed to 'nth-child' must be 'odd', 'even', or of type int");
+		return $this->count == $criteria;
+	}
+
+	//TODO: Abstract assertions throughout
+	private function assert($condition, $error) {
+		if (!$condition) throw new \Exception($error);
 	}
 
 	private function odd($num) {
