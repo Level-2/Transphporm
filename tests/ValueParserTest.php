@@ -30,6 +30,19 @@ class ValueParserTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals(['foo'], $result);
 	}
 
+
+	public function testTwoValues() {
+		$data = new stdclass;
+		$data->foo = 'bar';
+
+		$value = new Value($data);
+
+
+		$result = $value->parse('foo bar');
+
+		$this->assertEquals(['foo', 'bar'], $result);
+	}
+
 /*
 	public function testBasicConditional() {
 		$data = new stdclass;

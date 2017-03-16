@@ -114,6 +114,9 @@ class Value {
 	}
 
 	private function processScalar($token) {
+		if (is_scalar($this->last)) {
+			$this->result->processValue($this->last);
+		}
 		$this->last = $token['value'];
 	}
 
