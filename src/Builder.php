@@ -62,9 +62,6 @@ class Builder {
 		$result = ['body' => $template->output($document), 'headers' => array_merge($cachedOutput['headers'], $headers)];
 		$this->cache->write($this->template, $result);
 		$result['body'] = $this->doPostProcessing($template)->output($document);
-
-		//Required hack as DomXPath can only register static functions clear any statically stored instances
-		Parser\CssToXpath::cleanup();
 		return (object) $result;
 	}
 
@@ -114,5 +111,10 @@ class Builder {
 
 	private function isValidDoc($xml) {
 		return (strpos($xml, '<!') === 0 && strpos($xml, '<!--') !== 0) || strpos($xml, '<?') === 0;
+	}
+
+	public function __destruct() {
+		//Required hack as DomXPath can only register static functions clear any statically stored instances
+		Parser\CssToXpath::cleanup();
 	}
 }
