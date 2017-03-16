@@ -63,6 +63,8 @@ class Builder {
 		$this->cache->write($this->template, $result);
 		$result['body'] = $this->doPostProcessing($template)->output($document);
 
+		//Required hack as DomXPath can only register static functions clear any statically stored instances
+		Parser\CssToXpath::cleanup();
 		return (object) $result;
 	}
 

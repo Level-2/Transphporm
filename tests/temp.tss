@@ -1,1 +1,3 @@
-div { content: "test"; }
+
+	    		span {display: block;  update-frequency: always }
+	            span[data-hide=data(hide)] { display: none; update-frequency: always }

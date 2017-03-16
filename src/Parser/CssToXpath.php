@@ -14,7 +14,8 @@ class CssToXpath {
 
 
 	public function __construct(\Transphporm\FunctionSet $functionSet, $prefix = '') {
-		$hash = $this->registerInstance();
+		$hash = count(self::$instances);
+		self::$instances[$hash] = $this;
 		$this->functionSet = $functionSet;
 
 		$this->translators = [
@@ -27,12 +28,6 @@ class CssToXpath {
 		];
 	}
 
-	private function registerInstance() {
-		$hash = spl_object_hash($this);
-		self::$instances[$hash] = $this;
-		return $hash;
-	}
-
 	private function createSelector() {
 		$selector = new \stdclass;
 		$selector->type = '';
@@ -43,18 +38,23 @@ class CssToXpath {
 	//XPath only allows registering of static functions... this is a hacky workaround for that
 	public static function processAttr($attr, $element, $hash) {
 		$attr = unserialize(base64_decode($attr));
+		
 		$functionSet = self::$instances[$hash]->functionSet;
 		$functionSet->setElement($element[0]);
 
 		$attributes = array();
         foreach($element[0]->attributes as $attribute_name => $attribute_node) {
             $attributes[$attribute_name] = $attribute_node->nodeValue;
-        }
+        }	
 
         $parser = new \Transphporm\Parser\Value($functionSet, true);
 		$return = $parser->parseTokens($attr, $attributes);
 
 		return $return[0] === '' ? false : $return[0];
+	}
+
+	public static function cleanup() {
+		self::$instances = [];
 	}
 
 	//split the css into indivudal functions
@@ -74,7 +74,7 @@ class CssToXpath {
 		return $selectors;
 	}
 
-	public function getXpath($css) {		
+	public function getXpath($css) {
 		$css = $this->removeSpacesFromDirectDecend($css)->splitOnToken(Tokenizer::COLON)[0];
 		$selectors = $this->split($css);
 		$xpath = '/';

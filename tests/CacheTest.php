@@ -210,6 +210,41 @@ class CacheTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals($this->stripTabs($template->output()->body), $this->stripTabs("<div>test</div>"));
 	}
 
+
+	public function testCacheWithAttribute() {
+
+	    $xml = $this->makeXml('<div>
+		<span data-hide="1">Test1</span>
+		<span data-hide="2">Test2</span>
+		</div>');
+
+	    $tss = $this->makeTss('
+	    		span {display: block;  update-frequency: always }
+	            span[data-hide=data(hide)] { display: none; update-frequency: always }');
+
+	    $cache = new \ArrayObject();
+
+	    $template = new \Transphporm\Builder($xml, $tss);
+	    $template->setCache($cache);
+
+	    $expectedOutput = $this->stripTabs('<div><span data-hide="2">Test2</span></div>');
+	    $this->assertEquals($this->stripTabs($template->output(['hide' => 1])->body), $expectedOutput);
+
+	   // sleep(10);
+	    $template = new \Transphporm\Builder($xml, $tss);
+	    $template->setCache($cache);
+	  //  var_dump($cache);
+	    //Expire the cache by advancing time 10 minutes
+		$date = new \DateTime();
+		$date->modify('+11 minutes');
+		$template->setTime($date->format('U'));
+
+	    $expectedOutput = $this->stripTabs('<div><span data-hide="1">Test1</span></div>');
+
+	    // Run output again
+	    $this->assertEquals($expectedOutput, $this->stripTabs($template->output(['hide' => 2])->body));
+	}
+
 }
 
 class RandomGenerator {

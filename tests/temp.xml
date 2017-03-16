@@ -1,1 +1,4 @@
-<div></div>
+<div>
+		<span data-hide="1">Test1</span>
+		<span data-hide="2">Test2</span>
+		</div>
