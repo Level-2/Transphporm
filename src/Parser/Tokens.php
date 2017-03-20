@@ -94,6 +94,12 @@ class Tokens implements \Iterator, \Countable {
         return new Tokens($tokens);
     }
 
+    public function removeLine() {
+        $tokens = $this->tokens;
+        foreach ($tokens as &$token) unset($token['line']);
+        return new Tokens($tokens);
+    }
+
     public function read($offset = 0) {
         return isset($this->tokens[$offset]) ? $this->tokens[$offset]['value'] : false;
     }

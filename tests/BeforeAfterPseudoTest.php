@@ -1,6 +1,6 @@
 <?php
 use Transphporm\Builder;
-class GeneralFormatterTest extends PHPUnit_Framework_TestCase {
+class BeforeAfterPseudoTest extends PHPUnit_Framework_TestCase {
 
 	private function stripTabs($str) {
 		return trim(str_replace(["\t", "\n", "\r"], '', $str));

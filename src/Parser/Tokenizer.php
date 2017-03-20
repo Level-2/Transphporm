@@ -33,6 +33,8 @@ class Tokenizer {
 	const MULTIPLY = 'MULTIPLY';
 	const DIVIDE = 'DIVIDE';
 
+	private $lineNo = 1;
+
 	private $chars = [
 		'"' => self::STRING,
 		'\'' => self::STRING,
@@ -71,6 +73,7 @@ class Tokenizer {
 		for ($i = 0; $i < strlen($this->str); $i++) {
 			$char = $this->identifyChar($this->str[$i]);
 
+			$this->doNewLine($tokens, $char);
 			$this->doSimpleTokens($tokens, $char);
 			$this->doLiterals($tokens, $char, $i);
 			$i += $this->doStrings($tokens, $char, $i);
@@ -82,9 +85,16 @@ class Tokenizer {
 
 	private function doSimpleTokens(&$tokens, $char) {
 		if (in_array($char, [Tokenizer::ARG, Tokenizer::CONCAT, Tokenizer::DOT, Tokenizer::NOT, Tokenizer::EQUALS,
-			Tokenizer::COLON, Tokenizer::SEMI_COLON, Tokenizer::WHITESPACE, Tokenizer::NEW_LINE, Tokenizer::NUM_SIGN,
+			Tokenizer::COLON, Tokenizer::SEMI_COLON, Tokenizer::WHITESPACE, Tokenizer::NUM_SIGN,
 			Tokenizer::GREATER_THAN, Tokenizer::AT_SIGN, Tokenizer::SUBTRACT, Tokenizer::MULTIPLY, Tokenizer::DIVIDE])) {
-			$tokens[] = ['type' => $char];
+			$tokens[] = ['type' => $char, 'line' => $this->lineNo];
+		}
+	}
+
+	private function doNewLine(&$tokens, $char) {
+		if ($char == Tokenizer::NEW_LINE) {
+			$this->lineNo++;
+			$tokens[] = ['type' => $char, 'line' => $this->lineNo];
 		}
 	}
 
@@ -94,7 +104,7 @@ class Tokenizer {
 		//but a subtract can be part of a class name or a mathematical operation
 				|| ($this->identifyChar($this->str[$n]) == self::SUBTRACT && !is_numeric($this->str[$n-1])));
 	}
-	
+
 	private function doLiterals(&$tokens, $char, &$i) {
 		if ($char === self::NAME) {
 			$name = $this->str[$i];
@@ -110,7 +120,7 @@ class Tokenizer {
 		if (is_numeric($name)) $tokens[] = ['type' => self::NUMERIC, 'value' => $name];
 		else if ($name == 'true') $tokens[] = ['type' => self::BOOL, 'value' => true];
 		else if ($name == 'false') $tokens[] = ['type' => self::BOOL, 'value' => false];
-		else $tokens[] = ['type' => self::NAME, 'value' => $name];
+		else $tokens[] = ['type' => self::NAME, 'value' => $name, 'line' => $this->lineNo];
 	}
 
 	private function doBrackets(&$tokens, $char, $i) {
@@ -124,7 +134,7 @@ class Tokenizer {
 			if ($char === $type) {
 				$contents = $this->extractBrackets($i, $brackets[0], $brackets[1]);
 				$tokenizer = new Tokenizer($contents);
-				$tokens[] = ['type' => $type, 'value' => $tokenizer->getTokens(), 'string' => $contents];
+				$tokens[] = ['type' => $type, 'value' => $tokenizer->getTokens(), 'string' => $contents, 'line' => $this->lineNo];
 				return strlen($contents);
 			}
 		}
@@ -136,7 +146,7 @@ class Tokenizer {
 			$length = strlen($string)+1;
 			$char = $this->getChar($char);
 			$string = str_replace('\\' . $char, $char, $string);
-			$tokens[] = ['type' => self::STRING, 'value' => $string];
+			$tokens[] = ['type' => self::STRING, 'value' => $string, 'line' => $this->lineNo];
 			return $length;
 		}
 	}

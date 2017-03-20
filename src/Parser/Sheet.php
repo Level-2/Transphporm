@@ -13,26 +13,25 @@ class Sheet {
 	private $file;
 	private $valueParser;
 	private $xPath;
-	private $tokenizer;
 	private $filePath;
 	private $import = [];
 
 	public function __construct($tss, CssToXpath $xPath, Value $valueParser, \Transphporm\TSSCache $cache, \Transphporm\FilePath $filePath) {
 		$this->cache = $cache;
+		$this->xPath = $xPath;
+		$this->valueParser = $valueParser;
+		$this->filePath = $filePath;
 		if (is_file($tss)) {
 			$this->file = $tss;
 			$this->rules = $this->cache->load($tss);
-			$filePath->setBaseDir(dirname(realpath($tss)) . DIRECTORY_SEPARATOR);
+			$this->filePath->setBaseDir(dirname(realpath($tss)) . DIRECTORY_SEPARATOR);
 			if (empty($this->rules)) $tss = file_get_contents($tss);
 			else return;
 		}
 		$this->tss = $this->stripComments($tss, '//', "\n");
 		$this->tss = $this->stripComments($this->tss, '/*', '*/');
-		$this->tokenizer = new Tokenizer($this->tss);
-		$this->tss = $this->tokenizer->getTokens();
-		$this->xPath = $xPath;
-		$this->valueParser = $valueParser;
-		$this->filePath = $filePath;
+		$tokenizer = new Tokenizer($this->tss);
+		$this->tss = $tokenizer->getTokens();
 	}
 
 	public function parse($indexStart = 0) {
@@ -45,27 +44,21 @@ class Sheet {
 
 	private function parseTokens($indexStart) {
 		$this->rules = [];
-		$line = 1;
 		foreach (new TokenFilterIterator($this->tss, [Tokenizer::WHITESPACE]) as $token) {
 			if ($processing = $this->processingInstructions($token, count($this->rules)+$indexStart)) {
 				$this->rules = array_merge($this->rules, $processing);
-				continue;
 			}
-			else if ($token['type'] === Tokenizer::NEW_LINE) {
-				$line++;
-				continue;
-			}
-			else $this->addRules($token, $indexStart, $line);
+			else if ($token['type'] !== Tokenizer::NEW_LINE) $this->addRules($token, $indexStart);
 		}
 		return $this->rules;
 	}
 
-	private function addRules($token, $indexStart, $line) {
+	private function addRules($token, $indexStart) {
 		$selector = $this->tss->from($token['type'], true)->to(Tokenizer::OPEN_BRACE);
 		$this->tss->skip(count($selector));
 		if (count($selector) === 0) return;
 
-		$newRules = $this->cssToRules($selector, count($this->rules)+$indexStart, $this->getProperties($this->tss->current()['value']), $line);
+		$newRules = $this->cssToRules($selector, count($this->rules)+$indexStart, $this->getProperties($this->tss->current()['value']), $token['line']);
 		$this->rules = $this->writeRule($this->rules, $newRules);
 	}
 
@@ -77,7 +70,7 @@ class Sheet {
 		$parts = $selector->trim()->splitOnToken(Tokenizer::ARG);
 		$rules = [];
 		foreach ($parts as $part) {
-			$serialized = serialize($part);
+			$serialized = serialize($part->removeLine());
 			$rules[$serialized] = new \Transphporm\Rule($this->xPath->getXpath($part), $this->xPath->getPseudo($part), $this->xPath->getDepth($part), $index++, $this->file, $line);
 			$rules[$serialized]->properties = $properties;
 		}
@@ -109,8 +102,7 @@ class Sheet {
 	}
 
 	private function import($args, $indexStart) {
-		if ($this->file !== null) $fileName = $fileName = $this->filePath->getFilePath($args[0]);
-		else $fileName = $args[0];
+		$fileName = $this->filePath->getFilePath($args[0]);
 		$this->import[] = $fileName;
 		$baseDirTemp = $this->filePath->getFilePath();
 		$sheet = new Sheet($fileName, $this->xPath, $this->valueParser, $this->cache, $this->filePath);
