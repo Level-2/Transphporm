@@ -26,6 +26,19 @@ class TSSValidatorTest extends PHPUnit_Framework_TestCase {
         $this->assertFalse($validator->validate($tss));
     }
 
+    public function testValidMissingSemicolon() {
+        $tss = "
+            div {
+                content: 'Test1';
+                content-mode: replace
+            }
+        ";
+
+        $validator = new TSSValidator();
+
+        $this->assertTrue($validator->validate($tss));
+    }
+
     public function testMissingParenthesis() {
         $tss = "
             div {

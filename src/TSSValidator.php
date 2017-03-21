@@ -30,12 +30,11 @@ class TSSValidator {
     }
 
     private function checkSemicolons($braceToken) {
-        $prevSemicolon = true;
-        foreach ($braceToken['value'] as $token) {
-            if ($token['type'] === Tokenizer::SEMI_COLON) $prevSemicolon = true;
-            if ($token['type'] === Tokenizer::COLON && !$prevSemicolon) return false;
-            else if ($token['type'] === Tokenizer::COLON) $prevSemicolon = false;
-        }
+        $splitTokens = $braceToken['value']->splitOnToken(Tokenizer::COLON);
+        array_shift($splitTokens); array_pop($splitTokens);
+        foreach ($splitTokens as $tokens)
+            if (!in_array(Tokenizer::SEMI_COLON, array_column(iterator_to_array($tokens), 'type'))) return false;
+
         return true;
     }
 
