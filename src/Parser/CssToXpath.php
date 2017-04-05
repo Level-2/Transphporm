@@ -7,7 +7,7 @@
 namespace Transphporm\Parser;
 class CssToXpath {
 	private $specialChars = [Tokenizer::WHITESPACE, Tokenizer::DOT, Tokenizer::GREATER_THAN,
-		'~', Tokenizer::NUM_SIGN, Tokenizer::COLON, Tokenizer::OPEN_SQUARE_BRACKET];
+		'~', Tokenizer::NUM_SIGN, Tokenizer::COLON, Tokenizer::OPEN_SQUARE_BRACKET, Tokenizer::MULTIPLY];
 	private $translators = [];
 	private static $instances = [];
 	private $functionSet;
@@ -20,6 +20,7 @@ class CssToXpath {
 
 		$this->translators = [
 			Tokenizer::WHITESPACE => function($string) use ($prefix) { return '//' . $prefix . $string;	},
+            Tokenizer::MULTIPLY => function () { return '*'; },
 			'' => function($string) use ($prefix) { return '/' . $prefix . $string;	},
 			Tokenizer::GREATER_THAN => function($string) use ($prefix) { return '/' . $prefix  . $string; },
 			Tokenizer::NUM_SIGN => function($string) { return '[@id=\'' . $string . '\']'; },
@@ -38,14 +39,14 @@ class CssToXpath {
 	//XPath only allows registering of static functions... this is a hacky workaround for that
 	public static function processAttr($attr, $element, $hash) {
 		$attr = unserialize(base64_decode($attr));
-		
+
 		$functionSet = self::$instances[$hash]->functionSet;
 		$functionSet->setElement($element[0]);
 
 		$attributes = array();
         foreach($element[0]->attributes as $attribute_name => $attribute_node) {
             $attributes[$attribute_name] = $attribute_node->nodeValue;
-        }	
+        }
 
         $parser = new \Transphporm\Parser\Value($functionSet, true);
 		$return = $parser->parseTokens($attr, $attributes);

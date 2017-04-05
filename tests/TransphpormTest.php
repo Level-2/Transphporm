@@ -1434,6 +1434,32 @@ ul li span {
 			<br>'), $this->stripTabs($template->output()->body));
 
 	}
+
+    public function testTemplateSelector() {
+        $template = "<div></div>";
+
+        $tss = "
+        div { content: template('/tests/templateSelector.xml', '.test1'); }
+        ";
+
+        $template = new \Transphporm\Builder($template, $tss);
+
+        $this->assertEquals($this->stripTabs('<div><div class="test1"><a>Test1</a><a>Test2</a></div></div>'),
+            $this->stripTabs($template->output()->body));
+    }
+
+    public function testTemplateSelectorWithAsterisk() {
+        $template = "<div></div>";
+
+        $tss = "
+        div { content: template('/tests/templateSelector.xml', '.test1 *'); }
+        ";
+
+        $template = new \Transphporm\Builder($template, $tss);
+
+        $this->assertEquals($this->stripTabs('<div><a>Test1</a><a>Test2</a></div>'),
+            $this->stripTabs($template->output()->body));
+    }
 }
 
 
