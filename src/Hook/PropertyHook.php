@@ -10,6 +10,7 @@ class PropertyHook implements \Transphporm\Hook {
 	private $rules;
 	private $configLine;
 	private $file;
+    private $filePath;
 	private $line;
 	private $valueParser;
 	private $pseudoMatcher;
@@ -21,14 +22,15 @@ class PropertyHook implements \Transphporm\Hook {
 		$this->rules = $rules;
 		$this->configLine = &$configLine;
 		$this->file = $file;
+        $this->filePath = $filePath;
 		$this->line = $line;
 		$this->valueParser = $valueParser;
 		$this->pseudoMatcher = $pseudoMatcher;
 		$this->functionSet = $functionSet;
-		if ($this->file !== null) $filePath->setBaseDir(dirname(realpath($this->file)) . DIRECTORY_SEPARATOR);
 	}
 
 	public function run(\DomElement $element) {
+        if ($this->file !== null) $this->filePath->setBaseDir(dirname(realpath($this->file)) . DIRECTORY_SEPARATOR);
 		$this->functionSet->setElement($element);
 		$this->configLine = $this->line;
 		try {

@@ -122,6 +122,12 @@ class ImportTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('<!DOCTYPE html><html><body><p>foo</p></body></html>', $this->stripTabs($template->output()->body));
 	}
 
+    public function testBaseDirChangeWithImport2() {
+		$template = new \Transphporm\Builder("tests/test.xml", "tests/other/importTest2.tss");
+
+		$this->assertEquals('<!DOCTYPE html><html><body><div>test</div></body></html>', $this->stripTabs($template->output()->body));
+	}
+
 	public function testImportFromRoot() {
 		$template = new \Transphporm\Builder("<div>test</div>", __DIR__ . DIRECTORY_SEPARATOR . "other/rootImport.tss");
 
