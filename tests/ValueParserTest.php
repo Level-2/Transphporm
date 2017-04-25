@@ -350,6 +350,12 @@ class ValueParserTest extends PHPUnit_Framework_TestCase {
 
 	}
 
+	public function testNullComparison() {
+		$value = new Value([]);
+		$result = $value->parse('foo.returnFalse()=true');
+		$this->assertEquals([false], $result);	
+	}
+
 	//public fucntion testNested
 }
 

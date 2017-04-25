@@ -1487,6 +1487,21 @@ ul li span {
         $this->assertEquals($this->stripTabs('<div><a>Test1</a><a>Test2</a></div>'),
             $this->stripTabs($template->output()->body));
     }
+
+    public function testDataFunctionReturnFalse() {
+
+        $template = "<div></div>";
+
+        $tss = "
+        div:data[foo.returnFalse()=true] { content: 'test'; }
+        ";
+
+        $template = new \Transphporm\Builder($template, $tss);
+
+        $this->assertEquals($this->stripTabs('<div></div>'),
+            $this->stripTabs($template->output()->body));
+
+    }
 }
 
 
