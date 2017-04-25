@@ -24,7 +24,7 @@ class FunctionSet {
 		catch (\Exception $e) {
 			throw new RunException(Exception::TSS_FUNCTION, $name, $e);
 		}
-		return true;
+		return false;
 	}
 
 	private function getArgs0($name, $args) {
