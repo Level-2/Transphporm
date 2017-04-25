@@ -1502,6 +1502,23 @@ ul li span {
             $this->stripTabs($template->output()->body));
 
     }
+
+
+    public function testContentModeReplaceBlockInclude() {
+		$xml = '<div>
+			<include href="/tests/include.xml" />
+		</div>';
+
+		$tss = '
+        @import "/tests/includeTest.tss";
+        ';
+
+		$template = new \Transphporm\Builder($xml, $tss);
+
+		$output = $template->output()->body;
+
+		$this->assertEquals($this->stripTabs($output), $this->stripTabs('<div><p>foo</p></div>'));
+	}
 }
 
 

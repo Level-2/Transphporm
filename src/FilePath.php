@@ -6,7 +6,7 @@ class FilePath {
     private $customBase;
 
     public function __construct($customBase = null) {
-        $this->baseDir = "";
+        $this->baseDir = '';
         if ($customBase === null) $this->customBase = getcwd();
         else $this->customBase = rtrim($customBase, '/');
     }
@@ -15,8 +15,8 @@ class FilePath {
         $this->baseDir = $baseDir;
     }
 
-    public function getFilePath($filePath = "") {
-		if (isset($filePath[0]) && $filePath[0] == "/") return $this->customBase . $filePath;
+    public function getFilePath($filePath = '') {
+		if (isset($filePath[0]) && $filePath[0] == '/') return $this->customBase . $filePath;
 		else return $this->baseDir . $filePath;
 	}
 }
