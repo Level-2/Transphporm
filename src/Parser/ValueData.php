@@ -35,6 +35,10 @@ class ValueData {
 		return is_array($this->data) || $this->data instanceof \ArrayAccess;
 	}
 
+	public function getData() {
+		return $this->data;
+	}
+
 	public function read($value) {
 		if ($this->isArray()) {
 			if (isset($this->data[$value])) return $this->data[$value];

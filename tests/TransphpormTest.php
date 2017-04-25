@@ -429,6 +429,33 @@ class TransphpormTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+
+	public function testReadDataFromAttribute() {
+		$template = '
+			<input name="foo" />
+		';
+
+		$tss = 'input:attr(value) {content: data(attr(name)); }';
+
+		$template = new \Transphporm\Builder($template, $tss);
+
+		$this->assertEquals('<input name="foo" value="bar" />', $template->output(['foo' => 'bar'])->body);
+	}
+
+	public function testReadDataFromAttributeArray() {
+		$template = '
+			<input name="foo[bar]" />
+		';
+
+		$tss = 'input:attr(value) {content: data(attr(name)); }';
+
+		$template = new \Transphporm\Builder($template, $tss);
+
+		$this->assertEquals('<input name="foo[bar]" value="baz" />', $template->output(['foo' => ['bar' => 'baz']])->body);
+	}
+	
+
+
 	public function testWriteAttribute() {
 		$template = '
 			<div>Test</div>

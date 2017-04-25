@@ -141,15 +141,19 @@ class Value {
 		$this->last = null;
 	}
 
-	private function callTransphpormFunctions($token) {
-		$this->result->processValue($this->baseData->{$this->last}($token['value']));
-		foreach ($this->result->getResult() as $i => $value) {
-			if (is_scalar($value)) {
-				$val = $this->data->read($value);
-				$this->result->write($i, $val, $this->allowNullResult);
+	private function callTransphpormFunctions($token, $parse = true) {
+		$val = $this->baseData->{$this->last}($token['value']);
+		$this->result->processValue($val);
 
-			}
+		if ($this->autoLookup) {
+			$parser = new Value($this->data->getData());
+			$parsedVal = $parser->parse($val)[0] ?? null;
+			$this->result->postProcess($this->data, $val, $parsedVal, $this->allowNullResult);
 		}
+		else {
+			$this->result->postProcess($this->data, $val, null, $this->allowNullResult);
+		}
+
 		$this->last = null;
 	}
 
@@ -172,7 +176,7 @@ class Value {
 		}
 		else {
 			$this->result->clear();
-			$this->result->write(0, false);
+			$this->result->processValue(false);
 		}
 	}
 }

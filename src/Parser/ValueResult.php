@@ -84,9 +84,20 @@ class ValueResult {
 		return array_pop($this->result);
 	}
 
-	public function write($index, $value, $allowNull = false) {
+	private function write($index, $value, $allowNull = false) {
 		if ($value !== null || $allowNull == true) {
 			$this->result[$index] = $value;
+		}
+	}
+
+	//Postprocessing - replace values with null where allowed, or override a value at position
+	public function postProcess(ValueData $data, $val, $overrideVal, $allowNull) {
+		foreach ($this->getResult() as $i => $value) {
+			if (is_scalar($value)) {
+				$val = ($overrideVal == $val) ? $data->read($value) : $overrideVal;
+				$this->write($i, $val, $allowNull);
+
+			}
 		}
 	}
 
