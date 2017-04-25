@@ -11,11 +11,11 @@ class CssToXpath {
 	private $translators = [];
 	private static $instances = [];
 	private $functionSet;
+	private $id;
 
-
-	public function __construct(\Transphporm\FunctionSet $functionSet, $prefix = '') {
-		$hash = count(self::$instances);
-		self::$instances[$hash] = $this;
+	public function __construct(\Transphporm\FunctionSet $functionSet, $prefix = '', $id = null) {
+		$this->id = $id;
+		self::$instances[$this->id] = $this;
 		$this->functionSet = $functionSet;
 
 		$this->translators = [
@@ -25,7 +25,7 @@ class CssToXpath {
 			Tokenizer::GREATER_THAN => function($string) use ($prefix) { return '/' . $prefix  . $string; },
 			Tokenizer::NUM_SIGN => function($string) { return '[@id=\'' . $string . '\']'; },
 			Tokenizer::DOT => function($string) { return '[contains(concat(\' \', normalize-space(@class), \' \'), \' ' . $string . ' \')]'; },
-			Tokenizer::OPEN_SQUARE_BRACKET => function($string) use ($hash) { return '[' .'php:function(\'\Transphporm\Parser\CssToXpath::processAttr\', \'' . base64_encode(serialize($string)) . '\', ., "' . $hash . '")' . ']';	}
+			Tokenizer::OPEN_SQUARE_BRACKET => function($string) { return '[' .'php:function(\'\Transphporm\Parser\CssToXpath::processAttr\', \'' . base64_encode(serialize($string)) . '\', ., "' .  $this->id . '")' . ']';	}
 		];
 	}
 
@@ -54,8 +54,8 @@ class CssToXpath {
 		return $return[0] === '' ? false : $return[0];
 	}
 
-	public static function cleanup() {
-		self::$instances = [];
+	public function cleanup() {
+		unset(self::$instances[$this->id]);
 	}
 
 	//split the css into indivudal functions
