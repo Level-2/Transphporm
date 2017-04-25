@@ -1,1 +1,1 @@
-include {content: template(attr(href))}
+include {content: template(attr(href)); content-mode: replace}

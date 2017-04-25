@@ -102,9 +102,7 @@ class Sheet {
 	}
 
 	private function import($args, $indexStart) {
-		if ($this->file !== null) $fileName = $this->filePath->getFilePath($args[0]);
- 		else $fileName = $args[0];
- 		
+		$fileName = $this->filePath->getFilePath($args[0]);
 		$this->import[] = $fileName;
 		$baseDirTemp = $this->filePath->getFilePath();
 		$sheet = new Sheet($fileName, $this->xPath, $this->valueParser, $this->cache, $this->filePath);
