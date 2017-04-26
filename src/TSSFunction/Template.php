@@ -34,7 +34,6 @@ class Template implements \Transphporm\TSSFunction {
 		if ($selector != '') return $this->templateSubsection($doc, $selector);
 
 		return $this->getTemplateContent($doc->documentElement, $tss);
-
 	}
 
 	private function getTemplateContent($newNode, $tss) {

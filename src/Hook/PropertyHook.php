@@ -30,7 +30,8 @@ class PropertyHook implements \Transphporm\Hook {
 	}
 
 	public function run(\DomElement $element) {
-        if ($this->file !== null) $this->filePath->addPath(dirname(realpath($this->file)));
+		//Set the baseDir so that all files for this rule are relative to the file it came from
+        if ($this->file !== null) $this->filePath->setBaseDir(dirname(realpath($this->file)));
 		$this->functionSet->setElement($element);
 		$this->configLine = $this->line;
 		try {
