@@ -14,6 +14,7 @@ class Builder {
 	private $time;
 	private $modules = [];
 	private $config;
+	private $filePath;
 	private $defaultModules = [
 		'\\Transphporm\\Module\\Basics',
 		'\\Transphporm\\Module\\Pseudo',
@@ -25,7 +26,7 @@ class Builder {
 		$this->template = $template;
 		$this->tss = $tss;
 		$this->cache = new Cache(new \ArrayObject());
-
+		$this->filePath = new FilePath();
 		$modules = is_array($modules) ? $modules : $this->defaultModules;
 		foreach ($modules as $module) $this->loadModule(new $module);
 	}
@@ -40,8 +41,8 @@ class Builder {
 		$this->modules[get_class($module)] = $module;
 	}
 
-	public function setRootDir($rootDir) {
-		$this->rootDir = $rootDir;
+	public function addPath($dir) {
+		$this->filePath->addPath($dir);
 	}
 
 	public function output($data = null, $document = false) {
@@ -54,7 +55,7 @@ class Builder {
 		//To be a valid XML document it must have a root element, automatically wrap it in <template> to ensure it does
 		$template = new Template($this->isValidDoc($cachedOutput['body']) ? str_ireplace('<!doctype', '<!DOCTYPE', $cachedOutput['body']) : '<template>' . $cachedOutput['body'] . '</template>' );
 		$valueParser = new Parser\Value($functionSet);
-		$this->config = new Config($functionSet, $valueParser, $elementData, new Hook\Formatter(), new Parser\CssToXpath($functionSet, $template->getPrefix(), md5($this->tss)), new FilePath($this->rootDir), $headers);
+		$this->config = new Config($functionSet, $valueParser, $elementData, new Hook\Formatter(), new Parser\CssToXpath($functionSet, $template->getPrefix(), md5($this->tss)), $this->filePath, $headers);
 
 		foreach ($this->modules as $module) $module->load($this->config);
 

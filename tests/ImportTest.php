@@ -11,7 +11,7 @@ class ImportTest extends PHPUnit_Framework_TestCase {
 		';
 
 		$tss = "
-			@import '/tests/import.tss';
+			@import 'tests/import.tss';
 		";
 
 		$template = new \Transphporm\Builder($template, $tss);
@@ -30,7 +30,7 @@ class ImportTest extends PHPUnit_Framework_TestCase {
 		";
 
 		$data = [
-			'filename' => '/tests/import.tss'
+			'filename' => 'tests/import.tss'
 		];
 
 		$template = new \Transphporm\Builder($template, $tss);
@@ -45,7 +45,7 @@ class ImportTest extends PHPUnit_Framework_TestCase {
 			<h1>foo</h1>
 		';
 
-		$file = '/tests/import.tss';
+		$file = 'tests/import.tss';
 		$tss = "
 			span {content: 'test1';}
 			@import '$file';
@@ -64,8 +64,8 @@ class ImportTest extends PHPUnit_Framework_TestCase {
 			<h1>foo</h1>
 		';
 
-		$file = '/tests/import.tss';
-		$file2 = '/tests/import2.tss';
+		$file = 'tests/import.tss';
+		$file2 = 'tests/import2.tss';
 		$tss = "
 			span {content: 'test1';}
 			@import '$file';
@@ -87,8 +87,8 @@ class ImportTest extends PHPUnit_Framework_TestCase {
 			<h1>foo</h1>
 		';
 
-		$file = '/tests/import.tss';
-		$file2 = '/tests/import2.tss';
+		$file = 'tests/import.tss';
+		$file2 = 'tests/import2.tss';
 
 		$tss = "
 			span {content: 'test1';}
@@ -130,7 +130,7 @@ class ImportTest extends PHPUnit_Framework_TestCase {
 
 	public function testImportFromCustomRoot() {
 		$template = new \Transphporm\Builder("<div>test</div>", __DIR__ . DIRECTORY_SEPARATOR . "other/rootImportOverride.tss");
-		$template->setRootDir(getcwd() . "/tests");
+		$template->addPath(getcwd() . "/tests");
 
 		$this->assertEquals('<div>foo</div>', $this->stripTabs($template->output()->body));
 	}

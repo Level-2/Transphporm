@@ -24,7 +24,7 @@ class Sheet {
 		if (is_file($tss)) {
 			$this->file = $tss;
 			$this->rules = $this->cache->load($tss);
-			$this->filePath->setBaseDir(dirname(realpath($tss)) . DIRECTORY_SEPARATOR);
+			$this->filePath->addPath(dirname(realpath($tss)));
 			if (empty($this->rules)) $tss = file_get_contents($tss);
 			else return;
 		}
@@ -104,9 +104,7 @@ class Sheet {
 	private function import($args, $indexStart) {
 		$fileName = $this->filePath->getFilePath($args[0]);
 		$this->import[] = $fileName;
-		$baseDirTemp = $this->filePath->getFilePath();
 		$sheet = new Sheet($fileName, $this->xPath, $this->valueParser, $this->cache, $this->filePath);
-		$this->filePath->setBaseDir($baseDirTemp);
 		return $sheet->parse($indexStart);
 	}
 

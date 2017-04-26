@@ -1337,7 +1337,6 @@ ul li span {
 		//When using repeat to repeat some data, set the content to the data for the iteration
 		$css = 'ul li {repeat: data(list); content: iteration()}';
 
-
 		$data = new stdclass;
 
 

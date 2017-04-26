@@ -1,22 +1,21 @@
 <?php
 namespace Transphporm;
-
 class FilePath {
-    private $baseDir;
-    private $customBase;
+	private $paths = ['.'];
 
-    public function __construct($customBase = null) {
-        $this->baseDir = '';
-        if ($customBase === null) $this->customBase = getcwd();
-        else $this->customBase = rtrim($customBase, '/');
-    }
+	public function addPath($path) {
+		$this->paths[] = rtrim($path, DIRECTORY_SEPARATOR);
+	}
 
-    public function setBaseDir($baseDir) {
-        $this->baseDir = $baseDir;
-    }
+	public function getFilePath($filePath) {
+		if (is_file($filePath)) return $filePath;
+		else {
+			foreach ($this->paths as $path) {
+				if (is_file($path . DIRECTORY_SEPARATOR . $filePath)) return $path . DIRECTORY_SEPARATOR . $filePath;
 
-    public function getFilePath($filePath = '') {
-		if (isset($filePath[0]) && $filePath[0] == '/') return $this->customBase . $filePath;
-		else return $this->baseDir . $filePath;
+			}
+		}
+
+		throw new \Exception($filePath . ' not found in include path: ' . implode(';', $this->paths));
 	}
 }
