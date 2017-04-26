@@ -508,4 +508,29 @@ class PseudoTest extends PHPUnit_Framework_TestCase {
 		'));
 
 	}
+
+    public function testNotWithPseudoInside() {
+        $xml = '
+		<div class="one">
+			<p></p>
+		</div>
+		<div class="two">
+			<p></p>
+		</div>
+		<div class="three">
+			<p></p>
+		</div>
+		';
+
+		$tss = 'div:not("div:nth-child(2)") {content: "foo"; }';
+
+
+		$template = new \Transphporm\Builder($xml, $tss);
+
+		$this->assertEquals($this->stripTabs('
+			<div class="one">foo</div>
+			<div class="two"><p></p></div>
+			<div class="three">foo</div>
+		'), $this->stripTabs($template->output()->body));
+    }
 }

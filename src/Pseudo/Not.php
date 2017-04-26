@@ -7,9 +7,11 @@
 namespace Transphporm\Pseudo;
 class Not implements \Transphporm\Pseudo {
 	private $cssToXpath;
+    private $config;
 
-	public function __construct(\Transphporm\Parser\CssToXpath $cssToXpath) {
+	public function __construct(\Transphporm\Parser\CssToXpath $cssToXpath, \Transphporm\Config $config) {
 		$this->cssToXpath = $cssToXpath;
+        $this->config = $config;
 	}
 
 	public function match($name, $args, \DomElement $element) {
@@ -24,10 +26,12 @@ class Not implements \Transphporm\Pseudo {
 		foreach ($css as $selector) {
 			$tokenizer = new \Transphporm\Parser\Tokenizer($selector);
 			$xpathString = $this->cssToXpath->getXpath($tokenizer->getTokens());
+            $pseudo = $this->cssToXpath->getPseudo($tokenizer->getTokens());
+            $pseudoMatcher = $this->config->createPseudoMatcher($pseudo);
 			//Find all nodes matched by the expressions in the brackets :not(EXPR)
 			foreach ($xpath->query($xpathString) as $matchedElement) {
 				//Check to see whether this node was matched by the not query
-				if ($element->isSameNode($matchedElement)) return false;
+				if ($pseudoMatcher->matches($matchedElement) && $element->isSameNode($matchedElement)) return false;
 			}
 		}
 		return true;

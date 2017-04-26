@@ -11,6 +11,6 @@ class Pseudo implements \Transphporm\Module {
 	public function load(\Transphporm\Config $config) {
 		$config->registerPseudo(new \Transphporm\Pseudo\Attribute());
 		$config->registerPseudo(new \Transphporm\Pseudo\Nth());
-		$config->registerPseudo(new \Transphporm\Pseudo\Not($config->getCssToXpath()));
+		$config->registerPseudo(new \Transphporm\Pseudo\Not($config->getCssToXpath(), $config));
 	}
 }
