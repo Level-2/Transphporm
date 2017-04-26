@@ -28,12 +28,17 @@ class Not implements \Transphporm\Pseudo {
 			$xpathString = $this->cssToXpath->getXpath($tokenizer->getTokens());
             $pseudo = $this->cssToXpath->getPseudo($tokenizer->getTokens());
             $pseudoMatcher = $this->config->createPseudoMatcher($pseudo);
-			//Find all nodes matched by the expressions in the brackets :not(EXPR)
-			foreach ($xpath->query($xpathString) as $matchedElement) {
-				//Check to see whether this node was matched by the not query
-				if ($pseudoMatcher->matches($matchedElement) && $element->isSameNode($matchedElement)) return false;
-			}
+			if ($this->matches($xpath->query($xpathString), $element, $pseudoMatcher)) return false;
 		}
 		return true;
 	}
+
+    private function matches($foundElements, $element, $pseudoMatcher) {
+        //Find all nodes matched by the expressions in the brackets :not(EXPR)
+        foreach ($foundElements as $matchedElement) {
+            //Check to see whether this node was matched by the not query
+            if ($pseudoMatcher->matches($matchedElement) && $element->isSameNode($matchedElement)) return true;
+        }
+        return false;
+    }
 }
