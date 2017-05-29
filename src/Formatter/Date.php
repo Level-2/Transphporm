@@ -16,7 +16,7 @@ class Date {
 	/** Converts $val into a \DateTime object if it's not already */
 	private function getDate($val) {
 		$tz = new \DateTimeZone($this->locale['timezone']);
-		$date =  $val instanceof \DateTime ? $val : new \DateTime($val, $tz);
+		$date =  $val instanceof \DateTimeInterface ? $val : new \DateTime($val, $tz);
 		$date->setTimeZone($tz);
 		return $date;
 	}
@@ -64,7 +64,7 @@ class Date {
 		$result = '';
 
 		foreach ($parts as $l => $time) {
-			if ($diff->$l > 0) {				
+			if ($diff->$l > 0) {
 				$result = sprintf($str, $diff->$l, $this->getPlural($strings, $diff->$l, $time));
 				break;
 			}
@@ -103,11 +103,11 @@ class Date {
 		$strings = $this->locale['offset_strings'];
 
 		$result = '';
-		
+
 		foreach ($this->getRanges($strings) as list($lower, $upper, $str, $divisor, $plural)) {
 			if ($diffDays >= $lower && $diffDays <= $upper) {
 				$num = abs(round($diffDays / $divisor));
-				$result = sprintf($str, $num, $this->getPlural($strings, $num, $plural));				
+				$result = sprintf($str, $num, $this->getPlural($strings, $num, $plural));
 				break;
 			}
 		}
