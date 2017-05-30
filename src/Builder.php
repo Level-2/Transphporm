@@ -117,6 +117,6 @@ class Builder {
 
 	public function __destruct() {
 		//Required hack as DomXPath can only register static functions clear, the statically stored instance to avoid memory leaks
-		$this->config->getCssToXpath()->cleanup();
+		if (isset($this->config)) $this->config->getCssToXpath()->cleanup();
 	}
 }
