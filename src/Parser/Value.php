@@ -147,7 +147,8 @@ class Value {
 
 		if ($this->autoLookup) {
 			$parser = new Value($this->data->getData());
-			$parsedVal = $parser->parse($val)[0] ?? null;
+			$parsedArr = $parser->parse($val);
+			$parsedVal = isset($parsedArr[0]) ? $parsedArr[0] : null;
 			$this->result->postProcess($this->data, $val, $parsedVal, $this->allowNullResult);
 		}
 		else {
