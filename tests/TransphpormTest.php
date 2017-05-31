@@ -453,7 +453,7 @@ class TransphpormTest extends PHPUnit_Framework_TestCase {
 
 		$this->assertEquals('<input name="foo[bar]" value="baz" />', $template->output(['foo' => ['bar' => 'baz']])->body);
 	}
-	
+
 
 
 	public function testWriteAttribute() {
@@ -1518,6 +1518,19 @@ ul li span {
 
 		$this->assertEquals($this->stripTabs($output), $this->stripTabs('<div><p>foo</p></div>'));
 	}
+
+    public function testValueZero() {
+        $xml = '<p>Exception code: <span class="code">unknown</span></p>';
+        $tss = '.code { content: data(errorCode); }';
+        $template = new Transphporm\Builder($xml, $tss);
+
+        $data['errorCode'] = 0;
+        $this->assertEquals($this->stripTabs($template->output($data)->body), $this->stripTabs('<p>Exception code: <span class="code">0</span></p>'));
+
+        $data['errorCode'] = (string)0;
+        $this->assertEquals($this->stripTabs($template->output($data)->body), $this->stripTabs('<p>Exception code: <span class="code">0</span></p>'));
+
+    }
 }
 
 

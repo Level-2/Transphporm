@@ -114,7 +114,7 @@ class ValueParserTest extends PHPUnit_Framework_TestCase {
 	}
 
 
-	
+
 
 	public function testFunctionCallBasic() {
 
@@ -341,7 +341,7 @@ class ValueParserTest extends PHPUnit_Framework_TestCase {
 	}
 
 	public function testArrayLookupOnObj() {
-		
+
 		$value = new Value(new TestData);
 
 		$result = $value->parse('getObj()[data(test)]');
@@ -353,8 +353,14 @@ class ValueParserTest extends PHPUnit_Framework_TestCase {
 	public function testNullComparison() {
 		$value = new Value([]);
 		$result = $value->parse('foo.returnFalse()=true');
-		$this->assertEquals([false], $result);	
+		$this->assertEquals([false], $result);
 	}
+
+    public function testReturnZero() {
+        $value = new Value(new TestData);
+		$result = $value->parse('data(getZero())');
+		$this->assertEquals([0], $result);
+    }
 
 	//public fucntion testNested
 }
@@ -398,6 +404,10 @@ class TestData {
 		$obj->test = "foo";
 		return $obj;
 	}
+
+    public function getZero() {
+        return 0;
+    }
 }
 
 class TestBar {

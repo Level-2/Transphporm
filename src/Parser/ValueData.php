@@ -57,7 +57,7 @@ class ValueData {
 
 	public function parseNested($parser, $token, $funcName) {
 		$args = $parser->parseTokens($token['value'], $this->data);
-		if ($args[0] == $this->data) $args = [];
+		if ($args[0] === $this->data) $args = [];
 		return $this->callFuncOnObject($this->data, $funcName, $args);
 	}
 
@@ -69,7 +69,7 @@ class ValueData {
 
 	public function extract($last, $autoLookup, $traversing) {
 		$value = $this->read($last);
-		if ($value && ($autoLookup || $traversing) ) {
+		if ($value !== null && ($autoLookup || $traversing) ) {
 			return $value;
 		}
 		throw new \UnexpectedValueException('Not found');
