@@ -28,14 +28,7 @@ class Last {
 
 
 	public function traverse() {
-		if ($this->last !== null) $this->data->traverse($this->last);
-		else {
-			$lastResult = $this->result->pop();
-			if ($lastResult) {
-				$this->data = new ValueData($lastResult);
-				return $lastResult;
-			}
-		}
+		return $this->data->traverse($this->last, $this->result);
 	}
 
 	public function clear() {
@@ -43,13 +36,13 @@ class Last {
 	}
 
 	public function isEmpty() {
-		return $this->last == null;
+		return $this->last === null;
 	}
 
-	public function processNested($parser, $token) {		
+	public function processNested($parser, $token) {
 		$funcResult = $this->data->parseNested($parser, $token, $this->last);
 		$this->result->processValue($funcResult);
-		$this->last = null;
+		$this->clear();
 	}
 
 	public function read() {
@@ -60,6 +53,9 @@ class Last {
 		$this->last = $value;
 	}
 
+    public function makeTraversing() {
+        $this->traversing = true;
+    }
 
 	//Applies the current operation to whatever is in $last based on $mode
 	public function process() {
@@ -80,7 +76,7 @@ class Last {
 		}
 		else {
 			$this->result->clear();
-			$this->result[0] = false;
+			$this->result->processValue(false);
 		}
 	}
 }

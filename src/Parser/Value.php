@@ -53,7 +53,7 @@ class Value {
 	public function parseTokens($tokens, $data = null) {
 		$this->result = new ValueResult();
 		$this->data = new ValueData($data ? $data : $this->baseData);
-		$this->last = null;
+		$this->last = new Last($this->data, $this->result, $this->autoLookup);
 		$this->traversing = false;
 
 		if (count($tokens) <= 0) return [$data];
@@ -62,35 +62,35 @@ class Value {
 			$this->{$this->tokenFuncs[$token['type']]}($token);
 		}
 
-		$this->processLast();
+		$this->last->process();
 		return $this->result->getResult();
 	}
 
 	private function processComparator($token) {
-		$this->processLast();
+		$this->last->process();
 
 		if (!(in_array($this->result->getMode(), array_keys($this->tokenFuncs, 'processComparator')) && $token['type'] == Tokenizer::EQUALS)) {
 			$this->result->setMode($token['type']);
-			$this->last = null;
+			$this->last->clear();
 		}
 	}
 
 	//Reads the last selected value from $data regardless if it's an array or object and overrides $this->data with the new value
 	//Dot moves $data to the next object in $data foo.bar moves the $data pointer from `foo` to `bar`
 	private function processDot($token) {
-		$lastResult = $this->data->traverse($this->last, $this->result);
+		$lastResult = $this->last->traverse();
 
 		//When . is not preceeded by anything, treat it as part of the string instead of an operator
 		// foo.bar is treated as looking up `bar` in `foo` whereas .foo is treated as the string ".foo"
 		if ($lastResult) {
-			$this->traversing = true;
+			$this->last->makeTraversing();
 		}
-		else if ($this->last === null)  {
+		else if ($this->last->isEmpty())  {
 			$this->processString(['value' => '.']);
 			$this->result->setMode(Tokenizer::CONCAT);
 		}
 
-		$this->last = null;
+		$this->last->clear();
 	}
 
 	private function hasFunction($name) {
@@ -98,14 +98,13 @@ class Value {
 	}
 
 	private function processSquareBracket($token) {
-		$parser = new Value($this->baseData, $this->autoLookup);
-		if ($this->hasFunction($this->last)) {
+		if ($this->hasFunction($this->last->read())) {
 			$this->callTransphpormFunctions($token);
 		}
 		else {
-			$this->data->traverse($this->last, $this->result);
-			$this->last = $parser->parseTokens($token['value'], null)[0];
-			if (!is_bool($this->last)) $this->traversing = true;
+			$this->last->traverse();
+			$this->last->set($this->getNewParser()->parseTokens($token['value'], null)[0]);
+			if (!is_bool($this->last->read())) $this->last->makeTraversing();
 		}
 	}
 
@@ -114,10 +113,10 @@ class Value {
 	}
 
 	private function processScalar($token) {
-		if (is_scalar($this->last)) {
-			$this->result->processValue($this->last);
+		if (is_scalar($this->last->read())) {
+			$this->result->processValue($this->last->read());
 		}
-		$this->last = $token['value'];
+		$this->last->set($token['value']);
 	}
 
 	private function processString($token) {
@@ -125,59 +124,32 @@ class Value {
 	}
 
 	private function processBrackets($token) {
-		if ($this->hasFunction($this->last)
-			&& !$this->data->methodExists($this->last)) {
+		if ($this->hasFunction($this->last->read())
+			&& !$this->data->methodExists($this->last->read())) {
 			$this->callTransphpormFunctions($token);
 		}
 		else {
-			$this->processNested($token);
+			$this->last->processNested($this->getNewParser(), $token);
 		}
 	}
 
-	private function processNested($token) {
-		$parser = new Value($this->baseData, $this->autoLookup);
-		$funcResult = $this->data->parseNested($parser, $token, $this->last);
-		$this->result->processValue($funcResult);
-		$this->last = null;
+	private function getNewParser() {
+		return new Value($this->baseData, $this->autoLookup);
 	}
 
 	private function callTransphpormFunctions($token, $parse = true) {
-		$val = $this->baseData->{$this->last}($token['value']);
+		$val = $this->baseData->{$this->last->read()}($token['value']);
 		$this->result->processValue($val);
 
 		if ($this->autoLookup) {
 			$parser = new Value($this->data->getData());
 			$parsedArr = $parser->parse($val);
 			$parsedVal = isset($parsedArr[0]) ? $parsedArr[0] : null;
-			$this->result->postProcess($this->data, $val, $parsedVal, $this->allowNullResult);
 		}
-		else {
-			$this->result->postProcess($this->data, $val, null, $this->allowNullResult);
-		}
+		else $parsedVal = null;
+        
+        $this->result->postProcess($this->data, $val, $parsedVal, $this->allowNullResult);
 
-		$this->last = null;
-	}
-
-	//Applies the current operation to whatever is in $last based on $mode
-	private function processLast() {
-		if ($this->last !== null) {
-			try {
-				$value = $this->data->extract($this->last, $this->autoLookup, $this->traversing);
-				$this->result->processValue($value);
-			}
-			catch (\UnexpectedValueException $e) {
-				$this->processLastUnexpected();
-			}
-		}
-	}
-
-	private function processLastUnexpected() {
-		if (!($this->autoLookup || $this->traversing)) {
-			$this->result->processValue($this->last);
-		}
-		else {
-			$this->result->clear();
-			$this->result->processValue(false);
-		}
+		$this->last->clear();
 	}
 }
