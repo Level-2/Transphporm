@@ -77,7 +77,7 @@ class Value {
 
 	//Reads the last selected value from $data regardless if it's an array or object and overrides $this->data with the new value
 	//Dot moves $data to the next object in $data foo.bar moves the $data pointer from `foo` to `bar`
-	private function processDot($token) {
+	private function processDot() {
 		$lastResult = $this->data->traverse($this->last, $this->result);
 
 		//When . is not preceeded by anything, treat it as part of the string instead of an operator
@@ -141,7 +141,7 @@ class Value {
 		$this->last = null;
 	}
 
-	private function callTransphpormFunctions($token, $parse = true) {
+	private function callTransphpormFunctions($token) {
 		$val = $this->baseData->{$this->last}($token['value']);
 		$this->result->processValue($val);
 

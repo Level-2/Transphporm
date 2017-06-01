@@ -80,22 +80,21 @@ class Content implements \Transphporm\Property {
 
 	/** Functions for writing to pseudo elements, attr, before, after, header */
 	private function attr($value, $pseudoArgs, $element) {
-
 		$element->setAttribute($pseudoArgs, implode('', $value));
 	}
 
-	private function header($value, $pseudoArgs, $element) {
+	private function header($value, $pseudoArgs) {
 		$this->headers[] = [$pseudoArgs, implode('', $value)];
 	}
 
-	private function before($value, $pseudoArgs, $element) {
+	private function before($value, $element) {
 		foreach ($this->getNode($value, $element->ownerDocument) as $node) {
 			$element->insertBefore($node, $element->firstChild);
 		}
 		return true;
 	}
 
-	private function after($value, $pseudoArgs, $element) {
+	private function after($value, $element) {
 		 foreach ($this->getNode($value, $element->ownerDocument) as $node) {
 		 		$element->appendChild($node);
 		}

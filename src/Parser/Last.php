@@ -7,7 +7,6 @@
 namespace Transphporm\Parser;
 /** Parses "string" and function(args) e.g. data(foo) or iteration(bar) */
 class Last {
-	private $baseData;
 	private $autoLookup;
 	/*
 		Stores the last value e.g.
@@ -46,7 +45,7 @@ class Last {
 		return $this->last == null;
 	}
 
-	public function processNested($parser, $token) {		
+	public function processNested($parser, $token) {
 		$funcResult = $this->data->parseNested($parser, $token, $this->last);
 		$this->result->processValue($funcResult);
 		$this->last = null;
