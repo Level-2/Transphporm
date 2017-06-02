@@ -1,11 +1,11 @@
 <?php
 namespace Transphporm\Formatter;
-class Nl2br {
+class Nl2brFormat {
 	public function nl2br($var) {
 		$parts = explode("\n", $var);
 		$doc = new \DomDocument();
 		$result = [];
-		
+
 		foreach ($parts as $key => $part) {
 			$new = $doc->createTextNode($part);
 			$result[] = $new;
