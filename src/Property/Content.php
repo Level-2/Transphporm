@@ -83,18 +83,18 @@ class Content implements \Transphporm\Property {
 		$element->setAttribute($pseudoArgs, implode('', $value));
 	}
 
-	private function header($value, $pseudoArgs) {
+	private function header($value, $pseudoArgs, $element) {
 		$this->headers[] = [$pseudoArgs, implode('', $value)];
 	}
 
-	private function before($value, $element) {
+	private function before($value, $pseudoArgs, $element) {
 		foreach ($this->getNode($value, $element->ownerDocument) as $node) {
 			$element->insertBefore($node, $element->firstChild);
 		}
 		return true;
 	}
 
-	private function after($value, $element) {
+	private function after($value, $pseudoArgs, $element) {
 		 foreach ($this->getNode($value, $element->ownerDocument) as $node) {
 		 		$element->appendChild($node);
 		}
