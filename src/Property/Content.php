@@ -80,7 +80,6 @@ class Content implements \Transphporm\Property {
 
 	/** Functions for writing to pseudo elements, attr, before, after, header */
 	private function attr($value, $pseudoArgs, $element) {
-
 		$element->setAttribute($pseudoArgs, implode('', $value));
 	}
 

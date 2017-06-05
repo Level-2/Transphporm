@@ -41,8 +41,9 @@ class Repeat implements \Transphporm\Property {
 
 	private function getRepeatValue($values, &$max) {
 		$mode = $this->getMode($values);
-		if ($mode === 'each') $repeat = $values[0];
-		else if ($mode === 'loop') {
+		$repeat = $values[0];
+
+		if ($mode !== 'each') { // $mode === 'loop'
 			$repeat = range($values[0], $max);
 			$max++;
 		}

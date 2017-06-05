@@ -7,7 +7,6 @@
 namespace Transphporm\Parser;
 /** Parses "string" and function(args) e.g. data(foo) or iteration(bar) */
 class Last {
-	private $baseData;
 	private $autoLookup;
 	/*
 		Stores the last value e.g.
