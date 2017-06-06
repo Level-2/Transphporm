@@ -42,6 +42,7 @@ class Content implements \Transphporm\Property {
     public function addContentPseudo($name, ContentPseudo $contentPseudo) {
         $this->contentPseudo[$name] = $contentPseudo;
     }
+    
 	private function processPseudo($value, $element, $pseudoMatcher) {
 		foreach ($this->contentPseudo as $pseudoName => $pseudoFunction) {
 			if ($pseudoMatcher->hasFunction($pseudoName)) {
