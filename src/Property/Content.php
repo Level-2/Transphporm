@@ -6,11 +6,10 @@
  * @version         1.0                                                             */
 namespace Transphporm\Property;
 class Content implements \Transphporm\Property {
-	private $headers;
+	private $contentPseudo = [];
 	private $formatter;
 
-	public function __construct(&$headers, \Transphporm\Hook\Formatter $formatter) {
-		$this->headers = &$headers;
+	public function __construct(\Transphporm\Hook\Formatter $formatter) {
 		$this->formatter = $formatter;
 	}
 
@@ -40,18 +39,20 @@ class Content implements \Transphporm\Property {
 		return (isset($rules['content-mode'])) ? $rules['content-mode']->read() : 'append';
 	}
 
+    public function addContentPseudo($name, ContentPseudo $contentPseudo) {
+        $this->contentPseudo[$name] = $contentPseudo;
+    }
 	private function processPseudo($value, $element, $pseudoMatcher) {
-		$pseudoContent = ['attr', 'header', 'before', 'after'];
-		foreach ($pseudoContent as $pseudo) {
-			if ($pseudoMatcher->hasFunction($pseudo)) {
-				$this->$pseudo($value, $pseudoMatcher->getFuncArgs($pseudo, $element)[0], $element);
+		foreach ($this->contentPseudo as $pseudoName => $pseudoFunction) {
+			if ($pseudoMatcher->hasFunction($pseudoName)) {
+				$pseudoFunction->run($value, $pseudoMatcher->getFuncArgs($pseudoName, $element)[0], $element);
 				return true;
 			}
 		}
 		return false;
 	}
 
-	private function getNode($node, $document) {
+	public function getNode($node, $document) {
 		foreach ($node as $n) {
 			if (is_array($n)) {
 				foreach ($this->getNode($n, $document) as $new) yield $new;
@@ -76,29 +77,6 @@ class Content implements \Transphporm\Property {
 			$new->setAttribute('transphporm', 'text');
 		}
 		return $new;
-	}
-
-	/** Functions for writing to pseudo elements, attr, before, after, header */
-	private function attr($value, $pseudoArgs, $element) {
-
-		$element->setAttribute($pseudoArgs, implode('', $value));
-	}
-
-	private function header($value, $pseudoArgs, $element) {
-		$this->headers[] = [$pseudoArgs, implode('', $value)];
-	}
-
-	private function before($value, $pseudoArgs, $element) {
-		foreach ($this->getNode($value, $element->ownerDocument) as $node) {
-			$element->insertBefore($node, $element->firstChild);
-		}
-		return true;
-	}
-
-	private function after($value, $pseudoArgs, $element) {
-		 foreach ($this->getNode($value, $element->ownerDocument) as $node) {
-		 		$element->appendChild($node);
-		}
 	}
 
 	private function replaceContent($element, $content) {
