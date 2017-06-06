@@ -9,7 +9,6 @@ namespace Transphporm;
 class Builder {
 	private $template;
 	private $tss;
-	private $rootDir;
 	private $cache;
 	private $time;
 	private $modules = [];

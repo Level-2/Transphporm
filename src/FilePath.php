@@ -15,14 +15,14 @@ class FilePath {
 	public function getFilePath($filePath) {
 		if (is_file($filePath)) return $filePath;
 		else if (is_file($this->baseDir . DIRECTORY_SEPARATOR . $filePath)) return $this->baseDir . DIRECTORY_SEPARATOR . $filePath;
-		else return $this->loadFromPaths($filePath); 
-
-		throw new \Exception($filePath . ' not found in include path: ' . implode(';', $this->paths));
+		else return $this->loadFromPaths($filePath);
 	}
 
 	private function loadFromPaths($filePath) {
 		foreach ($this->paths as $path) {
 			if (is_file($path . DIRECTORY_SEPARATOR . $filePath)) return $path . DIRECTORY_SEPARATOR . $filePath;
 		}
+
+		throw new \Exception($filePath . ' not found in include path: ' . implode(';', $this->paths));
 	}
 }
