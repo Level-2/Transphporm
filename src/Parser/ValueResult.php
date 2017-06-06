@@ -85,7 +85,7 @@ class ValueResult {
 	}
 
 	private function write($index, $value, $allowNull = false) {
-		if ($value !== null || $allowNull == true) {
+		if ($value !== null || $allowNull === true) {
 			$this->result[$index] = $value;
 		}
 	}

@@ -40,7 +40,8 @@ class Config {
 	}
 
 	public function &getLine() {
-		return $this->line;
+        $line = &$this->line;
+		return $line;
 	}
 
 	public function registerFormatter($formatter) {
