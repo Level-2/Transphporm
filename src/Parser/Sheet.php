@@ -28,10 +28,7 @@ class Sheet {
 			if (empty($this->rules)) $tss = file_get_contents($tss);
 			else return;
 		}
-		$this->tss = $this->stripComments($tss, '//', "\n");
-		$this->tss = $this->stripComments($this->tss, '/*', '*/');
-		$tokenizer = new Tokenizer($this->tss);
-		$this->tss = $tokenizer->getTokens();
+		$this->tss = (new SheetTokenizer($tss))->getTokens();
 	}
 
 	public function parse($indexStart = 0) {
@@ -113,17 +110,6 @@ class Sheet {
 		if ($a->depth === $b->depth) return $a->index < $b->index ? -1 : 1;
 
 		return ($a->depth < $b->depth) ? -1 : 1;
-	}
-
-	private function stripComments($str, $open, $close) {
-		$pos = 0;
-		while (($pos = strpos($str, $open, $pos)) !== false) {
-			$end = strpos($str, $close, $pos);
-			if ($end === false) break;
-			$str = substr_replace($str, '', $pos, $end-$pos+strlen($close));
-		}
-
-		return $str;
 	}
 
 	private function getProperties($tokens) {

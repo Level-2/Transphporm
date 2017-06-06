@@ -44,20 +44,6 @@ class TSSValidator {
 
     private function tokenize($tss) {
         if (is_file($tss)) $tss = file_get_contents($tss);
-        $tss = $this->stripComments($tss, '//', "\n");
-		$tss = $this->stripComments($tss, '/*', '*/');
-		$tokenizer = new Tokenizer($tss);
-		return $tokenizer->getTokens();
+        return (new Parser\SheetTokenizer($tss))->getTokens();
     }
-
-    private function stripComments($str, $open, $close) {
-		$pos = 0;
-		while (($pos = strpos($str, $open, $pos)) !== false) {
-			$end = strpos($str, $close, $pos);
-			if ($end === false) break;
-			$str = substr_replace($str, '', $pos, $end-$pos+strlen($close));
-		}
-
-		return $str;
-	}
 }
