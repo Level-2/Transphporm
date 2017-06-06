@@ -51,18 +51,19 @@ class Tokens implements \Iterator, \Countable {
     }
 
     public function from($tokenType, $inclusive = false) {
-        return $this->sliceTokens($tokenType, "from", $inclusive);
+        return $this->sliceTokens($tokenType, "from", !$inclusive);
     }
 
     public function to($tokenType, $inclusive = false) {
         return $this->sliceTokens($tokenType, "to", $inclusive);
     }
 
-    private function sliceTokens($tokenType, $type, $inclusive = false) {
+    private function sliceTokens($tokenType, $type, $increment = false) {
         $key = $this->getKeyToSlice($tokenType);
         if ($key === false) return new Tokens([]);
-        if ($type === "from") return new Tokens(array_slice($this->tokens, $inclusive ? $key : $key+1));
-        else return new Tokens(array_slice($this->tokens, $this->iterator, $inclusive ? $key+1 : $key));
+        if ($increment) $key++;
+        if ($type === "from") return new Tokens(array_slice($this->tokens, $key));
+        else return new Tokens(array_slice($this->tokens, $this->iterator, $key));
     }
 
     public function skip($count) {
