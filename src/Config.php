@@ -67,6 +67,10 @@ class Config {
 		$this->properties[$name] = $property;
 	}
 
+    public function registerContentPseudo($name, Property\ContentPseudo $pseudo) {
+        if (isset($this->properties['content'])) $this->properties['content']->addContentPseudo($name, $pseudo);
+    }
+
 	public function registerPseudo(Pseudo $pseudo) {
 		$this->pseudo[] = $pseudo;
 	}
