@@ -87,10 +87,15 @@ class Date {
 			[-365, -28, $strings['future'], 28, 'months'],
 			[-999999, -365, $strings['future'], 365, 'years'],
 		];
-		if (isset($strings['day_before_yesterday'])) array_unshift($ranges, [2, 2, $strings['day_before_yesterday'], 1, '']);
-		if (isset($strings['day_after_tomorrow'])) array_unshift($ranges, [-2, -2, $strings['day_after_tomorrow'], 1, '']);
+		if (isset($strings['day_before_yesterday'])) $this->add2DayRanges($ranges, $strings['day_before_yesterday'], "before");
+		if (isset($strings['day_after_tomorrow'])) $this->add2DayRanges($ranges, $strings['day_after_tomorrow'], "after");
 		return $ranges;
 	}
+
+    private function add2DayRanges(&$ranges, $property, $when) {
+        $rangeVal = $when === "before" ? 2 : -2;
+        array_unshift($ranges, [$rangeVal, $rangeVal, $property, 1, '']);
+    }
 
 	/** Converts "week" to "weeks", "month" to "months" etc when plural is required using language from $locale */
 	private function getPlural($strings, $num, $interval) {
