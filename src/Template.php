@@ -37,7 +37,7 @@ class Template {
 				$this->save = function($content = null) {
 					return $this->document->saveHtml($content);
 				};
-				$this->document->loadHtml('<' . '?xml encoding="UTF-8">' .$doc,  LIBXML_HTML_NODEFDTD | LIBXML_HTML_NOIMPLIED);
+				$this->document->loadHtml('<' . '?xml encoding="UTF-8">' .$doc,  LIBXML_HTML_NODEFDTD | LIBXML_HTML_NOIMPLIED | LIBXML_NOCDATA);
 
 				if (strpos($doc, '<!') !== 0) {
 					$templateNode = $this->document->getElementsByTagName('template')[0];
