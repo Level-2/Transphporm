@@ -1531,6 +1531,17 @@ ul li span {
         $this->assertEquals($this->stripTabs($template->output($data)->body), $this->stripTabs('<p>Exception code: <span class="code">0</span></p>'));
 
     }
+
+    public function testExtraLineBreak() {
+        $xml1 = ' <div> </div> ';
+        $tss1 = 'div {content: "2015-12-22"; format: date "jS M Y"}';
+        $template1 = new \Transphporm\Builder($xml1, $tss1);
+        $xml2 = ' <div> </div> ';
+        $tss2 = 'div {content: "2015-12-22"; format: date "jS M Y"
+}';
+        $template2 = new \Transphporm\Builder($xml2, $tss2);
+        $this->assertEquals($this->stripTabs($template1->output()->body), $this->stripTabs($template2->output()->body));
+    }
 }
 
 
