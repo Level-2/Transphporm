@@ -144,8 +144,7 @@ class Tokenizer {
 		if ($char === self::STRING) {
 			$string = $this->extractString($i);
 			$length = strlen($string)+1;
-			$char = $this->getChar($char);
-			$string = str_replace('\\' . $char, $char, $string);
+			$string = str_replace('\\' . $this->str[$i], $this->str[$i], $string);
 			$tokens[] = ['type' => self::STRING, 'value' => $string, 'line' => $this->lineNo];
 			return $length;
 		}

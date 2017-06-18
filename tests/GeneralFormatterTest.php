@@ -176,6 +176,19 @@ class GeneralFormatterTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals($this->stripTabs('<div>5th Oct</div>'), $this->stripTabs($template->output()->body));
 	}
 
+    public function testFormatDateCustomEscape() {
+        $xml = '<div class="created">--</div>';
+
+        $tss = '.created {
+        content: data(create_time);
+        format: date "jS M Y \\a\\t h:i a";
+        }';
+
+        $data['create_time'] = '2017-05-30 10:52:00';
+        $template = new Transphporm\Builder($xml, $tss);
+        $this->assertEquals($this->stripTabs('<div class="created">30th May 2017 at 10:52 am</div>'), $this->stripTabs($template->output($data)->body));
+    }
+
     /*
      * Nl2br Formatter Tests
      */
