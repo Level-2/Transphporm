@@ -160,7 +160,7 @@ It's not usually possible to specify the content in a static file like a stylesh
 
 $xml = '<h1>Original Title</h1>';
 
-$data = 'My Title!'
+$data = 'My Title!';
 
 $tss = 'h1 {content: data(); }';
 
