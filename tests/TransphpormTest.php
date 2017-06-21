@@ -11,7 +11,7 @@ class TransphpormTest extends PHPUnit_Framework_TestCase {
         $xml = "<p>this is half english and половина России &</p>";
         $template = new Builder($xml);
 
-		$this->assertEquals('<p>this is half english and половина России &</p>', $template->output()->body);
+		$this->assertEquals('<p>this is half english and половина России &amp;</p>', $template->output()->body);
     }
 
 	public function testLoadHTMLWithEntities() {
@@ -1557,13 +1557,14 @@ ul li span {
 
     $template = new \Transphporm\Builder($xml, $tss);
 
-    $this->assertEquals($this->stripTabs('<!DOCTYPE html><html>
-<head>
-<title>My Site</title>
-</head>
-<body><img></body>
-</html>'), $this->stripTabs($template->output()->body));
-}
+	    $this->assertEquals($this->stripTabs('<!DOCTYPE html><html>
+	<head>
+	<title>My Site</title>
+	</head>
+	<body><img></body>
+	</html>'), $this->stripTabs($template->output()->body));
+	}
+
 }
 
 
