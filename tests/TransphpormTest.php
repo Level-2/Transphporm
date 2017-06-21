@@ -7,6 +7,13 @@
 use Transphporm\Builder;
 class TransphpormTest extends PHPUnit_Framework_TestCase {
 
+    public function testUTF8() {
+        $xml = "<p>this is half english and половина России &</p>";
+        $template = new Builder($xml);
+
+		$this->assertEquals('<p>this is half english and половина России &</p>', $template->output()->body);
+    }
+
 	public function testLoadHTMLWithEntities() {
 		$template = '<div>&nbsp; &lt;</div>';
 
