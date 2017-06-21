@@ -1542,6 +1542,21 @@ ul li span {
         $template2 = new \Transphporm\Builder($xml2, $tss2);
         $this->assertEquals($this->stripTabs($template1->output()->body), $this->stripTabs($template2->output()->body));
     }
+
+    public function testDoctypeUsingLoadHTML() {
+    $xml = '<!DOCTYPE html><html><head><title></title></head><body><img></body></html>';
+
+    $tss = 'title {content: "My Site"}';
+
+    $template = new \Transphporm\Builder($xml, $tss);
+
+    $this->assertEquals($this->stripTabs('<!DOCTYPE html><html>
+<head>
+<title>My Site</title>
+</head>
+<body><img></body>
+</html>'), $this->stripTabs($template->output()->body));
+}
 }
 
 
