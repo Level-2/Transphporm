@@ -38,7 +38,7 @@ class Template {
 					return $this->document->saveHtml($content);
 				};
 				$this->document->loadHtml($doc,  LIBXML_HTML_NODEFDTD | LIBXML_HTML_NOIMPLIED);
-				
+
 				if (strpos($doc, '<!') !== 0) {
 					$templateNode = $this->document->getElementsByTagName('template')[0];
 					$this->document->replaceChild($templateNode, $this->document->documentElement);
@@ -88,7 +88,8 @@ class Template {
 		 //Either return a whole DomDocument or return the output HTML
 		if ($document) return $this->document;
 
-		$output = ($this->document->doctype) ? call_user_func($this->save, $this->document->doctype) . "\n" : '';
+		//Print the doctype... saveHtml inexplicably does not support $doc->doctype as an argument
+		$output = ($this->document->doctype) ? $this->document->saveXml($this->document->doctype) . "\n" : '';
 
 		if ($this->document->documentElement->tagName !== 'template') $output .= call_user_func($this->save, $this->document->documentElement);
 		else $output = $this->printDocument();
