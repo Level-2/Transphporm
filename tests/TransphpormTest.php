@@ -33,6 +33,14 @@ class TransphpormTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('<div><img src="foo.jpg"></div>', $template->output()->body);
 	}
 
+    public function testNoCDATA() {
+        $xml = '<div><style scoped="scoped">fieldset, legend { width:75%; }</style></div>';
+
+        $template = new Builder($xml);
+
+        $this->assertEquals('<div><style scoped="scoped">fieldset, legend { width:75%; }</style></div>', $template->output()->body);
+    }
+
 
 	public function testContentSimple() {
 		$template = '
