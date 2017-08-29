@@ -362,7 +362,6 @@ class ValueParserTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals([0], $result);
     }
 
-	//public fucntion testNested
 }
 
 

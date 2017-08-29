@@ -44,6 +44,6 @@ class TSSValidator {
 
     private function tokenize($tss) {
         if (is_file($tss)) $tss = file_get_contents($tss);
-        return (new Parser\SheetTokenizer($tss))->getTokens();
+        return (new Parser\Tokenizer($tss))->getTokens();
     }
 }

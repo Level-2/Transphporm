@@ -59,7 +59,6 @@ class TransphpormTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('<ul><li>tom</li></ul>' ,$template->output($data)->body);
 	}
 
-
 	public function testContentObject() {
 		$template = '
 				<ul><li>TEST1</li></ul>
@@ -512,11 +511,13 @@ class TransphpormTest extends PHPUnit_Framework_TestCase {
 			<div>Test</div>
 		';
 
-		$tss = '/* div {content: "foo"; } */';
+		$tss = '/* div {content: "foo"; } */
+		div {content: "bar"} 
+		';
 
 		$template = new \Transphporm\Builder($template, $tss);
 
-		$this->assertEquals('<div>Test</div>', $template->output()->body);
+		$this->assertEquals('<div>bar</div>', $template->output()->body);
 	}
 
 	public function testCommentBeforeRule() {
@@ -527,6 +528,22 @@ class TransphpormTest extends PHPUnit_Framework_TestCase {
 		$tss = '
 // Comment
 div {content: "bar"; }
+		';
+
+		$template = new \Transphporm\Builder($template, $tss);
+
+		$this->assertEquals('<div>bar</div>', $template->output()->body);
+	}
+
+	public function testCommentInRule() {
+		$template = '
+			<div>foo</div>
+		';
+
+		$tss = '
+
+div {// Comment 
+	content: "bar"; }
 		';
 
 		$template = new \Transphporm\Builder($template, $tss);
@@ -1573,20 +1590,18 @@ ul li span {
 	</html>'), $this->stripTabs($template->output()->body));
 	}
 
-	public function testStringWithColon() {
-		$xml = '<a href="#" id="foo">My Link</a>';
+	public function testRuleWithNewline() {
+		$xml = '<p>My Link</p>';
 
-		$data = (object)  ['site' => ['clientUrl' => 'bar:baz']];
-		$tss = '#foo:attr(href) {
-			content: 
-			data(site.clientUrl),
-			"http://foo/bar";       
-			 }';
+		$tss = 'p {
+			content: "http://foo/bar";   
+		}
+		';
 
 		$template = new \Transphporm\Builder($xml, $tss);
 
-		$this->assertEquals($this->stripTabs('<a href="bar:bazhttp://foo/bar" id="foo">My Link</a>'), 
-			$this->stripTabs($template->output($data)->body));
+		$this->assertEquals($this->stripTabs('<p>http://foo/bar</p>'), 
+			$this->stripTabs($template->output()->body));
 	}
 
 }

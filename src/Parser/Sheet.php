@@ -28,7 +28,7 @@ class Sheet {
 			if (empty($this->rules)) $tss = file_get_contents($tss);
 			else return;
 		}
-		$this->tss = (new SheetTokenizer($tss))->getTokens();
+		$this->tss = (new Tokenizer($tss))->getTokens();
 	}
 
 	public function parse($indexStart = 0) {
