@@ -1573,6 +1573,22 @@ ul li span {
 	</html>'), $this->stripTabs($template->output()->body));
 	}
 
+	public function testStringWithColon() {
+		$xml = '<a href="#" id="foo">My Link</a>';
+
+		$data = (object)  ['site' => ['clientUrl' => 'bar:baz']];
+		$tss = '#foo:attr(href) {
+			content: 
+			data(site.clientUrl),
+			"http://foo/bar";       
+			 }';
+
+		$template = new \Transphporm\Builder($xml, $tss);
+
+		$this->assertEquals($this->stripTabs('<a href="bar:bazhttp://foo/bar" id="foo">My Link</a>'), 
+			$this->stripTabs($template->output($data)->body));
+	}
+
 }
 
 
