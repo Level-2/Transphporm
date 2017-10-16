@@ -512,7 +512,7 @@ class TransphpormTest extends PHPUnit_Framework_TestCase {
 		';
 
 		$tss = '/* div {content: "foo"; } */
-		div {content: "bar"} 
+		div {content: "bar"}
 		';
 
 		$template = new \Transphporm\Builder($template, $tss);
@@ -542,7 +542,7 @@ div {content: "bar"; }
 
 		$tss = '
 
-div {// Comment 
+div {// Comment
 	content: "bar"; }
 		';
 
@@ -550,6 +550,22 @@ div {// Comment
 
 		$this->assertEquals('<div>bar</div>', $template->output()->body);
 	}
+
+    public function testComments3() {
+        $template = '
+        <div>foo</div>
+        ';
+
+        $tss = '
+        /* CDN stuff */
+        // Online
+div { content: "bar"; }
+        ';
+
+		$template = new \Transphporm\Builder($template, $tss);
+
+		$this->assertEquals('<div>bar</div>', $template->output()->body);
+    }
 
 	public function testContentTemplate() {
 		$template = '
@@ -1594,13 +1610,13 @@ ul li span {
 		$xml = '<p>My Link</p>';
 
 		$tss = 'p {
-			content: "http://foo/bar";   
+			content: "http://foo/bar";
 		}
 		';
 
 		$template = new \Transphporm\Builder($xml, $tss);
 
-		$this->assertEquals($this->stripTabs('<p>http://foo/bar</p>'), 
+		$this->assertEquals($this->stripTabs('<p>http://foo/bar</p>'),
 			$this->stripTabs($template->output()->body));
 	}
 
