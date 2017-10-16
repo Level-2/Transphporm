@@ -1,0 +1,6 @@
+<?php
+namespace Transphporm\Parser;
+
+interface Tokenize {
+	public function tokenize($str, $tokens, $char, $start);
+}

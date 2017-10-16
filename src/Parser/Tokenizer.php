@@ -72,10 +72,9 @@ class Tokenizer {
 
 		for ($i = 0; $i < strlen($this->str); $i++) {
 			$char = $this->identifyChar($this->str[$i]);
-			if ($commentChangeI = $this->doComments($tokens, $char, $i)) {
-                $i = $commentChangeI;
-                continue;
-            }
+
+            $i += $this->doSingleLineComments($tokens, $char, $i);
+            $i += $this->doMultiLineComments($tokens, $char, $i);
 
 			$this->doNewLine($tokens, $char);
 			$this->doSimpleTokens($tokens, $char);
@@ -88,15 +87,11 @@ class Tokenizer {
 		else return $tokens;
 	}
 
-    private function doComments(&$tokens, $char, $i) {
-        return $this->doSingleLineComments($tokens, $char, $i) +
-               $this->doMultiLineComments($tokens, $char, $i);
-    }
-
 	private function doSingleLineComments(&$tokens, $char, $i) {
 		if ($char == Tokenizer::DIVIDE && isset($this->str[$i+1]) && $this->identifyChar($this->str[$i+1]) == Tokenizer::DIVIDE) {
 			$pos = strpos($this->str, "\n", $i);
-			return $pos ? $pos-2 : 0;
+			if ($pos && $i === 0) return $pos;
+			else if ($pos) return $pos-2;
 		}
 	}
 
