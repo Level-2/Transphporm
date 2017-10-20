@@ -39,6 +39,11 @@ class Builder {
 	public function loadModule(Module $module) {
 		$this->modules[get_class($module)] = $module;
 	}
+	
+	public function setLocale($locale) {
+                $format = new \Transphporm\Module\Format($locale);
+                $this->modules[get_class($format)] = $format;
+        }
 
 	public function addPath($dir) {
 		$this->filePath->addPath($dir);
