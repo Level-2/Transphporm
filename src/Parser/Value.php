@@ -34,7 +34,9 @@ class Value {
 			Tokenizer::NUMERIC => 'processString',
 			Tokenizer::BOOL => 'processString',
 			Tokenizer::STRING => 'processString',
-			Tokenizer::OPEN_BRACKET => 'processBrackets'
+			Tokenizer::OPEN_BRACKET => 'processBrackets',
+			Tokenizer::GREATER_THAN => 'processComparator',
+			Tokenizer::LOWER_THAN => 'processComparator',
 	];
 
 	public function __construct($data, $autoLookup = false, $allowNullResult = false) {
