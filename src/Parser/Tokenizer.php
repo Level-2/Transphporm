@@ -28,6 +28,7 @@ class Tokenizer {
 	const SEMI_COLON = 'SEMI_COLON';
 	const NUM_SIGN = 'NUM_SIGN';
 	const GREATER_THAN = 'GREATER_THAN';
+	const LOWER_THAN = 'LOWER_THAN';
 	const AT_SIGN = 'AT_SIGN';
 	const SUBTRACT = 'SUBTRACT';
 	const MULTIPLY = 'MULTIPLY';
@@ -53,6 +54,7 @@ class Tokenizer {
 		';' => self::SEMI_COLON,
 		'#' => self::NUM_SIGN,
 		'>' => self::GREATER_THAN,
+		'<' => self::LOWER_THAN,
 		'@' => self::AT_SIGN,
 		'-' => self::SUBTRACT,
 		'*' => self::MULTIPLY,
@@ -106,7 +108,7 @@ class Tokenizer {
 	private function doSimpleTokens(&$tokens, $char) {
 		if (in_array($char, [Tokenizer::ARG, Tokenizer::CONCAT, Tokenizer::DOT, Tokenizer::NOT, Tokenizer::EQUALS,
 			Tokenizer::COLON, Tokenizer::SEMI_COLON, Tokenizer::WHITESPACE, Tokenizer::NUM_SIGN,
-			Tokenizer::GREATER_THAN, Tokenizer::AT_SIGN, Tokenizer::SUBTRACT, Tokenizer::MULTIPLY, Tokenizer::DIVIDE])) {
+			Tokenizer::GREATER_THAN, Tokenizer::LOWER_THAN, Tokenizer::AT_SIGN, Tokenizer::SUBTRACT, Tokenizer::MULTIPLY, Tokenizer::DIVIDE])) {
 			$tokens[] = ['type' => $char, 'line' => $this->lineNo];
 		}
 	}
