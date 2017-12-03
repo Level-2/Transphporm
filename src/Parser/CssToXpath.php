@@ -89,12 +89,17 @@ class CssToXpath {
 	}
 
 	private function removeSpacesFromDirectDecend($css) {
-		$tokens = [];
-		foreach ($css->splitOnToken(Tokenizer::GREATER_THAN) as $token) {
-			foreach ($token->trim() as $t) $tokens[]  = $t;
-			$tokens[] = ['type' => Tokenizer::GREATER_THAN];
+		$tokens = new Tokens;
+		$split = $css->splitOnToken(Tokenizer::GREATER_THAN);
+
+		if (count($split) <= 1) return $css;
+
+		for ($i = 0; $i < count($split); $i++) {
+			$tokens->add($split[$i]->trim());
+			if (isset($split[$i+1])) $tokens->add(['type' => Tokenizer::GREATER_THAN]);
 		}
-		return new Tokens(array_slice($tokens, 0, -1));
+		
+		return $tokens;
 	}
 
 

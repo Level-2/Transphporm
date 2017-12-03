@@ -47,11 +47,13 @@ class Sheet {
 			}
 			else if ($token['type'] !== Tokenizer::NEW_LINE) $this->addRules($token, $indexStart);
 		}
+
 		return $this->rules;
 	}
 
 	private function addRules($token, $indexStart) {
 		$selector = $this->tss->from($token['type'], true)->to(Tokenizer::OPEN_BRACE);
+
 		$this->tss->skip(count($selector));
 		if (count($selector) === 0) return;
 
