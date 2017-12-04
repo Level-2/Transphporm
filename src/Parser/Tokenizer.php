@@ -70,10 +70,14 @@ class Tokenizer {
 	public function getTokens() {
 		$tokens = new Tokens;
 
+		$str2 = new Tokenizer\TokenizedString($this->str);
+
 		for ($i = 0; $i < strlen($this->str); $i++) {
 			$char = $this->identifyChar($this->str[$i]);
-			$i += $this->doSingleLineComments($tokens, $char, $i);
-			$i += $this->doMultiLineComments($tokens, $char, $i);
+			
+			$str2->pos = $i;
+			$i += $this->doSingleLineComments($tokens, $char, $i, $str2);
+			$i = $str2->pos;
 			$char = $this->identifyChar($this->str[$i]);
 
 			$this->doNewLine($tokens, $char);
@@ -87,18 +91,13 @@ class Tokenizer {
 		return $tokens;
 	}
 
-	private function doSingleLineComments($tokens, $char, $i) {
-		if ($char == Tokenizer::DIVIDE && isset($this->str[$i+1]) && $this->identifyChar($this->str[$i+1]) == Tokenizer::DIVIDE) {
-			$pos = strpos($this->str, "\n", $i);
-			return $pos !== false ? $pos-$i : strlen($this->str)-$i-1;
-		}
-	}
+	private function doSingleLineComments($tokens, $char, $i, $str) {
+		$comments = new \Transphporm\Parser\Tokenizer\Comments;
+		$x = $comments->tokenize($str, $tokens, $char, $i);
 
-	private function doMultiLineComments($tokens, $char, $i) {
-		if ($char == Tokenizer::DIVIDE && isset($this->str[$i+1]) && $this->identifyChar($this->str[$i+1]) == Tokenizer::MULTIPLY) {
-			$pos = strpos($this->str, '*/', $i);
-			return $pos !== false ? $pos-$i+2 : strlen($this->str)-$i-1;
-		}
+		//var_dump($x);
+		return $x;
+
 	}
 
 	private function doWhitespace($tokens, $char) {
