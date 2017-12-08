@@ -68,16 +68,6 @@ class TokenizedString {
 		return isset($this->str[$this->pos + $offset]);
 	}
 
-	private function identifyChar2($chr) {
-		if (isset($this->chars[$chr])) return $this->chars[$chr];
-		else return self::NAME;
-	}
-
-
-	public function count() {
-		return strlen($this->str);
-	}
-
 	public function pos($str) {
 		$pos = strpos($this->str,  $str, $this->pos);
 		return $pos ? $pos-$this->pos : false;
@@ -89,10 +79,6 @@ class TokenizedString {
 
 	public function lineNo() {
 		return $this->lineNo;
-	}
-
-	public function undigested() {
-		return substr($this->str, $this->pos);
 	}
 
 	public function extractString($offset = 0) {
