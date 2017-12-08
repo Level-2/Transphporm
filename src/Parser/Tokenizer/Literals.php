@@ -30,9 +30,9 @@ class Literals implements \Transphporm\Parser\Tokenize {
 
 	private function isLiteral($n, $str) {
 		//Is it a normal literal character
-		return ($str->has($n) && $str->identifyChar($n, $str) === Tokenizer::NAME
+		return ($str->has($n) && ($str->identifyChar($n, $str) === Tokenizer::NAME
 		//but a subtract can be part of a class name or a mathematical operation
-				|| ($str->has($n) && $str->identifyChar($n) == Tokenizer::SUBTRACT && !is_numeric($str->read($n-1)))
+				|| $str->identifyChar($n) == Tokenizer::SUBTRACT && !is_numeric($str->read($n-1)))
 			);
 	}
 
