@@ -3,7 +3,7 @@
  * @author          Tom Butler tom@r.je                                             *
  * @copyright       2017 Tom Butler <tom@r.je> | https://r.je/                      *
  * @license         http://www.opensource.org/licenses/bsd-license.php  BSD License *
- * @version         0.9                                                             */
+ * @version         1.2                                                             */
 //Autoloader for Vision classes
 
 //Add support for PHPUnit 5 and 6
