@@ -7,7 +7,7 @@
 namespace Transphporm\Parser;
 class CssToXpath {
 	private $specialChars = [Tokenizer::WHITESPACE, Tokenizer::DOT, Tokenizer::GREATER_THAN,
-		'~', Tokenizer::NUM_SIGN, Tokenizer::COLON, Tokenizer::OPEN_SQUARE_BRACKET, Tokenizer::MULTIPLY];
+		'~', Tokenizer::NUM_SIGN, Tokenizer::OPEN_SQUARE_BRACKET, Tokenizer::MULTIPLY];
 	private $translators = [];
 	private static $instances = [];
 	private $functionSet;
