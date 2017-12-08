@@ -33,36 +33,6 @@ class Tokenizer {
 	const MULTIPLY = 'MULTIPLY';
 	const DIVIDE = 'DIVIDE';
 
-	private $lineNo = 1;
-
-	private $chars = [
-		'"' => self::STRING,
-		'\'' => self::STRING,
-		'(' => self::OPEN_BRACKET,
-		')' => self::CLOSE_BRACKET,
-		'[' => self::OPEN_SQUARE_BRACKET,
-		']' => self::CLOSE_SQUARE_BRACKET,
-		'+' => self::CONCAT,
-		',' => self::ARG,
-		'.' => self::DOT,
-		'!' => self::NOT,
-		'=' => self::EQUALS,
-		'{' => self::OPEN_BRACE,
-		'}' => self::CLOSE_BRACE,
-		':' => self::COLON,
-		';' => self::SEMI_COLON,
-		'#' => self::NUM_SIGN,
-		'>' => self::GREATER_THAN,
-		'@' => self::AT_SIGN,
-		'-' => self::SUBTRACT,
-		'*' => self::MULTIPLY,
-		'/' => self::DIVIDE,
-		' ' => self::WHITESPACE,
-		"\n" => self::NEW_LINE,
-		"\r" => self::WHITESPACE,
-		"\t" => self::WHITESPACE
-	];
-
 	public function __construct($str) {
 		$this->str = new Tokenizer\TokenizedString($str);
 
@@ -78,7 +48,7 @@ class Tokenizer {
 	public function getTokens() {
 		$tokens = new Tokens;
 		$this->str->reset();
-		
+
 		while ($this->str->next()) {
 			foreach ($this->tokenizeRules as $tokenizer) {
 				$tokenizer->tokenize($this->str, $tokens);
