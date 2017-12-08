@@ -26,7 +26,9 @@ class ValueResult {
 			Tokenizer::NOT => 'not',
 			Tokenizer::SUBTRACT => 'sub',
 			Tokenizer::MULTIPLY => 'mult',
-			Tokenizer::DIVIDE => 'div'
+			Tokenizer::DIVIDE => 'div',
+			Tokenizer::GREATER_THAN => 'greater',
+			Tokenizer::LOWER_THAN => 'lower'
 		];
 
 		if ($funcs[$this->mode] === 'concat' && is_numeric($newValue)
@@ -50,6 +52,14 @@ class ValueResult {
 
 	public function equals($value) {
 		$this->result[count($this->result)-1] = $this->result[count($this->result)-1] == $value;
+	}
+
+	public function greater($value) {
+		$this->result[count($this->result)-1] = $this->result[count($this->result)-1] > $value;
+	}
+
+	public function lower($value) {
+		$this->result[count($this->result)-1] = $this->result[count($this->result)-1] < $value;
 	}
 
 	public function add($value) {
