@@ -73,6 +73,7 @@ class Tokenizer {
 		$comments = new Tokenizer\Comments;
 		$basics = new  Tokenizer\BasicChars;
 		$literals = new  Tokenizer\Literals;
+		$strings = new  Tokenizer\Strings;
 
 		$str2 = new Tokenizer\TokenizedString($this->str);
 
@@ -83,12 +84,11 @@ class Tokenizer {
 			
 			$comments->tokenize($str2, $tokens);			
 			$basics->tokenize($str2, $tokens);
-			$literals->tokenize($str2, $tokens, $i, $this->str);
+			$literals->tokenize($str2, $tokens);
+			$strings->tokenize($str2, $tokens);
 			$i = $str2->pos;
 
 			$this->lineNo = $str2->lineNo;
-
-			$i += $this->doStrings($tokens, $char, $i);
 			$i += $this->doBrackets($tokens, $char, $i);
 
 		}
@@ -111,24 +111,6 @@ class Tokenizer {
 				return strlen($contents);
 			}
 		}
-	}
-
-	private function doStrings($tokens, $char, $i) {
-		if ($char === self::STRING) {
-			$string = $this->extractString($i);
-			$length = strlen($string)+1;
-			$string = str_replace('\\' . $this->str[$i], $this->str[$i], $string);
-			$tokens->add(['type' => self::STRING, 'value' => $string, 'line' => $this->lineNo]);
-			return $length;
-		}
-	}
-
-	private function extractString($pos) {
-		$char = $this->str[$pos];
-		$end = strpos($this->str, $char, $pos+1);
-		while ($end !== false && $this->str[$end-1] == '\\') $end = strpos($this->str, $char, $end+1);
-
-		return substr($this->str, $pos+1, $end-$pos-1);
 	}
 
 	private function extractBrackets($open, $startBracket = '(', $closeBracket = ')') {

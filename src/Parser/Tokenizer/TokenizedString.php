@@ -90,4 +90,12 @@ class TokenizedString {
 		return substr($this->str, $this->pos);
 	}
 
+	public function extractString($offset = 0) {
+		$pos = $this->pos + $offset;
+		$char = $this->str[$pos];
+		$end = strpos($this->str, $char, $pos+1);
+		while ($end !== false && $this->str[$end-1] == '\\') $end = strpos($this->str, $char, $end+1);
+
+		return substr($this->str, $pos+1, $end-$pos-1);
+	}
 }
