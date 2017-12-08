@@ -33,7 +33,7 @@ class BasicChars implements \Transphporm\Parser\Tokenize {
 		$char = $str->identifyChar();
 		if (in_array($char, [Tokenizer::ARG, Tokenizer::CONCAT, Tokenizer::DOT, Tokenizer::NOT, Tokenizer::EQUALS,
 			Tokenizer::COLON, Tokenizer::SEMI_COLON, Tokenizer::NUM_SIGN,
-			Tokenizer::GREATER_THAN, Tokenizer::AT_SIGN, Tokenizer::SUBTRACT, Tokenizer::MULTIPLY, Tokenizer::DIVIDE])) {
+			Tokenizer::GREATER_THAN, Tokenizer::LOWER_THAN, Tokenizer::AT_SIGN, Tokenizer::SUBTRACT, Tokenizer::MULTIPLY, Tokenizer::DIVIDE])) {
 			$tokens->add(['type' => $char, 'line' => $str->lineNo()]);
 		}
 	}

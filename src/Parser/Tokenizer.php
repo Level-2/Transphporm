@@ -30,6 +30,7 @@ class Tokenizer {
 	const SEMI_COLON = 'SEMI_COLON';
 	const NUM_SIGN = 'NUM_SIGN';
 	const GREATER_THAN = 'GREATER_THAN';
+	const LOWER_THAN = 'LOWER_THAN';
 	const AT_SIGN = 'AT_SIGN';
 	const SUBTRACT = 'SUBTRACT';
 	const MULTIPLY = 'MULTIPLY';
