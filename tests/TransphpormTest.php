@@ -7,12 +7,12 @@
 use Transphporm\Builder;
 class TransphpormTest extends PHPUnit_Framework_TestCase {
 
-    public function testUTF8() {
-        $xml = "<p>this is half english and половина России &</p>";
-        $template = new Builder($xml);
+	public function testUTF8() {
+		$xml = "<p>this is half english and половина России &</p>";
+		$template = new Builder($xml);
 
 		$this->assertEquals('<p>this is half english and половина России &amp;</p>', $template->output()->body);
-    }
+	}
 
 	public function testLoadHTMLWithEntities() {
 		$template = '<div>&nbsp; &lt;</div>';
@@ -33,13 +33,13 @@ class TransphpormTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('<div><img src="foo.jpg"></div>', $template->output()->body);
 	}
 
-    public function testNoCDATA() {
-        $xml = '<div><style scoped="scoped">fieldset, legend { width:75%; }</style></div>';
+	public function testNoCDATA() {
+		$xml = '<div><style scoped="scoped">fieldset, legend { width:75%; }</style></div>';
 
-        $template = new Builder($xml);
+		$template = new Builder($xml);
 
-        $this->assertEquals('<div><style scoped="scoped">fieldset, legend { width:75%; }</style></div>', $template->output()->body);
-    }
+		$this->assertEquals('<div><style scoped="scoped">fieldset, legend { width:75%; }</style></div>', $template->output()->body);
+	}
 
 
 	public function testContentSimple() {
@@ -551,21 +551,21 @@ div {// Comment
 		$this->assertEquals('<div>bar</div>', $template->output()->body);
 	}
 
-    public function testComments3() {
-        $template = '
-        <div>foo</div>
-        ';
+	public function testComments3() {
+		$template = '
+		<div>foo</div>
+		';
 
-        $tss = '
-        /* CDN stuff */
-        // Online
+		$tss = '
+		/* CDN stuff */
+		// Online
 div { content: "bar"; }
-        ';
+		';
 
 		$template = new \Transphporm\Builder($template, $tss);
 
 		$this->assertEquals('<div>bar</div>', $template->output()->body);
-    }
+	}
 
 	public function testContentTemplate() {
 		$template = '
@@ -1084,34 +1084,34 @@ select option[value=data()]:attr(selected) { content: "selected"; }
 
 	public function testKeyChild() {
 		$xml = '<ul>
-            <li>
-            <span></span>
-            <a>Edit</a></li>
-        </ul>';
+			<li>
+			<span></span>
+			<a>Edit</a></li>
+		</ul>';
 
 
-        $data = ['array' => [
-        'one' => 'foo',
-        'two' => 'bar']
-        ];
+		$data = ['array' => [
+		'one' => 'foo',
+		'two' => 'bar']
+		];
 
 
-          $tss = 'ul li {repeat: data(array); }
+		  $tss = 'ul li {repeat: data(array); }
 ul li span {
   content: iteration();
 }
-       ul li a { content: key() }
-        ';
+	   ul li a { content: key() }
+		';
 
 
-        $template = new \Transphporm\Builder($xml, $tss);
-        $this->assertEquals($this->stripTabs($template->output($data)->body), $this->stripTabs('<ul>
-            <li>
-            <span>foo</span>
-            <a>one</a></li><li>
-            <span>bar</span>
-            <a>two</a></li>
-        </ul>'));
+		$template = new \Transphporm\Builder($xml, $tss);
+		$this->assertEquals($this->stripTabs($template->output($data)->body), $this->stripTabs('<ul>
+			<li>
+			<span>foo</span>
+			<a>one</a></li><li>
+			<span>bar</span>
+			<a>two</a></li>
+		</ul>'));
 	}
 
 	public function testFunctionCall1() {
@@ -1278,36 +1278,36 @@ ul li span {
 
 
 	public function testNestedData() {
-		        $data = json_decode('{ "children": [
+				$data = json_decode('{ "children": [
   {
-    "target":"Parent",
-    "title":"Parent",
-    "children":
-      [
-        {
-          "target":"Child 2",
-          "title":"Child 2",
-          "children":
-            [
-              {
-                 "target":"two.1",
-                 "title":"grandchild 1"
-               },
-               {
-                 "target":"two.2",
-                 "title":"grandchildchild 2"
-               }
-             ]
-          },
-          {
-     "target":"child 1",
-     "title":"child 1"
+	"target":"Parent",
+	"title":"Parent",
+	"children":
+	  [
+		{
+		  "target":"Child 2",
+		  "title":"Child 2",
+		  "children":
+			[
+			  {
+				 "target":"two.1",
+				 "title":"grandchild 1"
+			   },
+			   {
+				 "target":"two.2",
+				 "title":"grandchildchild 2"
+			   }
+			 ]
+		  },
+		  {
+	 "target":"child 1",
+	 "title":"child 1"
   }
-      ]
+	  ]
   },
   {
-     "target":"http://facebook.com",
-     "title":"Facebook"
+	 "target":"http://facebook.com",
+	 "title":"Facebook"
   }
 ]}', true);
 
@@ -1509,56 +1509,56 @@ ul li span {
 
 	}
 
-    public function testTemplateSelector() {
-        $template = "<div></div>";
+	public function testTemplateSelector() {
+		$template = "<div></div>";
 
-        $tss = "
-        div { content: template('/tests/templateSelector.xml', '.test1'); }
-        ";
+		$tss = "
+		div { content: template('/tests/templateSelector.xml', '.test1'); }
+		";
 
-        $template = new \Transphporm\Builder($template, $tss);
+		$template = new \Transphporm\Builder($template, $tss);
 
-        $this->assertEquals($this->stripTabs('<div><div class="test1"><a>Test1</a><a>Test2</a></div></div>'),
-            $this->stripTabs($template->output()->body));
-    }
+		$this->assertEquals($this->stripTabs('<div><div class="test1"><a>Test1</a><a>Test2</a></div></div>'),
+			$this->stripTabs($template->output()->body));
+	}
 
-    public function testTemplateSelectorWithAsterisk() {
-        $template = "<div></div>";
+	public function testTemplateSelectorWithAsterisk() {
+		$template = "<div></div>";
 
-        $tss = "
-        div { content: template('/tests/templateSelector.xml', '.test1 *'); }
-        ";
+		$tss = "
+		div { content: template('/tests/templateSelector.xml', '.test1 *'); }
+		";
 
-        $template = new \Transphporm\Builder($template, $tss);
+		$template = new \Transphporm\Builder($template, $tss);
 
-        $this->assertEquals($this->stripTabs('<div><a>Test1</a><a>Test2</a></div>'),
-            $this->stripTabs($template->output()->body));
-    }
+		$this->assertEquals($this->stripTabs('<div><a>Test1</a><a>Test2</a></div>'),
+			$this->stripTabs($template->output()->body));
+	}
 
-    public function testDataFunctionReturnFalse() {
+	public function testDataFunctionReturnFalse() {
 
-        $template = "<div></div>";
+		$template = "<div></div>";
 
-        $tss = "
-        div:data[foo.returnFalse()=true] { content: 'test'; }
-        ";
+		$tss = "
+		div:data[foo.returnFalse()=true] { content: 'test'; }
+		";
 
-        $template = new \Transphporm\Builder($template, $tss);
+		$template = new \Transphporm\Builder($template, $tss);
 
-        $this->assertEquals($this->stripTabs('<div></div>'),
-            $this->stripTabs($template->output()->body));
+		$this->assertEquals($this->stripTabs('<div></div>'),
+			$this->stripTabs($template->output()->body));
 
-    }
+	}
 
 
-    public function testContentModeReplaceBlockInclude() {
+	public function testContentModeReplaceBlockInclude() {
 		$xml = '<div>
 			<include href="/tests/include.xml" />
 		</div>';
 
 		$tss = '
-        @import "/tests/includeTest.tss";
-        ';
+		@import "/tests/includeTest.tss";
+		';
 
 		$template = new \Transphporm\Builder($xml, $tss);
 
@@ -1567,38 +1567,38 @@ ul li span {
 		$this->assertEquals($this->stripTabs($output), $this->stripTabs('<div><p>foo</p></div>'));
 	}
 
-    public function testValueZero() {
-        $xml = '<p>Exception code: <span class="code">unknown</span></p>';
-        $tss = '.code { content: data(errorCode); }';
-        $template = new Transphporm\Builder($xml, $tss);
+	public function testValueZero() {
+		$xml = '<p>Exception code: <span class="code">unknown</span></p>';
+		$tss = '.code { content: data(errorCode); }';
+		$template = new Transphporm\Builder($xml, $tss);
 
-        $data['errorCode'] = 0;
-        $this->assertEquals($this->stripTabs($template->output($data)->body), $this->stripTabs('<p>Exception code: <span class="code">0</span></p>'));
+		$data['errorCode'] = 0;
+		$this->assertEquals($this->stripTabs($template->output($data)->body), $this->stripTabs('<p>Exception code: <span class="code">0</span></p>'));
 
-        $data['errorCode'] = (string)0;
-        $this->assertEquals($this->stripTabs($template->output($data)->body), $this->stripTabs('<p>Exception code: <span class="code">0</span></p>'));
+		$data['errorCode'] = (string)0;
+		$this->assertEquals($this->stripTabs($template->output($data)->body), $this->stripTabs('<p>Exception code: <span class="code">0</span></p>'));
 
-    }
+	}
 
-    public function testExtraLineBreak() {
-        $xml1 = ' <div> </div> ';
-        $tss1 = 'div {content: "2015-12-22"; format: date "jS M Y"}';
-        $template1 = new \Transphporm\Builder($xml1, $tss1);
-        $xml2 = ' <div> </div> ';
-        $tss2 = 'div {content: "2015-12-22"; format: date "jS M Y"
+	public function testExtraLineBreak() {
+		$xml1 = ' <div> </div> ';
+		$tss1 = 'div {content: "2015-12-22"; format: date "jS M Y"}';
+		$template1 = new \Transphporm\Builder($xml1, $tss1);
+		$xml2 = ' <div> </div> ';
+		$tss2 = 'div {content: "2015-12-22"; format: date "jS M Y"
 }';
-        $template2 = new \Transphporm\Builder($xml2, $tss2);
-        $this->assertEquals($this->stripTabs($template1->output()->body), $this->stripTabs($template2->output()->body));
-    }
+		$template2 = new \Transphporm\Builder($xml2, $tss2);
+		$this->assertEquals($this->stripTabs($template1->output()->body), $this->stripTabs($template2->output()->body));
+	}
 
-    public function testDoctypeUsingLoadHTML() {
-    $xml = '<!DOCTYPE html><html><head><title></title></head><body><img></body></html>';
+	public function testDoctypeUsingLoadHTML() {
+	$xml = '<!DOCTYPE html><html><head><title></title></head><body><img></body></html>';
 
-    $tss = 'title {content: "My Site"}';
+	$tss = 'title {content: "My Site"}';
 
-    $template = new \Transphporm\Builder($xml, $tss);
+	$template = new \Transphporm\Builder($xml, $tss);
 
-	    $this->assertEquals($this->stripTabs('<!DOCTYPE html><html>
+		$this->assertEquals($this->stripTabs('<!DOCTYPE html><html>
 	<head>
 	<title>My Site</title>
 	</head>
@@ -1623,18 +1623,18 @@ ul li span {
 	public function testCommentBlock() {
 
 		$tss = 'div {content: "foo"}
-    
+	
    /*.comment {foo: bar} */
    
-    span {content: "bar"}
-    ';
+	span {content: "bar"}
+	';
 
-    	$xml = '<div></div><span></span>';
+		$xml = '<div></div><span></span>';
 
 
-    	$template = new \Transphporm\Builder($xml, $tss);
+		$template = new \Transphporm\Builder($xml, $tss);
 
-    	$this->assertEquals($this->stripTabs('<div>foo</div><span>bar</span>'),
+		$this->assertEquals($this->stripTabs('<div>foo</div><span>bar</span>'),
 			$this->stripTabs($template->output()->body));
 
 
@@ -1656,6 +1656,26 @@ ul li span {
 			<nav>bar</nav><footer>baz</footer><span>end</span></body>'),
 			$this->stripTabs($template->output()->body));
 
+	}
+
+	public function testConcatDataAndAttr() {
+		$data = ['class' => ' AFTER'];
+		$xml = '<h1 class="foo">Example Title</h1>';
+		$tss = 'h1:attr(class) {content: attr(class) + data(class); }';
+		$template = new \Transphporm\Builder($xml, $tss);
+
+		$this->assertEquals($this->stripTabs('<h1 class="foo AFTER">Example Title</h1>'),
+			$this->stripTabs($template->output($data)->body));
+	}
+
+	public function testConcatDataAndAttr2() {
+		$data = ['class' => ' AFTER'];
+		$xml = '<h1 class="foo">Example Title</h1>';
+		$tss = 'h1:attr(class) {content: attr(class), data(class); }';
+		$template = new \Transphporm\Builder($xml, $tss);
+
+		$this->assertEquals($this->stripTabs('<h1 class="foo AFTER">Example Title</h1>'),
+			$this->stripTabs($template->output($data)->body));
 	}
 
 }
