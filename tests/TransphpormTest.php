@@ -1620,6 +1620,26 @@ ul li span {
 			$this->stripTabs($template->output()->body));
 	}
 
+	public function testCommentBlock() {
+
+		$tss = 'div {content: "foo"}
+    
+   /*.comment {foo: bar} */
+   
+    span {content: "bar"}
+    ';
+
+    	$xml = '<div></div><span></span>';
+
+
+    	$template = new \Transphporm\Builder($xml, $tss);
+
+    	$this->assertEquals($this->stripTabs('<div>foo</div><span>bar</span>'),
+			$this->stripTabs($template->output()->body));
+
+
+	}
+
 }
 
 
