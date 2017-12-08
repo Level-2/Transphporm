@@ -10,20 +10,18 @@ class BeforeAfter implements \Transphporm\Property\ContentPseudo {
 	}
 
 	public function run($value, $pseudoArgs, $element) {
-		$this->{$this->insertLocation}($value, $element);
-	}
-
-	private function before($value, $element) {
 		$currentFirst = $element->firstChild;
 
 		foreach ($this->content->getNode($value, $element->ownerDocument) as $node) {
-			$element->insertBefore($node, $currentFirst);
+			$this->{$this->insertLocation}($node, $element, $currentFirst);
 		}
 	}
 
-	private function after($value, $element) {
-		foreach ($this->content->getNode($value, $element->ownerDocument) as $node) {
-			$element->appendChild($node);
-		}
+	private function before($node, $element, $currentFirst) {		
+		$element->insertBefore($node, $currentFirst);
+	}
+
+	private function after($node, $element, $currentFirst) {
+		$element->appendChild($node);
 	}
 }
