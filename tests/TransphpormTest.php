@@ -1678,6 +1678,15 @@ ul li span {
 			$this->stripTabs($template->output($data)->body));
 	}
 
+	public function testAttrAfter() {
+		$data = ['class' => ' AFTER'];
+		$xml = '<h1 class="foo">Example Title</h1>';
+		$tss = 'h1:attr(class):after {content: data(class); }';
+		$template = new \Transphporm\Builder($xml, $tss);
+
+		$this->assertEquals($this->stripTabs('<h1 class="foo AFTER">Example Title</h1>'),
+			$this->stripTabs($template->output($data)->body));
+	}
 }
 
 

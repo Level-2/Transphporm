@@ -39,14 +39,14 @@ class Content implements \Transphporm\Property {
 		return (isset($rules['content-mode'])) ? $rules['content-mode']->read() : 'append';
 	}
 
-    public function addContentPseudo($name, ContentPseudo $contentPseudo) {
-        $this->contentPseudo[$name] = $contentPseudo;
-    }
-    
+	public function addContentPseudo($name, ContentPseudo $contentPseudo) {
+		$this->contentPseudo[$name] = $contentPseudo;
+	}
+	
 	private function processPseudo($value, $element, $pseudoMatcher) {
 		foreach ($this->contentPseudo as $pseudoName => $pseudoFunction) {
 			if ($pseudoMatcher->hasFunction($pseudoName)) {
-				$pseudoFunction->run($value, $pseudoMatcher->getFuncArgs($pseudoName, $element)[0], $element);
+				$pseudoFunction->run($value, $pseudoMatcher->getFuncArgs($pseudoName, $element)[0], $element, $pseudoMatcher);
 				return true;
 			}
 		}

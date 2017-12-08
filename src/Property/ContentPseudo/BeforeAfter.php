@@ -9,7 +9,7 @@ class BeforeAfter implements \Transphporm\Property\ContentPseudo {
 		$this->content = $content;
 	}
 
-	public function run($value, $pseudoArgs, $element) {
+	public function run($value, $pseudoArgs, $element, \Transphporm\Hook\PseudoMatcher $pseudoMatcher) {
 		$currentFirst = $element->firstChild;
 
 		foreach ($this->content->getNode($value, $element->ownerDocument) as $node) {

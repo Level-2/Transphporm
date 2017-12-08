@@ -19,9 +19,10 @@ class Basics implements \Transphporm\Module {
 		$config->registerProperty('display', new \Transphporm\Property\Display);
 		$config->registerProperty('bind', new \Transphporm\Property\Bind($config->getElementData()));
 
+        $content->addContentPseudo("attr", new \Transphporm\Property\ContentPseudo\Attr());
         $content->addContentPseudo("before", new \Transphporm\Property\ContentPseudo\BeforeAfter("before", $content));
         $content->addContentPseudo("after", new \Transphporm\Property\ContentPseudo\BeforeAfter("after", $content));
-        $content->addContentPseudo("attr", new \Transphporm\Property\ContentPseudo\Attr());
+
         $content->addContentPseudo("header", new \Transphporm\Property\ContentPseudo\Headers($headers));
 	}
 }
