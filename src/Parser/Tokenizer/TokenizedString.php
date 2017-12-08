@@ -4,8 +4,8 @@ use Transphporm\Parser\Tokenizer;
 
 class TokenizedString {
 	private $str;
-	public $pos = 0;
-	public $lineNo = 1;
+	private $pos = -1;
+	private $lineNo = 1;
 
 	private $chars = [
 		'"' => Tokenizer::STRING,
@@ -44,10 +44,15 @@ class TokenizedString {
 		else $this->pos += $n;
 	}
 
-	/*public function next() {
-	//	$this->pos++;
-	//	return $this->pos > strlen($this->str) ? false : $this->str[$this->pos];
-	}*/
+	public function next() {
+		$this->pos++;
+		return $this->pos < strlen($this->str);
+	}
+
+	public function reset() {
+		$this->lineNo = 1;
+		$this->pos = -1;
+	}
 
 	public function read($offset = 0) {
 		return $this->str[$this->pos + $offset];
@@ -98,4 +103,14 @@ class TokenizedString {
 
 		return substr($this->str, $pos+1, $end-$pos-1);
 	}
+
+	public function extractBrackets($startBracket = '(', $closeBracket = ')', $offset = 0) {
+		$open = $this->pos+$offset;
+		$close = strpos($this->str, $closeBracket, $open);
+
+		$cPos = $open+1;
+		while (($cPos = strpos($this->str, $startBracket, $cPos+1)) !== false && $cPos < $close) $close = strpos($this->str, $closeBracket, $close+1);
+		return substr($this->str, $open+1, $close-$open-1);
+	}
+
 }

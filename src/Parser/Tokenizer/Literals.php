@@ -4,7 +4,6 @@ use \Transphporm\Parser\Tokenizer;
 use \Transphporm\Parser\Tokens;
 
 class Literals implements \Transphporm\Parser\Tokenize {
-	private $c = 0;
 
 	public function tokenize(TokenizedString $str, Tokens $tokens) {
 		$char = $str->identifyChar();

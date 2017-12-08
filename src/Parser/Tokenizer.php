@@ -34,7 +34,6 @@ class Tokenizer {
 	const DIVIDE = 'DIVIDE';
 
 	private $lineNo = 1;
-	private $c = 0;
 
 	private $chars = [
 		'"' => self::STRING,
@@ -65,70 +64,28 @@ class Tokenizer {
 	];
 
 	public function __construct($str) {
-		$this->str = $str;
+		$this->str = new Tokenizer\TokenizedString($str);
+
+		$this->tokenizeRules = [
+			new Tokenizer\Comments,
+			new Tokenizer\BasicChars,
+			new Tokenizer\Literals,
+			new Tokenizer\Strings,
+			new Tokenizer\Brackets
+		];
 	}
 
 	public function getTokens() {
 		$tokens = new Tokens;
-		$comments = new Tokenizer\Comments;
-		$basics = new  Tokenizer\BasicChars;
-		$literals = new  Tokenizer\Literals;
-		$strings = new  Tokenizer\Strings;
-
-		$str2 = new Tokenizer\TokenizedString($this->str);
-
-		for ($i = 0; $i < strlen($this->str); $i++) {
-			$char = $this->identifyChar($this->str[$i]);
-
-			$str2->pos = $i;
-			
-			$comments->tokenize($str2, $tokens);			
-			$basics->tokenize($str2, $tokens);
-			$literals->tokenize($str2, $tokens);
-			$strings->tokenize($str2, $tokens);
-			$i = $str2->pos;
-
-			$this->lineNo = $str2->lineNo;
-			$i += $this->doBrackets($tokens, $char, $i);
-
+		$this->str->reset();
+		
+		while ($this->str->next()) {
+			foreach ($this->tokenizeRules as $tokenizer) {
+				$tokenizer->tokenize($this->str, $tokens);
+			}
 		}
 
 		return $tokens;
 	}
 
-	private function doBrackets($tokens, $char, $i) {
-		$types = [
-			self::OPEN_BRACKET => ['(', ')'],
-			self::OPEN_BRACE => ['{', '}'],
-			self::OPEN_SQUARE_BRACKET => ['[', ']']
-		];
-
-		foreach ($types as $type => $brackets) {
-			if ($char === $type) {
-				$contents = $this->extractBrackets($i, $brackets[0], $brackets[1]);
-				$tokenizer = new Tokenizer($contents);
-				$tokens->add(['type' => $type, 'value' => $tokenizer->getTokens(), 'string' => $contents, 'line' => $this->lineNo]);
-				return strlen($contents);
-			}
-		}
-	}
-
-	private function extractBrackets($open, $startBracket = '(', $closeBracket = ')') {
-		$close = strpos($this->str, $closeBracket, $open);
-
-		$cPos = $open+1;
-		while (($cPos = strpos($this->str, $startBracket, $cPos+1)) !== false && $cPos < $close) $close = strpos($this->str, $closeBracket, $close+1);
-		return substr($this->str, $open+1, $close-$open-1);
-	}
-
-	private function identifyChar($chr) {
-		if (isset($this->chars[$chr])) return $this->chars[$chr];
-		else return self::NAME;
-	}
-
-	private function getChar($num) {
-		$chars = array_reverse($this->chars);
-		if (isset($chars[$num])) return $chars[$num];
-		else return false;
-	}
 }
