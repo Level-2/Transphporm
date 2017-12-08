@@ -5,6 +5,7 @@ use Transphporm\Parser\Tokenizer;
 class TokenizedString {
 	private $str;
 	public $pos = 0;
+	public $lineNo = 1;
 
 	private $chars = [
 		'"' => Tokenizer::STRING,
@@ -39,22 +40,34 @@ class TokenizedString {
 	}
 
 	public function move($n) {
-		if ($n == false) $this->pos = strlen($this->str)-1;
+		if ($n === false) $this->pos = strlen($this->str)-1;
 		else $this->pos += $n;
 	}
 
-	public function next() {
-		$this->pos++;
-		return $this->pos > strlen($this->str) ? false : $this->str[$this->pos];
+	/*public function next() {
+	//	$this->pos++;
+	//	return $this->pos > strlen($this->str) ? false : $this->str[$this->pos];
+	}*/
+
+	public function read($offset = 0) {
+		return $this->str[$this->pos + $offset];
 	}
 
 	public function identifyChar($offset = 0) {
-		if (!isset($this->str[$this->pos + $offset])) return false;
-
 		$chr = $this->str[$this->pos + $offset];
-		if (isset($this->chars[$chr])) return $this->chars[$chr];
+		if (!empty($this->chars[$chr])) return $this->chars[$chr];
 		else return Tokenizer::NAME;
 	}
+
+	public function has($offset = 0) {
+		return isset($this->str[$this->pos + $offset]);
+	}
+
+	private function identifyChar2($chr) {
+		if (isset($this->chars[$chr])) return $this->chars[$chr];
+		else return self::NAME;
+	}
+
 
 	public function count() {
 		return strlen($this->str);
@@ -63,6 +76,18 @@ class TokenizedString {
 	public function pos($str) {
 		$pos = strpos($this->str,  $str, $this->pos);
 		return $pos ? $pos-$this->pos : false;
+	}
+
+	public function newLine() {
+		return $this->lineNo++;
+	}
+
+	public function lineNo() {
+		return $this->lineNo;
+	}
+
+	public function undigested() {
+		return substr($this->str, $this->pos);
 	}
 
 }

@@ -34,6 +34,7 @@ class Tokenizer {
 	const DIVIDE = 'DIVIDE';
 
 	private $lineNo = 1;
+	private $c = 0;
 
 	private $chars = [
 		'"' => self::STRING,
@@ -69,85 +70,30 @@ class Tokenizer {
 
 	public function getTokens() {
 		$tokens = new Tokens;
+		$comments = new Tokenizer\Comments;
+		$basics = new  Tokenizer\BasicChars;
+		$literals = new  Tokenizer\Literals;
 
 		$str2 = new Tokenizer\TokenizedString($this->str);
 
 		for ($i = 0; $i < strlen($this->str); $i++) {
 			$char = $this->identifyChar($this->str[$i]);
-			
-			$str2->pos = $i;
-			$i += $this->doSingleLineComments($tokens, $char, $i, $str2);
-			$i = $str2->pos;
-			$char = $this->identifyChar($this->str[$i]);
 
-			$this->doNewLine($tokens, $char);
-			$this->doWhitespace($tokens, $char);
-			$this->doSimpleTokens($tokens, $char);
-			$this->doLiterals($tokens, $char, $i);
+			$str2->pos = $i;
+			
+			$comments->tokenize($str2, $tokens);			
+			$basics->tokenize($str2, $tokens);
+			$literals->tokenize($str2, $tokens, $i, $this->str);
+			$i = $str2->pos;
+
+			$this->lineNo = $str2->lineNo;
+
 			$i += $this->doStrings($tokens, $char, $i);
 			$i += $this->doBrackets($tokens, $char, $i);
 
 		}
+
 		return $tokens;
-	}
-
-	private function doSingleLineComments($tokens, $char, $i, $str) {
-		$comments = new \Transphporm\Parser\Tokenizer\Comments;
-		$x = $comments->tokenize($str, $tokens, $char, $i);
-
-		//var_dump($x);
-		return $x;
-
-	}
-
-	private function doWhitespace($tokens, $char) {
-		//Combine whitespace, this increases performance across the board: Anywhere tokens are iterated over, whitespace is only looped once 8 spaces of indentation = 1 iteration
-		if ($char === Tokenizer::WHITESPACE) {
-			$last = $tokens->end();
-			if ($last['type'] !== Tokenizer::WHITESPACE) {
-				$tokens->add(['type' => $char]);
-			}
-		}
-	}
-
-	private function doSimpleTokens($tokens, $char) {
-		if (in_array($char, [Tokenizer::ARG, Tokenizer::CONCAT, Tokenizer::DOT, Tokenizer::NOT, Tokenizer::EQUALS,
-			Tokenizer::COLON, Tokenizer::SEMI_COLON, Tokenizer::NUM_SIGN,
-			Tokenizer::GREATER_THAN, Tokenizer::AT_SIGN, Tokenizer::SUBTRACT, Tokenizer::MULTIPLY, Tokenizer::DIVIDE])) {
-			$tokens->add(['type' => $char, 'line' => $this->lineNo]);
-		}
-	}
-
-	private function doNewLine($tokens, $char) {
-		if ($char == Tokenizer::NEW_LINE) {
-			$this->lineNo++;
-			$tokens->add(['type' => Tokenizer::WHITESPACE, 'line' => $this->lineNo]);
-		}
-	}
-
-	private function isLiteral($n) {
-		//Is it a normal literal character
-		return isset($this->str[$n]) && ($this->identifyChar($this->str[$n]) == self::NAME
-		//but a subtract can be part of a class name or a mathematical operation
-				|| ($this->identifyChar($this->str[$n]) == self::SUBTRACT && !is_numeric($this->str[$n-1])));
-	}
-
-	private function doLiterals($tokens, $char, &$i) {
-		if ($char === self::NAME) {
-			$name = $this->str[$i];
-			while ($this->isLiteral($i+1)) {
-				$name .= $this->str[$i+1];
-				$i++;
-			}
-			$this->processLiterals($tokens, $name);
-		}
-	}
-
-	private function processLiterals($tokens, $name) {
-		if (is_numeric($name)) $tokens->add(['type' => self::NUMERIC, 'value' => $name]);
-		else if ($name == 'true') $tokens->add(['type' => self::BOOL, 'value' => true]);
-		else if ($name == 'false') $tokens->add(['type' => self::BOOL, 'value' => false]);
-		else $tokens->add(['type' => self::NAME, 'value' => $name, 'line' => $this->lineNo]);
 	}
 
 	private function doBrackets($tokens, $char, $i) {

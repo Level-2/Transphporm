@@ -20,7 +20,7 @@ class CssToXpath {
 
 		$this->translators = [
 			Tokenizer::WHITESPACE => function($string) use ($prefix) { return '//' . $prefix . $string;	},
-            Tokenizer::MULTIPLY => function () { return '*'; },
+			Tokenizer::MULTIPLY => function () { return '*'; },
 			'' => function($string) use ($prefix) { return '/' . $prefix . $string;	},
 			Tokenizer::GREATER_THAN => function($string) use ($prefix) { return '/' . $prefix  . $string; },
 			Tokenizer::NUM_SIGN => function($string) { return '[@id=\'' . $string . '\']'; },
@@ -43,15 +43,14 @@ class CssToXpath {
 		$functionSet = self::$instances[$hash]->functionSet;
 		$functionSet->setElement($element[0]);
 
-		$attributes = array();
-        foreach($element[0]->attributes as $attribute_name => $attribute_node) {
-            $attributes[$attribute_name] = $attribute_node->nodeValue;
-        }
+		$attributes = [];
+		foreach($element[0]->attributes as $name => $node) {
+			$attributes[$name] = $node->nodeValue;
+		}
 
-        $parser = new \Transphporm\Parser\Value($functionSet, true);
+		$parser = new \Transphporm\Parser\Value($functionSet, true);
 		$return = $parser->parseTokens($attr, $attributes);
-
-		return $return[0] === '' ? false : $return[0];
+		return $return[0] === '' ? false : $return[0];		
 	}
 
 	public function cleanup() {

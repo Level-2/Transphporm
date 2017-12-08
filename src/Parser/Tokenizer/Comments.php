@@ -5,7 +5,8 @@ use \Transphporm\Parser\Tokens;
 
 class Comments implements \Transphporm\Parser\Tokenize {
 	public function tokenize(TokenizedString $str, Tokens $tokens) {
-		return $this->singleLineComments($str) + $this->multiLinecomments($str);
+		$this->singleLineComments($str);
+		$this->multiLinecomments($str);
 	}
 
 	private function singleLineComments($str) {
