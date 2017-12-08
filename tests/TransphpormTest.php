@@ -1640,6 +1640,24 @@ ul li span {
 
 	}
 
+
+	// #165
+	public function testNotWellFormedPartialBefore() {
+		$xml = '<body><span>end</span></body>';
+
+		$includeFile = __DIR__ . DIRECTORY_SEPARATOR . 'not-well-formed.xml';
+		$includeFile = str_replace(getcwd(), '/', $includeFile);
+
+		$tss = 'body:before { content: template("' . $includeFile . '"); }';
+
+		$template = new \Transphporm\Builder($xml, $tss);
+
+		$this->assertEquals($this->stripTabs('<body><header>foo</header>
+			<nav>bar</nav><footer>baz</footer><span>end</span></body>'),
+			$this->stripTabs($template->output()->body));
+
+	}
+
 }
 
 
