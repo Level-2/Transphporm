@@ -1,9 +1,9 @@
 <?php
 /* @description     Transformation Style Sheets - Revolutionising PHP templating    *
  * @author          Tom Butler tom@r.je                                             *
- * @copyright       2015 Tom Butler <tom@r.je> | https://r.je/                      *
+ * @copyright       2017 Tom Butler <tom@r.je> | https://r.je/                      *
  * @license         http://www.opensource.org/licenses/bsd-license.php  BSD License *
- * @version         1.0                                                             */
+ * @version         1.2                                                             */
 namespace Transphporm\Parser;
 /** Parses a .tss file into individual rules, each rule has a query e,g, `ul li` and a set of rules e.g. `display: none; bind: iteration(id);` */
 class Sheet {
@@ -47,11 +47,13 @@ class Sheet {
 			}
 			else if ($token['type'] !== Tokenizer::NEW_LINE) $this->addRules($token, $indexStart);
 		}
+
 		return $this->rules;
 	}
 
 	private function addRules($token, $indexStart) {
 		$selector = $this->tss->from($token['type'], true)->to(Tokenizer::OPEN_BRACE);
+
 		$this->tss->skip(count($selector));
 		if (count($selector) === 0) return;
 

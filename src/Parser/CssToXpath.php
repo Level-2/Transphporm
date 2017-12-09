@@ -1,9 +1,9 @@
 <?php
 /* @description     Transformation Style Sheets - Revolutionising PHP templating    *
  * @author          Tom Butler tom@r.je                                             *
- * @copyright       2015 Tom Butler <tom@r.je> | https://r.je/                      *
+ * @copyright       2017 Tom Butler <tom@r.je> | https://r.je/                      *
  * @license         http://www.opensource.org/licenses/bsd-license.php  BSD License *
- * @version         1.0                                                             */
+ * @version         1.2                                                             */
 namespace Transphporm\Parser;
 class CssToXpath {
 	private $specialChars = [Tokenizer::WHITESPACE, Tokenizer::DOT, Tokenizer::GREATER_THAN,
@@ -20,7 +20,7 @@ class CssToXpath {
 
 		$this->translators = [
 			Tokenizer::WHITESPACE => function($string) use ($prefix) { return '//' . $prefix . $string;	},
-            Tokenizer::MULTIPLY => function () { return '*'; },
+			Tokenizer::MULTIPLY => function () { return '*'; },
 			'' => function($string) use ($prefix) { return '/' . $prefix . $string;	},
 			Tokenizer::GREATER_THAN => function($string) use ($prefix) { return '/' . $prefix  . $string; },
 			Tokenizer::NUM_SIGN => function($string) { return '[@id=\'' . $string . '\']'; },
@@ -43,15 +43,14 @@ class CssToXpath {
 		$functionSet = self::$instances[$hash]->functionSet;
 		$functionSet->setElement($element[0]);
 
-		$attributes = array();
-        foreach($element[0]->attributes as $attribute_name => $attribute_node) {
-            $attributes[$attribute_name] = $attribute_node->nodeValue;
-        }
+		$attributes = [];
+		foreach($element[0]->attributes as $name => $node) {
+			$attributes[$name] = $node->nodeValue;
+		}
 
-        $parser = new \Transphporm\Parser\Value($functionSet, true);
+		$parser = new \Transphporm\Parser\Value($functionSet, true);
 		$return = $parser->parseTokens($attr, $attributes);
-
-		return $return[0] === '' ? false : $return[0];
+		return $return[0] === '' ? false : $return[0];		
 	}
 
 	public function cleanup() {
@@ -89,12 +88,17 @@ class CssToXpath {
 	}
 
 	private function removeSpacesFromDirectDecend($css) {
-		$tokens = [];
-		foreach ($css->splitOnToken(Tokenizer::GREATER_THAN) as $token) {
-			foreach ($token->trim() as $t) $tokens[]  = $t;
-			$tokens[] = ['type' => Tokenizer::GREATER_THAN];
+		$tokens = new Tokens;
+		$split = $css->splitOnToken(Tokenizer::GREATER_THAN);
+
+		if (count($split) <= 1) return $css;
+
+		for ($i = 0; $i < count($split); $i++) {
+			$tokens->add($split[$i]->trim());
+			if (isset($split[$i+1])) $tokens->add(['type' => Tokenizer::GREATER_THAN]);
 		}
-		return new Tokens(array_slice($tokens, 0, -1));
+		
+		return $tokens;
 	}
 
 
