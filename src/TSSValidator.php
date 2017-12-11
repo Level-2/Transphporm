@@ -19,10 +19,6 @@ class TSSValidator {
         return true;
     }
 
-    public function getLastError() {
-        return $this->error;
-    }
-
     private function validateRule($token) {
         if ($token['type'] !== Tokenizer::OPEN_BRACE) return true;
 

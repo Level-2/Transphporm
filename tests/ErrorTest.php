@@ -44,4 +44,13 @@ class ErrorTest extends PHPUnit_Framework_TestCase {
 		$template->output();
 	}
 
+
+	public function testFileNotFound() {
+		$this->expectException('\\Exception');
+		$this->expectExceptionMessage('No TSS rules parsed');
+
+		$template = new \Transphporm\Builder('no-file.tss', 'no-file.xml');
+
+		$template->output();
+	}
 }
