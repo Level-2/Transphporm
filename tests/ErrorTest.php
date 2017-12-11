@@ -44,15 +44,4 @@ class ErrorTest extends PHPUnit_Framework_TestCase {
 		$template->output();
 	}
 
-/*
-    public function testParseErrorFromFile() {
-        $this->expectException('Transphporm\\Exception');
-		$this->expectExceptionMessage('TSS Error: Problem carrying out function 'data' on Line 3 of ' . __DIR__ . DIRECTORY_SEPARATOR . 'parseErrorTss.tss');
-
-        $xml = '<div></div>';
-		$tss =  __DIR__ . DIRECTORY_SEPARATOR . 'parseErrorTss.tss';
-		$template = new \Transphporm\Builder($xml, $tss);
-		$template->output();
-    }
-    */
 }
