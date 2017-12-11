@@ -33,7 +33,6 @@ class FunctionSet {
 			return iterator_to_array($args[0]);
 		}
 
-		return $args[0];
 	}
 
 	public function addFunction($name, \Transphporm\TSSFunction $function) {
