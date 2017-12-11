@@ -53,4 +53,12 @@ class ErrorTest extends PHPUnit_Framework_TestCase {
 
 		$template->output();
 	}
+
+	public function testIncludeFileNotFound() {
+		$this->expectException('\\Exception');
+		$xml = '<div></div>';
+		$tss = 'div {content: template("not-found.xml"); }';
+		$template = new \Transphporm\Builder($xml, $tss);
+		$template->output();
+	}
 }

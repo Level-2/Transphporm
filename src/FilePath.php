@@ -27,5 +27,7 @@ class FilePath {
 		foreach ($this->paths as $path) {
 			if (is_file($path . DIRECTORY_SEPARATOR . $filePath)) return $path . DIRECTORY_SEPARATOR . $filePath;
 		}
+
+		throw new \Exception('File ' . $filePath . ' not found in paths (' . implode(', ', $this->paths) . ')');
 	}
 }
