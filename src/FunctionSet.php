@@ -16,14 +16,10 @@ class FunctionSet {
 	}
 
 	public function __call($name, $args) {
-		try {
-			if (isset($this->functions[$name])) {
-				return $this->functions[$name]->run($this->getArgs0($name, $args), $this->element);
-			}
+		if (isset($this->functions[$name])) {
+			return $this->functions[$name]->run($this->getArgs0($name, $args), $this->element);
 		}
-		catch (\Exception $e) {
-			throw new RunException(Exception::TSS_FUNCTION, $name, $e);
-		}
+		
 		return false;
 	}
 
