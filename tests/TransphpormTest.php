@@ -1358,6 +1358,30 @@ ul li span {
 		$this->assertEquals($this->stripTabs('<div>bar</div>'), $this->stripTabs($template->output($data)->body));
 	}
 
+	public function testJsonFile() {
+		$data = '{
+			"foo" : "bar"
+		}';
+
+		$file = __DIR__ . '/data.json';
+
+		file_put_contents($file, $data);
+
+		$xml = "
+		<div></div>
+		";
+
+		$tss = '
+		div { content: json("' . $file. '").foo; }
+		';
+
+		$template = new \Transphporm\Builder($xml, $tss);
+
+		$this->assertEquals($this->stripTabs('<div>bar</div>'), $this->stripTabs($template->output($data)->body));
+
+		unlink($file);
+	}
+
 	public function testRoot() {
 		$xml = "
 		<div></div>
