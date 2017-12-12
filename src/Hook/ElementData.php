@@ -25,7 +25,7 @@ class ElementData {
 	/** Returns the data that has been bound to $element, or, if no data is bound to $element climb the DOM tree to find the data bound to a parent node*/
 	public function getData(\DomElement $element = null, $type = 'data') {
 		while ($element) {
-			if (isset($this->elementMap[$element]) && isset($this->elementMap[$element][$type])) return $this->elementMap[$element][$type];
+			if (isset($this->elementMap[$element]) && array_key_exists($type, $this->elementMap[$element])) return $this->elementMap[$element][$type];
 			$element = $element->parentNode;
 		}
 		return $this->data;
