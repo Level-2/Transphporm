@@ -111,9 +111,17 @@ class Sheet {
 
 	private function sortRules($a, $b) {
 		//If they have the same depth, compare on index
-		if ($a->depth === $b->depth) return $a->index < $b->index ? -1 : 1;
+		if ($a->query === $b->query) return $this->sortPseudo($a, $b);
 
-		return ($a->depth < $b->depth) ? -1 : 1;
+		if ($a->depth === $b->depth) $property = 'index';
+		else $property = 'depth'; 
+		
+		return ($a->$property < $b->$property) ? -1 : 1;
+	}
+
+
+	private function sortPseudo($a, $b) {
+		return count($a->pseudo) < count($b->pseudo)  ? -1  :1;
 	}
 
 	private function getProperties($tokens) {
