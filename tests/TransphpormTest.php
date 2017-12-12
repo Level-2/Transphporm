@@ -1687,6 +1687,41 @@ ul li span {
 		$this->assertEquals($this->stripTabs('<h1 class="foo AFTER">Example Title</h1>'),
 			$this->stripTabs($template->output($data)->body));
 	}
+
+	public function testImportHTMLIntoXML() {
+		$xml = '<html>
+			<head>
+
+			</head>
+			<body>
+				This will be loaded as XML
+			</body>
+		</html>';
+
+		$includeFile = __DIR__ . DIRECTORY_SEPARATOR . 'htmlcontent.xml';
+
+		$tss = 'head {content: template("' . $includeFile . '"); }';
+
+
+		$template = new \Transphporm\Builder($xml, $tss);
+
+		$this->assertEquals(
+			$this->stripTabs('<html>
+			<head>
+				<title>Head as&nbsp;HTML</title>
+				<script>
+					alert(1);
+				</script>
+			</head>
+			<body>
+				This will be loaded as XML
+			</body>
+		</html>')
+			,$this->stripTabs($template->output()->body));
+
+
+
+	}
 }
 
 

@@ -1,0 +1,4 @@
+<title>Head as&nbsp;HTML</title>
+<script>
+	alert(1);
+</script>
