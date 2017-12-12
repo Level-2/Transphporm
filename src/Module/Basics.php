@@ -13,16 +13,16 @@ class Basics implements \Transphporm\Module {
 		$data = $config->getFunctionSet();
 		$headers = &$config->getHeaders();
 
-        $content = new \Transphporm\Property\Content($config->getFormatter());
+		$content = new \Transphporm\Property\Content($config->getFormatter());
 		$config->registerProperty('content', $content);
 		$config->registerProperty('repeat', new \Transphporm\Property\Repeat($data, $config->getElementData(), $config->getLine(), $config->getFilePath()));
 		$config->registerProperty('display', new \Transphporm\Property\Display);
 		$config->registerProperty('bind', new \Transphporm\Property\Bind($config->getElementData()));
 
-        $content->addContentPseudo("attr", new \Transphporm\Property\ContentPseudo\Attr());
-        $content->addContentPseudo("before", new \Transphporm\Property\ContentPseudo\BeforeAfter("before", $content));
-        $content->addContentPseudo("after", new \Transphporm\Property\ContentPseudo\BeforeAfter("after", $content));
+		$config->registerContentPseudo('attr', new \Transphporm\Property\ContentPseudo\Attr());
+		$config->addContentPseudo('before', new \Transphporm\Property\ContentPseudo\BeforeAfter('before', $content));
+		$config->addContentPseudo("after", new \Transphporm\Property\ContentPseudo\BeforeAfter('after', $content));
 
-        $content->addContentPseudo("header", new \Transphporm\Property\ContentPseudo\Headers($headers));
+		$config->addContentPseudo('header', new \Transphporm\Property\ContentPseudo\Headers($headers));
 	}
 }
