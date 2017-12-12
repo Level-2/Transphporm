@@ -1817,6 +1817,32 @@ ul li span {
 		
 	}
 
+	public function testFillSelect() {
+		$xml = '<select><option></option></select>';
+
+		$tss = 'select option {repeat: data(options); }
+		select option { content: iteration(); }
+		select option:attr(value) { content: key(); }
+		';
+
+		$template = new Builder($xml, $tss);
+
+		$data = ['options' => [
+				'01' => 'January',
+				'02' => 'Februrary',
+				'03' => 'March'
+		]];
+
+		$output = $template->output($data)->body;
+
+		$this->assertEquals($this->stripTabs('<select><option value="01">January</option>
+<option value="02">Februrary</option>
+<option value="03">March</option></select>'), $this->stripTabs($output));	
+
+	}
+
+
+
 }
 
 

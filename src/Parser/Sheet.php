@@ -45,7 +45,7 @@ class Sheet {
 			if ($processing = $this->processingInstructions($token, count($this->rules)+$indexStart)) {
 				$this->rules = array_merge($this->rules, $processing);
 			}
-			else if ($token['type'] !== Tokenizer::NEW_LINE) $this->addRules($token, $indexStart);
+			else if ($token['type'] !== Tokenizer::NEW_LINE) $this->addRules($token, $indexStart++);
 		}
 
 		return $this->rules;
@@ -70,7 +70,7 @@ class Sheet {
 		$rules = [];
 		foreach ($parts as $part) {
 			$serialized = serialize($part->removeLine());
-			$rules[$serialized] = new \Transphporm\Rule($this->xPath->getXpath($part), $this->xPath->getPseudo($part), $this->xPath->getDepth($part), $index++, $this->file, $line);
+			$rules[$serialized] = new \Transphporm\Rule($this->xPath->getXpath($part), $this->xPath->getPseudo($part), $this->xPath->getDepth($part), $index, $this->file, $line);
 			$rules[$serialized]->properties = $properties;
 		}
 		return $rules;
