@@ -27,29 +27,29 @@ class Template {
 			$this->xpath->registerNamespace('nsprefix', $this->document->documentElement->namespaceURI);
 			$this->prefix = 'nsprefix:';
 		}
+
 	}
 
 	/** Loads a HTML or XML document */
 	private function loadDocument($doc) {
 		libxml_use_internal_errors(true);
-		if ($this->document->loadXml($doc) === false) {
-				//If HTML is loaded, make sure the document is also saved as HTML
-				$this->save = function($content = null) {
-					return $this->document->saveHtml($content);
-				};
-				$this->document->loadHtml('<' . '?xml encoding="UTF-8">' . $doc,  LIBXML_HTML_NODEFDTD | LIBXML_HTML_NOIMPLIED);
+		if (strpos(trim($doc), '<?xml') === false) {
+			//If HTML is loaded, make sure the document is also saved as HTML
+			$this->save = function($content = null) {
+				return $this->document->saveHtml($content);
+			};
+			$this->document->loadHtml('<' . '?xml encoding="UTF-8">' . $doc,  LIBXML_HTML_NODEFDTD | LIBXML_HTML_NOIMPLIED);
 
-				if (strpos($doc, '<!') !== 0) {
-					$templateNode = $this->document->getElementsByTagName('template')[0];
-					$this->document->replaceChild($templateNode, $this->document->documentElement);
-				}
-				return;
+		}
+		else {
+			$this->document->loadXml($doc);
+			//XML was loaded, save as XML.
+			$this->save = function($content = null) {
+				return $this->document->saveXml($content, LIBXML_NOEMPTYTAG);
+			};		
 		}
 
-		//XML was loaded, save as XML.
-		$this->save = function($content = null) {
-			return $this->document->saveXml($content, LIBXML_NOEMPTYTAG);
-		};		
+
 		libxml_clear_errors();
 	}
 

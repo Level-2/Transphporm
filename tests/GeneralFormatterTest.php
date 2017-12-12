@@ -132,7 +132,7 @@ class GeneralFormatterTest extends PHPUnit_Framework_TestCase {
 
 		$template = new \Transphporm\Builder($xml, $tss);
 
-		$this->assertEquals($this->stripTabs('<div><span></span><p></p></div>'), $template->output()->body);
+		$this->assertEquals($this->stripTabs('<div><span></span><p></p></div>'), $this->stripTabs($template->output()->body));
 	}
 
     public function testHTMLFormatWithNoWrapping() {
@@ -204,7 +204,7 @@ class GeneralFormatterTest extends PHPUnit_Framework_TestCase {
 
         $transphporm = new Builder($xml, $tss);
 
-        $this->assertEquals($this->stripTabs('<div>Test Line 1 <br /> Test Line 2</div>'), $this->stripTabs($transphporm->output()->body));
+        $this->assertEquals($this->stripTabs('<div>Test Line 1 <br> Test Line 2</div>'), $this->stripTabs($transphporm->output()->body));
     }
 
     public function testNl2brBasicFromData() {
@@ -220,6 +220,6 @@ class GeneralFormatterTest extends PHPUnit_Framework_TestCase {
 
         $transphporm = new Builder($xml, $tss);
 
-        $this->assertEquals($this->stripTabs('<div>Test Line 1 <br /> Test Line 2</div>'), $this->stripTabs($transphporm->output($data)->body));
+        $this->assertEquals($this->stripTabs('<div>Test Line 1 <br> Test Line 2</div>'), $this->stripTabs($transphporm->output($data)->body));
     }
 }
