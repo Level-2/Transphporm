@@ -4,7 +4,7 @@
  * @copyright       2017 Tom Butler <tom@r.je> | https://r.je/                      *
  * @license         http://www.opensource.org/licenses/bsd-license.php  BSD License *
  * @version         1.2                                                             */
- namespace Transphporm\Property;
+namespace Transphporm\Property;
 
 interface ContentPseudo {
     public function run($value, $pseudoArgs, $element, \Transphporm\Hook\PseudoMatcher $pseudoMatcher);
