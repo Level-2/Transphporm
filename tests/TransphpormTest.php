@@ -1763,8 +1763,19 @@ ul li span {
 		$template2->setLocale('enUS');
 
 		$this->assertEquals('<div>' . date('m/d/Y') . '</div>', $template1->output()->body);
+	}
+
+	public function testDebugOutput() {
+		$xml = '<div></div>';
+
+		$tss = 'div {content: data(foo); format: debug; }';
+
+		$template = new \Transphporm\Builder($xml, $tss);
 
 
+		$output = $template->output(['foo' => 'bar'])->body;
+
+		$this->assertRegexp('/string\(3\) \"bar\"/', $output);
 	}
 }
 
