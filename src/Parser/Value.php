@@ -60,7 +60,7 @@ class Value {
 
 		if (count($tokens) <= 0) return [$data];
 
-		foreach (new TokenFilterIterator($tokens, [Tokenizer::WHITESPACE, Tokenizer::NEW_LINE]) as $token) {
+		foreach (new TokenFilterIterator($tokens, [Tokenizer::WHITESPACE, Tokenizer::NEW_LINE]) as $name => $token) {
 			$this->{$this->tokenFuncs[$token['type']]}($token);
 		}
 

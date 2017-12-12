@@ -30,6 +30,7 @@ class TokenizedString {
 		';' => Tokenizer::SEMI_COLON,
 		'#' => Tokenizer::NUM_SIGN,
 		'>' => Tokenizer::GREATER_THAN,
+		'<' => Tokenizer::LOWER_THAN,
 		'@' => Tokenizer::AT_SIGN,
 		'-' => Tokenizer::SUBTRACT,
 		'*' => Tokenizer::MULTIPLY,

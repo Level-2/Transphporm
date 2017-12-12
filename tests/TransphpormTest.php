@@ -1721,7 +1721,7 @@ ul li span {
 		$this->assertEquals($this->stripTabs('<h1 class="BEFORE foo">Example Title</h1>'),
 			$this->stripTabs($template->output($data)->body));
 	}
-	
+
 	public function testImportHTMLIntoXML() {
 		$xml = '<html>
 			<head>
@@ -1784,6 +1784,39 @@ ul li span {
 
 		$this->assertRegexp('/string\(3\) \"bar\"/', $output);
 	}
+
+	public function testGreater() {
+		$xml = '<div><span class="one"></span><span class="two"></span></div>';
+
+
+		//Should not set content on .one but shoud set content on .two
+		$tss = '
+			span.one[2>4] {content: "true"; }
+			span.two[4>2] {content: "true"; }
+		';
+
+		$template = new Builder($xml, $tss);
+
+		$this->assertEquals('<div><span class="one"></span><span class="two">true</span></div>', $this->stripTabs($template->output()->body));
+		
+	}
+
+	public function testLess() {
+		$xml = '<div><span class="one"></span><span class="two"></span></div>';
+
+
+		//Should not set content on .two but shoud set content on .one
+		$tss = '
+			span.one[2<4] {content: "true"; }
+			span.two[4<2] {content: "true"; }
+		';
+
+		$template = new Builder($xml, $tss);
+
+		$this->assertEquals('<div><span class="one">true</span><span class="two"></span></div>', $this->stripTabs($template->output()->body));
+		
+	}
+
 }
 
 
