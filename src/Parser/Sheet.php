@@ -36,6 +36,7 @@ class Sheet {
 		$rules = $this->parseTokens($indexStart);
 		usort($rules, [$this, 'sortRules']);
 		$this->checkError($rules);
+		//var_dump($rules);
 		return $this->cache->write($this->file, $rules, $this->import);
 	}
 
@@ -81,6 +82,7 @@ class Sheet {
 
 			if (isset($rules[$selector])) {
 				$newRule->properties = array_merge($rules[$selector]->properties, $newRule->properties);
+				$newRule->index = $rules[$selector]->index;
 			}
 			$rules[$selector] = $newRule;
 		}
