@@ -1746,6 +1746,26 @@ ul li span {
 
 
 	}
+
+
+	public function testSetLocale() {
+		$xml = '<div></div>';
+
+		$tss = 'div {content: "now"; format: date}';
+
+		$template1 = new \Transphporm\Builder($xml, $tss);
+
+
+		$this->assertEquals('<div>' . date('d/m/Y') . '</div>', $template1->output()->body);
+
+
+		$template2 = new \Transphporm\Builder($xml, $tss);
+		$template2->setLocale('enUS');
+
+		$this->assertEquals('<div>' . date('m/d/Y') . '</div>', $template1->output()->body);
+
+
+	}
 }
 
 
