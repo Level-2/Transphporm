@@ -93,7 +93,7 @@ class TransphpormTest extends PHPUnit_Framework_TestCase {
 
 		$template = new \Transphporm\Builder($template, $css);
 
-		$this->assertEquals('<ul><li>One</li><li>Two</li><li>Three</li></ul>' ,$template->output($data)->body);
+		$this->assertEquals('<ul><li>One</li><li>Two</li><li>Three</li></ul>' ,$this->stripTabs($template->output($data)->body));
 	}
 
 
@@ -112,7 +112,7 @@ class TransphpormTest extends PHPUnit_Framework_TestCase {
 
 		$template = new \Transphporm\Builder($template, $css);
 
-		$this->assertEquals('<ul><li>One</li><li>Two</li></ul>' ,$template->output($data)->body);
+		$this->assertEquals('<ul><li>One</li><li>Two</li></ul>' , $this->stripTabs($template->output($data)->body));
 	}
 
 
@@ -165,7 +165,7 @@ class TransphpormTest extends PHPUnit_Framework_TestCase {
 
 		$template = new \Transphporm\Builder($template, $css);
 
-		$this->assertEquals('<ul><li>One</li><li>Two</li><li>Three</li></ul>' ,$template->output($data)->body);
+		$this->assertEquals('<ul><li>One</li><li>Two</li><li>Three</li></ul>' , $this->stripTabs($template->output($data)->body));
 	}
 
 	private function stripTabs($str) {
@@ -277,7 +277,7 @@ class TransphpormTest extends PHPUnit_Framework_TestCase {
 
 		$template = new \Transphporm\Builder($template, $css);
 
-		$this->assertEquals('<ul><li>0</li><li>1</li><li>2</li></ul>', $template->output()->body);
+		$this->assertEquals('<ul><li>0</li><li>1</li><li>2</li></ul>', $this->stripTabs($template->output()->body));
 	}
 
 
@@ -320,7 +320,7 @@ class TransphpormTest extends PHPUnit_Framework_TestCase {
 
 		$template = new \Transphporm\Builder($template, $tss);
 
-		$this->assertEquals('<h1>Test 1</h1><h1 class="test">REPLACED</h1><h1>Test 2</h1>', $template->output()->body);
+		$this->assertEquals('<h1>Test 1</h1><h1 class="test">REPLACED</h1><h1>Test 2</h1>', $this->striptabs($template->output()->body));
 	}
 
 	public function testMatchClassChild() {
@@ -453,7 +453,7 @@ class TransphpormTest extends PHPUnit_Framework_TestCase {
 
 		$template = new \Transphporm\Builder($template, $tss);
 
-		$this->assertEquals('<input name="foo" value="bar" />', $template->output(['foo' => 'bar'])->body);
+		$this->assertEquals('<input name="foo" value="bar">', $template->output(['foo' => 'bar'])->body);
 	}
 
 	public function testReadDataFromAttributeArray() {
@@ -465,7 +465,7 @@ class TransphpormTest extends PHPUnit_Framework_TestCase {
 
 		$template = new \Transphporm\Builder($template, $tss);
 
-		$this->assertEquals('<input name="foo[bar]" value="baz" />', $template->output(['foo' => ['bar' => 'baz']])->body);
+		$this->assertEquals('<input name="foo[bar]" value="baz">', $template->output(['foo' => ['bar' => 'baz']])->body);
 	}
 
 
@@ -618,8 +618,8 @@ div { content: "bar"; }
 		$template = new \Transphporm\Builder($template, $tss);
 
 		$this->assertEquals($this->stripTabs('<form>
-			<input type="text" name="one" value="VALUE-OF-ONE" />
-			<input type="text" name="two" value="VALUE-OF-TWO" />
+			<input type="text" name="one" value="VALUE-OF-ONE">
+			<input type="text" name="two" value="VALUE-OF-TWO">
 		</form>'), $this->stripTabs($template->output($data)->body));
 	}
 
@@ -645,8 +645,8 @@ div { content: "bar"; }
 		$template = new \Transphporm\Builder($template, $tss);
 
 		$this->assertEquals($this->stripTabs('<form>
-			<input type="text" name="one" value="VALUE-OF-ONE" />
-			<input type="text" name="two" value="VALUE-OF-TWO" />
+			<input type="text" name="one" value="VALUE-OF-ONE">
+			<input type="text" name="two" value="VALUE-OF-TWO">
 		</form>'), $this->stripTabs($template->output($data)->body));
 
 	}
@@ -745,7 +745,7 @@ div { content: "bar"; }
 	}
 
 	public function testHTTPHeader() {
-		$template = '
+		$template = '<!doctype html>
 			<html><div>Test</div></html>
 		';
 
@@ -787,7 +787,7 @@ div { content: "bar"; }
 
 		$template = new \Transphporm\Builder($xml, $tss);
 
-		$this->assertEquals($this->stripTabs('<form><input type="text" name="f1" value="v1" /><input type="text" name="f2" value="v2" /></form>'), $this->stripTabs($template->output($data)->body));
+		$this->assertEquals($this->stripTabs('<form><input type="text" name="f1" value="v1"><input type="text" name="f2" value="v2"></form>'), $this->stripTabs($template->output($data)->body));
 
 	}
 
@@ -807,7 +807,7 @@ div { content: "bar"; }
 
 		$template = new \Transphporm\Builder($xml, $tss);
 
-		$this->assertEquals($this->stripTabs('<form><input type="text" name="f1" value="v1" /><input type="text" name="f2" value="v2" /></form>'), $this->stripTabs($template->output($data)->body));
+		$this->assertEquals($this->stripTabs('<form><input type="text" name="f1" value="v1"><input type="text" name="f2" value="v2"></form>'), $this->stripTabs($template->output($data)->body));
 
 	}
 
@@ -994,7 +994,7 @@ select option[value=data()]:attr(selected) { content: "selected"; }
 
 		$this->assertEquals($this->stripTabs($output), $this->stripTabs('<select name="foo">
 		<option value="test">Test</option>
-		<option value="test2" selected="selected">Test 2</option>
+		<option value="test2" selected>Test 2</option>
 
 		</select>'));
 	}
@@ -1706,7 +1706,7 @@ ul li span {
 		$template = new \Transphporm\Builder($xml, $tss);
 
 		$this->assertEquals(
-			$this->stripTabs('<html>
+			$this->stripTabs(html_entity_decode('<html>
 			<head>
 				<title>Head as&nbsp;HTML</title>
 				<script>
@@ -1716,7 +1716,7 @@ ul li span {
 			<body>
 				This will be loaded as XML
 			</body>
-		</html>')
+		</html>'))
 			,$this->stripTabs($template->output()->body));
 
 
