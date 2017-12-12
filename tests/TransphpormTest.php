@@ -1712,6 +1712,16 @@ ul li span {
 			$this->stripTabs($template->output($data)->body));
 	}
 
+	public function testAttrBefore() {
+		$data = ['class' => 'BEFORE '];
+		$xml = '<h1 class="foo">Example Title</h1>';
+		$tss = 'h1:attr(class):before {content: data(class); }';
+		$template = new \Transphporm\Builder($xml, $tss);
+
+		$this->assertEquals($this->stripTabs('<h1 class="BEFORE foo">Example Title</h1>'),
+			$this->stripTabs($template->output($data)->body));
+	}
+	
 	public function testImportHTMLIntoXML() {
 		$xml = '<html>
 			<head>
@@ -1742,9 +1752,6 @@ ul li span {
 			</body>
 		</html>'))
 			,$this->stripTabs($template->output()->body));
-
-
-
 	}
 
 
