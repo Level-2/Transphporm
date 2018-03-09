@@ -34,6 +34,7 @@ class PseudoMatcher {
 	private function match($tokens, $function, $element) {
 		try {
 			$parts = $this->getFuncParts($tokens);
+
 			$matches = $function->match($parts['name'], $parts['args'], $element);
 			if ($matches === false) return false;
 		}

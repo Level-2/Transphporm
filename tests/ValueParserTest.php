@@ -362,6 +362,35 @@ class ValueParserTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals([0], $result);
     }
 
+    public function testInComparisonTrue() {
+
+    	$stub = $this->getMockBuilder('TestData')->setMethods(['data'])
+                     ->getMock();
+
+        $stub->expects($this->any())->method('data')->with($this->equalTo('array'))->will($this->returnValue(['one', 'two']));
+
+    	$value = new Value($stub);
+
+    	$result = $value->parse('"one" in data(array)');
+
+    	$this->assertEquals($result[0], true);
+    }
+
+
+       public function testInComparisonFalse() {
+
+    	$stub = $this->getMockBuilder('TestData')->setMethods(['data'])
+                     ->getMock();
+
+        $stub->expects($this->any())->method('data')->with($this->equalTo('array'))->will($this->returnValue(['one', 'two']));
+
+    	$value = new Value($stub);
+
+    	$result = $value->parse('"three" in data(array)');
+
+    	$this->assertEquals($result[0], false);
+    }
+
 }
 
 

@@ -533,4 +533,51 @@ class PseudoTest extends PHPUnit_Framework_TestCase {
 			<div class="three">foo</div>
 		'), $this->stripTabs($template->output()->body));
     }
+
+    public function testInOperator() {
+    	// Issue #185 https://github.com/Level-2/Transphporm/issues/185
+    	$xml = '<select name="teachers[]" id="teachers" multiple>
+					<option value="1">T1</option>
+				</select>';
+
+		$tss = '
+		select#teachers option {repeat: data(teachers); content: iteration(name)}
+		select#teachers option:attr(value) {content: iteration(id)}
+		select#teachers option:iteration[name in data(subject.teachers)]:attr(selected) { content: "selected"}
+		';
+
+		$data = json_decode('{
+			"subject": {
+				"id": 11,
+				"name": "Subject 5",
+				"year": 2,
+				"teachers": [ "Teacher 3", "Teacher 11"]
+			},
+			"teachers": [
+				{
+					"id": 1,
+					"name": "Teacher 1"
+				},
+				{
+					"id": 3,
+					"name": "Teacher 3"
+
+				},
+				{
+					"id": 11,
+					"name": "Teacher 11"
+				}
+			]
+		}');
+
+
+		$template = new \Transphporm\Builder($xml, $tss);
+		$this->assertEquals($this->stripTabs('
+			<select name="teachers[]" id="teachers" multiple>
+					<option value="1">Teacher 1</option>
+					<option value="3" selected>Teacher 3</option>
+					<option value="11" selected>Teacher 11</option>
+				</select>
+		'), $this->stripTabs($template->output($data)->body));
+    }
 }

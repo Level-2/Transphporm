@@ -21,7 +21,7 @@ class Literals implements \Transphporm\Parser\Tokenize {
 				$name .= $str->read($j+1);
 				$j++;
 			}
-			
+
 			$str->move($j);
 
 			$this->processLiterals($tokens, $name, $str);
@@ -40,6 +40,7 @@ class Literals implements \Transphporm\Parser\Tokenize {
 		if (is_numeric($name)) $tokens->add(['type' => Tokenizer::NUMERIC, 'value' => $name]);
 		else if ($name == 'true') $tokens->add(['type' => Tokenizer::BOOL, 'value' => true]);
 		else if ($name == 'false') $tokens->add(['type' => Tokenizer::BOOL, 'value' => false]);
+		else if ($name == 'in') $tokens->add(['type' => Tokenizer::IN, 'value' => 'in']);
 		else $tokens->add(['type' => Tokenizer::NAME, 'value' => $name, 'line' => $str->lineNo()]);
 	}
 }
