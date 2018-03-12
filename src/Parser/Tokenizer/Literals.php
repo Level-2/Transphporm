@@ -38,9 +38,19 @@ class Literals implements \Transphporm\Parser\Tokenize {
 
 	private function processLiterals($tokens, $name, $str) {
 		if (is_numeric($name)) $tokens->add(['type' => Tokenizer::NUMERIC, 'value' => $name]);
-		else if ($name == 'true') $tokens->add(['type' => Tokenizer::BOOL, 'value' => true]);
-		else if ($name == 'false') $tokens->add(['type' => Tokenizer::BOOL, 'value' => false]);
-		else if ($name == 'in') $tokens->add(['type' => Tokenizer::IN, 'value' => 'in']);
+		else if (method_exists($this, $name)) $this->$name($tokens);
 		else $tokens->add(['type' => Tokenizer::NAME, 'value' => $name, 'line' => $str->lineNo()]);
+	}
+
+	private function true($tokens) {
+		$tokens->add(['type' => Tokenizer::BOOL, 'value' => true]);
+	}
+
+	private function false($tokens) {
+		$tokens->add(['type' => Tokenizer::BOOL, 'value' => false]);
+	}
+
+	private function in($tokens) {
+		$tokens->add(['type' => Tokenizer::IN, 'value' => 'in']);
 	}
 }
