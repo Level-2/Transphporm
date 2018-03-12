@@ -18,7 +18,7 @@ class Value {
 	private $data;
 	private $result;
 	private $traversing = false;
-	private $allowNullResult;
+	private $allowNullResult = false;
 
 	private $tokenFuncs = [
 			Tokenizer::NOT => 'processComparator',
@@ -37,7 +37,7 @@ class Value {
 			Tokenizer::OPEN_BRACKET => 'processBrackets',
 			Tokenizer::GREATER_THAN => 'processComparator',
 			Tokenizer::LOWER_THAN => 'processComparator',
-			Tokenizer::IN => 'processComparator',
+			Tokenizer::IN => 'processIn',
 		];
 
 	public function __construct($data, $autoLookup = false, $allowNullResult = false) {
@@ -47,7 +47,6 @@ class Value {
 	}
 
 	public function parse($str) {
-
 		$tokenizer = new Tokenizer($str);
 		$tokens = $tokenizer->getTokens();
 		$this->result = $this->parseTokens($tokens, $this->baseData);
@@ -77,6 +76,11 @@ class Value {
 			$this->result->setMode($token['type']);
 			$this->last->clear();
 		}
+	}
+
+	private function processIn($token) {
+		$this->allowNullResult = false;
+		$this->processComparator($token);
 	}
 
 	//Reads the last selected value from $data regardless if it's an array or object and overrides $this->data with the new value
@@ -113,7 +117,6 @@ class Value {
 	}
 
 	private function processSeparator($token) {
-		var_dump($token);
 		$this->result->setMode($token['type']);
 	}
 
@@ -145,7 +148,6 @@ class Value {
 	private function callTransphpormFunctions($token) {
 		$val = $this->baseData->{$this->last->read()}($token['value']);
 		$this->result->processValue($val);
-
 
 		if ($this->autoLookup) {
 			if (!is_array($val)) {
