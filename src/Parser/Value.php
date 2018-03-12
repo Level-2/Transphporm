@@ -37,7 +37,7 @@ class Value {
 			Tokenizer::OPEN_BRACKET => 'processBrackets',
 			Tokenizer::GREATER_THAN => 'processComparator',
 			Tokenizer::LOWER_THAN => 'processComparator',
-			Tokenizer::IN => 'processIn',
+			Tokenizer::IN => 'processComparator'
 		];
 
 	public function __construct($data, $autoLookup = false, $allowNullResult = false) {
@@ -70,17 +70,13 @@ class Value {
 	}
 
 	private function processComparator($token) {
+		$this->allowNullResult = false;
 		$this->last->process();
 
 		if (!(in_array($this->result->getMode(), array_keys($this->tokenFuncs, 'processComparator')) && $token['type'] == Tokenizer::EQUALS)) {
 			$this->result->setMode($token['type']);
 			$this->last->clear();
 		}
-	}
-
-	private function processIn($token) {
-		$this->allowNullResult = false;
-		$this->processComparator($token);
 	}
 
 	//Reads the last selected value from $data regardless if it's an array or object and overrides $this->data with the new value
