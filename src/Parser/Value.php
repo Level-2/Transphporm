@@ -18,7 +18,7 @@ class Value {
 	private $data;
 	private $result;
 	private $traversing = false;
-	private $allowNullResult;
+	private $allowNullResult = false;
 
 	private $tokenFuncs = [
 			Tokenizer::NOT => 'processComparator',
@@ -37,7 +37,8 @@ class Value {
 			Tokenizer::OPEN_BRACKET => 'processBrackets',
 			Tokenizer::GREATER_THAN => 'processComparator',
 			Tokenizer::LOWER_THAN => 'processComparator',
-	];
+			Tokenizer::IN => 'processIn',
+		];
 
 	public function __construct($data, $autoLookup = false, $allowNullResult = false) {
 		$this->baseData = $data;
@@ -75,6 +76,11 @@ class Value {
 			$this->result->setMode($token['type']);
 			$this->last->clear();
 		}
+	}
+
+	private function processIn($token) {
+		$this->allowNullResult = false;
+		$this->processComparator($token);
 	}
 
 	//Reads the last selected value from $data regardless if it's an array or object and overrides $this->data with the new value
@@ -144,12 +150,15 @@ class Value {
 		$this->result->processValue($val);
 
 		if ($this->autoLookup) {
-			$parser = new Value($this->data->getData());
-			$parsedArr = $parser->parse($val);
-			$parsedVal = isset($parsedArr[0]) ? $parsedArr[0] : null;
+			if (!is_array($val)) {
+				$parser = new Value($this->data->getData());
+				$parsedArr = $parser->parse($val);
+				$parsedVal = isset($parsedArr[0]) ? $parsedArr[0] : null;
+			}
+			else $parsedVal = $val;
 		}
 		else $parsedVal = null;
-        
+
         $this->result->postProcess($this->data, $val, $parsedVal, $this->allowNullResult);
 
 		$this->last->clear();
