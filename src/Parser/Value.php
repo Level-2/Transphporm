@@ -143,13 +143,13 @@ class Value {
 		$val = $this->baseData->{$this->last->read()}($token['value']);
 		$this->result->processValue($val);
 
-		if ($this->autoLookup) {
+    	if ($this->autoLookup) {// && is_string($val)
 			$parser = new Value($this->data->getData());
 			$parsedArr = $parser->parse($val);
 			$parsedVal = isset($parsedArr[0]) ? $parsedArr[0] : null;
 		}
 		else $parsedVal = null;
-        
+
         $this->result->postProcess($this->data, $val, $parsedVal, $this->allowNullResult);
 
 		$this->last->clear();

@@ -1082,6 +1082,32 @@ select option[value=data()]:attr(selected) { content: "selected"; }
 
 	}
 
+    public function testMultiRule2() {
+		$xml = '
+		<div class="one">
+
+		</div>
+		<div class="two">
+
+		</div>
+		<div class="three">
+		</div>
+		';
+
+		$tss = '.one,
+.three {content: "foo"; }';
+
+		$template = new \Transphporm\Builder($xml, $tss);
+
+		$this->assertEquals($this->stripTabs($template->output()->body), $this->stripTabs('
+			<div class="one">foo</div>
+			<div class="two"></div>
+			<div class="three">foo</div>
+		'));
+
+
+	}
+
 	public function testKeyChild() {
 		$xml = '<ul>
 			<li>

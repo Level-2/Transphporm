@@ -50,7 +50,7 @@ class CssToXpath {
 
 		$parser = new \Transphporm\Parser\Value($functionSet, true);
 		$return = $parser->parseTokens($attr, $attributes);
-		return $return[0] === '' ? false : $return[0];		
+		return $return[0] === '' ? false : $return[0];
 	}
 
 	public function cleanup() {
@@ -75,7 +75,7 @@ class CssToXpath {
 	}
 
 	public function getXpath($css) {
-		$css = $this->removeSpacesFromDirectDecend($css)->splitOnToken(Tokenizer::COLON)[0];
+		$css = $this->removeSpacesFromDirectDecend($css)->splitOnToken(Tokenizer::COLON)[0]->trim();
 		$selectors = $this->split($css);
 		$xpath = '/';
 		foreach ($selectors as $selector) {
@@ -97,7 +97,7 @@ class CssToXpath {
 			$tokens->add($split[$i]->trim());
 			if (isset($split[$i+1])) $tokens->add(['type' => Tokenizer::GREATER_THAN]);
 		}
-		
+
 		return $tokens;
 	}
 
