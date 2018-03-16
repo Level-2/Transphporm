@@ -317,6 +317,19 @@ class PseudoTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals($this->stripTabs($template->output(true)->body), $this->stripTabs('<div>test</div>'));
 	}
 
+    public function testAttrPseudoConditionalWithObj() {
+        $xml = '<div><span></span></div>';
+
+        $tss = 'span:data[obj1=data(obj2)] { display: none; }';
+
+        $obj1 = (object) ['test' => 1];
+        $obj2 = (object) ['test' => 2];
+
+        $template = new \Transphporm\Builder($xml, $tss);
+
+		$this->assertEquals($this->stripTabs($template->output(['obj1' => $obj1, 'obj2'=> $obj2])->body), $this->stripTabs('<div><span></span></div>'));
+    }
+
     /*
      * Nth-child Pseudo tests
      */
