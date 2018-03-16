@@ -28,7 +28,8 @@ class ValueResult {
 			Tokenizer::MULTIPLY => 'mult',
 			Tokenizer::DIVIDE => 'div',
 			Tokenizer::GREATER_THAN => 'greater',
-			Tokenizer::LOWER_THAN => 'lower'
+			Tokenizer::LOWER_THAN => 'lower',
+			Tokenizer::IN => 'in'
 		];
 
 		if ($funcs[$this->mode] === 'concat' && is_numeric($newValue)
@@ -36,6 +37,11 @@ class ValueResult {
 			$this->add($newValue);
 		else
 			$this->{$funcs[$this->mode]}($newValue);
+	}
+
+	public function in($value) {
+		if (!is_array($value)) throw new \Exception(' `in` can only be used with arrays');
+		$this->result[count($this->result)-1] = in_array($this->result[count($this->result)-1], $value);
 	}
 
 	public function arg($value) {

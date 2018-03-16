@@ -50,7 +50,7 @@ class CssToXpath {
 
 		$parser = new \Transphporm\Parser\Value($functionSet, true);
 		$return = $parser->parseTokens($attr, $attributes);
-		return $return[0] === '' ? false : $return[0];
+		return is_array($return[0]) || $return[0] === '' ? false : $return[0];
 	}
 
 	public function cleanup() {

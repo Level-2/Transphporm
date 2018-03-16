@@ -8,7 +8,7 @@ namespace Transphporm\Parser;
 class Tokenizer {
 	private $str;
 	private $tokenizeRules = [];
-	
+
 	const NAME = 'LITERAL';
 	const STRING = 'STRING';
 	const OPEN_BRACKET = 'OPEN_BRACKET';
@@ -26,6 +26,7 @@ class Tokenizer {
 	const OPEN_BRACE = 'OPEN_BRACE';
 	const CLOSE_BRACE = 'CLOSE_BRACE';
 	const BOOL = 'BOOL';
+	const IN = 'IN';
 	const COLON = 'COLON';
 	const SEMI_COLON = 'SEMI_COLON';
 	const NUM_SIGN = 'NUM_SIGN';

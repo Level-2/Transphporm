@@ -18,7 +18,7 @@ class Value {
 	private $data;
 	private $result;
 	private $traversing = false;
-	private $allowNullResult;
+	private $allowNullResult = false;
 
 	private $tokenFuncs = [
 			Tokenizer::NOT => 'processComparator',
@@ -37,7 +37,8 @@ class Value {
 			Tokenizer::OPEN_BRACKET => 'processBrackets',
 			Tokenizer::GREATER_THAN => 'processComparator',
 			Tokenizer::LOWER_THAN => 'processComparator',
-	];
+			Tokenizer::IN => 'processComparator'
+		];
 
 	public function __construct($data, $autoLookup = false, $allowNullResult = false) {
 		$this->baseData = $data;
@@ -69,6 +70,7 @@ class Value {
 	}
 
 	private function processComparator($token) {
+		$this->allowNullResult = false;
 		$this->last->process();
 
 		if (!(in_array($this->result->getMode(), array_keys($this->tokenFuncs, 'processComparator')) && $token['type'] == Tokenizer::EQUALS)) {
@@ -143,7 +145,7 @@ class Value {
 		$val = $this->baseData->{$this->last->read()}($token['value']);
 		$this->result->processValue($val);
 
-    	if ($this->autoLookup && is_string($val)) {
+		if ($this->autoLookup && is_string($val)) {
 			$parser = new Value($this->data->getData());
 			$parsedArr = $parser->parse($val);
 			$parsedVal = isset($parsedArr[0]) ? $parsedArr[0] : null;

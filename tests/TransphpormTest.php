@@ -1673,9 +1673,9 @@ ul li span {
 	public function testCommentBlock() {
 
 		$tss = 'div {content: "foo"}
-	
+
    /*.comment {foo: bar} */
-   
+
 	span {content: "bar"}
 	';
 
@@ -1795,7 +1795,7 @@ ul li span {
 		$template2 = new \Transphporm\Builder($xml, $tss);
 		$template2->setLocale('enUS');
 
-		$this->assertEquals('<div>' . date('m/d/Y') . '</div>', $template1->output()->body);
+		$this->assertEquals('<div>' . date('m/d/Y') . '</div>', $template2->output()->body);
 	}
 
 	public function testDebugOutput() {
@@ -1824,7 +1824,7 @@ ul li span {
 		$template = new Builder($xml, $tss);
 
 		$this->assertEquals('<div><span class="one"></span><span class="two">true</span></div>', $this->stripTabs($template->output()->body));
-		
+
 	}
 
 	public function testLess() {
@@ -1840,7 +1840,7 @@ ul li span {
 		$template = new Builder($xml, $tss);
 
 		$this->assertEquals('<div><span class="one">true</span><span class="two"></span></div>', $this->stripTabs($template->output()->body));
-		
+
 	}
 
 	public function testFillSelect() {
@@ -1863,7 +1863,7 @@ ul li span {
 
 		$this->assertEquals($this->stripTabs('<select><option value="01">January</option>
 <option value="02">Februrary</option>
-<option value="03">March</option></select>'), $this->stripTabs($output));	
+<option value="03">March</option></select>'), $this->stripTabs($output));
 
 	}
 
@@ -1872,10 +1872,10 @@ ul li span {
 	public function testFillSelectWithNull() {
 		$xml = '<select><option></option></select>';
 
-		$tss = 'select option {repeat: data(options); }		
+		$tss = 'select option {repeat: data(options); }
 		select option { content: iteration(); }
 		select option:attr(value) { content: key(); }
-		
+
 		';
 
 		$template = new Builder($xml, $tss);
@@ -1891,7 +1891,7 @@ ul li span {
 
 		$this->assertEquals($this->stripTabs('<select><option value="0"></option><option value="01">January</option>
 <option value="02">Februrary</option>
-<option value="03">March</option></select>'), $this->stripTabs($output));	
+<option value="03">March</option></select>'), $this->stripTabs($output));
 
 	}
 
@@ -1917,7 +1917,7 @@ ul li span {
 
 		$this->assertEquals($this->stripTabs('<select><option value="01">January</option>
 <option value="02">Februrary</option>
-<option value="03">March</option></select>'), $this->stripTabs($output));	
+<option value="03">March</option></select>'), $this->stripTabs($output));
 
 	}
 
@@ -1943,7 +1943,7 @@ ul li span {
 
 		$this->assertEquals($this->stripTabs('<select><option value="01">January</option>
 <option value="02">Februrary</option>
-<option value="03">March</option></select>'), $this->stripTabs($output));	
+<option value="03">March</option></select>'), $this->stripTabs($output));
 
 	}
 
