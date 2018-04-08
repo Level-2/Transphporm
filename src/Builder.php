@@ -39,7 +39,7 @@ class Builder {
 	public function loadModule(Module $module) {
 		$this->modules[get_class($module)] = $module;
 	}
-	
+
 	public function setLocale($locale) {
                 $format = new \Transphporm\Module\Format($locale);
                 $this->modules[get_class($format)] = $format;
@@ -98,7 +98,7 @@ class Builder {
 	//Load a template, firstly check if it's a file or a valid string
 	private function loadTemplate() {
         $result = ['body' => $this->template, 'headers' => []];
-		if (file_exists($this->template)) $result = $this->loadTemplateFromFile($this->template);
+		if (strpos($this->template, "\n") === false && is_file($this->template)) $result = $this->loadTemplateFromFile($this->template);
 		return $result;
 	}
 
@@ -123,7 +123,7 @@ class Builder {
 	}
 
 	public function __destruct() {
-		//Required hack as DomXPath can only register static functions clear, the statically stored instance to avoid memory leaks
+		//Required hack as DomXPath can only register static functions clear the statically stored instance to avoid memory leaks
 		if (isset($this->config)) $this->config->getCssToXpath()->cleanup();
 	}
 }
