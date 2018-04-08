@@ -1784,18 +1784,17 @@ ul li span {
 	public function testSetLocale() {
 		$xml = '<div></div>';
 
-		$tss = 'div {content: "now"; format: date}';
+		$tss = 'div {content: "2018-04-03"; format: date}';
 
 		$template1 = new \Transphporm\Builder($xml, $tss);
 
-
-		$this->assertEquals('<div>' . date('d/m/Y') . '</div>', $template1->output()->body);
+		$this->assertEquals('<div>03/04/2018</div>', $template1->output()->body);
 
 
 		$template2 = new \Transphporm\Builder($xml, $tss);
 		$template2->setLocale('enUS');
 
-		$this->assertEquals('<div>' . date('m/d/Y') . '</div>', $template2->output()->body);
+		$this->assertEquals('<div>04/03/2018</div>', $template2->output()->body);
 	}
 
 	public function testDebugOutput() {
