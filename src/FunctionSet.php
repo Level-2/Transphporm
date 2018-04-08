@@ -19,13 +19,14 @@ class FunctionSet {
 		if (isset($this->functions[$name])) {
 			return $this->functions[$name]->run($this->getArgs0($name, $args), $this->element);
 		}
-		
+
 		return false;
 	}
 
 	private function getArgs0($name, $args) {
 		if (isset($this->functions[$name]) && !($this->functions[$name] instanceof TSSFunction\Data)) {
 			$tokens = $args[0];
+			if ($tokens->count() == 0) return [];
 			$parser = new \Transphporm\Parser\Value($this);
 			return $parser->parseTokens($tokens, $this->elementData->getData($this->element));
 		}
