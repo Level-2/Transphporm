@@ -17,6 +17,6 @@
         "phpunit/phpunit": "^5.7.20"
     },
     "autoload": {
-    	"classmap": ["src/"]
+    	"psr-4": {"Transphporm\\": "src/"}
     }
 }
