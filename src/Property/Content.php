@@ -29,7 +29,7 @@ class Content implements \Transphporm\Property {
 
 	private function shouldRun($element) {
 		do {
-			if (in_array($element->getAttribute('transphporm'), ['includedtemplate', 'added']))  return false;
+			if ($element->getAttribute('transphporm') == 'includedtemplate') return false;
 		}
 		while (($element = $element->parentNode) instanceof \DomElement);
 		return true;
@@ -82,13 +82,14 @@ class Content implements \Transphporm\Property {
 
 
 	private function replaceContent($element, $content) {
+		if ($element->getAttribute('transphporm') == 'added') return;
 		//If this rule was cached, the elements that were added last time need to be removed prior to running the rule again.
-		if ($transphpormMode = $element->getAttribute('transphporm')) {
-			 $this->replaceCachedContent($element);
+		if ($element->getAttribute('transphporm')) {
+			$this->replaceCachedContent($element);
 		}
 
 		foreach ($this->getNode($content, $element->ownerDocument) as $node) {
-			$node->setAttribute('transphporm', 'added');
+			if (!$node->getAttribute('transphporm'))  $node->setAttribute('transphporm', 'added');
 			$element->parentNode->insertBefore($node, $element);
 		}
 
@@ -99,7 +100,7 @@ class Content implements \Transphporm\Property {
 	private function replaceCachedContent($element) {
 		$el = $element;
 		while ($el = $el->previousSibling) {
-			if ($el->nodeType == 1 && $el->getAttribute('transphporm') == 'added') {
+			if ($el->nodeType == 1 && $el->getAttribute('transphporm') != 'remove') {
 				$el->parentNode->removeChild($el);
 			}
 		}
@@ -110,7 +111,7 @@ class Content implements \Transphporm\Property {
 	// Remove extra whitespace created by removeChild to avoid the cache growing 1 byte every time it's reloaded
 	// This may need to be moved in future, anywhere elements are being removed and files are cached may need to apply this fix
 	private function fixPreserveWhitespacRemoveChild($element) {
-		if ($element->previousSibling instanceof \DomText && $element->previousSibling->isElementContentWhiteSpace()) {
+		if ($element->previousSibling instanceof \DomText && trim($element->previousSibling->isElementContentWhiteSpace())) {
 			$element->parentNode->removeChild($element->previousSibling);
 		}
 	}
