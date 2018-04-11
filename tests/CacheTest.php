@@ -245,6 +245,34 @@ class CacheTest extends PHPUnit_Framework_TestCase {
 	    $this->assertEquals($expectedOutput, $this->stripTabs($template->output(['hide' => 2])->body));
 	}
 
+
+	public function testContentModeReplaceCache() {
+		$xml = $this->makeXml('<div>
+			<h1>To be replaced</h1>
+		</div>');
+
+		$tss = $this->makeTss('
+			h1 {content: data(replacement); content-mode: replace;}
+		');
+
+
+		$cache = new \ArrayObject();
+		$template = new \Transphporm\Builder($xml, $tss);
+		$template->setCache($cache);
+
+		$output1 = $template->output(['replacement' => 'r1'])->body;
+		$this->assertEquals('<div>r1</div>', $this->stripTabs($output1));
+
+
+		$template = new \Transphporm\Builder($xml, $tss);
+		$template->setCache($cache);
+
+		$output2 = $template->output(['replacement' => 'r2'])->body;
+		$this->assertEquals('<div>r2</div>', $this->stripTabs($output2));
+
+
+	}
+
 }
 
 class RandomGenerator {
