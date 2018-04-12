@@ -38,7 +38,12 @@ class TSSCache {
     }
 
     public function write($file, $rules, $imports = []) {
-        if (is_file($file)) $this->cache->write($this->getCacheKey($file), ['rules' => $rules, 'import' => $imports]);
+        if (is_file($file)) {
+        	$key = $this->getCacheKey($file);
+        	$existing = $this->cache->load($key, filemtime($file));
+        	if (isset($existing['import']) && empty($imports)) $imports = $existing['import'];
+        	$this->cache->write($key, ['rules' => $rules, 'import' => $imports]);
+        }
         return $rules;
     }
 }

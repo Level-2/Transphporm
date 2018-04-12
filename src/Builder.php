@@ -10,6 +10,7 @@ class Builder {
 	private $template;
 	private $tss;
 	private $cache;
+	private $tssCache;
 	private $time;
 	private $modules = [];
 	private $config;
@@ -58,6 +59,7 @@ class Builder {
 		$cachedOutput = $this->loadTemplate();
 		//To be a valid XML document it must have a root element, automatically wrap it in <template> to ensure it does
 		$template = new Template($this->isValidDoc($cachedOutput['body']) ? str_ireplace('<!doctype', '<!DOCTYPE', $cachedOutput['body']) : '<template>' . $cachedOutput['body'] . '</template>' );
+		$this->tssCache = new TSSCache($this->cache, $template->getPrefix());
 		$valueParser = new Parser\Value($functionSet);
 		$this->config = new Config($functionSet, $valueParser, $elementData, new Hook\Formatter(), new Parser\CssToXpath($functionSet, $template->getPrefix(), md5($this->tss)), $this->filePath, $headers);
 
@@ -77,6 +79,8 @@ class Builder {
 		foreach ($rules as $rule) {
 			if ($rule->shouldRun($this->time)) $this->executeTssRule($rule, $template, $config);
 		}
+
+		if (is_file($this->tss)) $this->tssCache->write($this->tss, $rules);
 	}
 
 	//Add a postprocessing hook. This cleans up anything transphporm has added to the markup which needs to be removed
@@ -110,8 +114,7 @@ class Builder {
 	//Load the TSS rules either from a file or as a string
 	//N.b. only files can be cached
 	private function getRules($template, $config) {
-		$cache = new TSSCache($this->cache, $template->getPrefix());
-		return (new Parser\Sheet($this->tss, $config->getCssToXpath(), $config->getValueParser(), $cache, $config->getFilePath()))->parse();
+		return (new Parser\Sheet($this->tss, $config->getCssToXpath(), $config->getValueParser(), $this->tssCache, $config->getFilePath()))->parse();
 	}
 
 	public function setCache(\ArrayAccess $cache) {

@@ -114,8 +114,8 @@ class Sheet {
 		if ($a->query === $b->query) return $this->sortPseudo($a, $b);
 
 		if ($a->depth === $b->depth) $property = 'index';
-		else $property = 'depth'; 
-		
+		else $property = 'depth';
+
 		return ($a->$property < $b->$property) ? -1 : 1;
 	}
 
