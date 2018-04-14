@@ -7,37 +7,27 @@
 namespace Transphporm\Parser;
 /** Parses a .tss file into individual rules, each rule has a query e,g, `ul li` and a set of rules e.g. `display: none; bind: iteration(id);` */
 class Sheet {
-	private $cache;
 	private $tss;
-	private $rules;
-	private $file;
-	private $valueParser;
 	private $xPath;
-	private $filePath;
-	private $import = [];
+	private $valueParser;
+	private $sheetLoader;
+	private $file;
+	private $rules;
 
-	public function __construct($tss, CssToXpath $xPath, Value $valueParser, \Transphporm\TSSCache $cache, \Transphporm\FilePath $filePath) {
-		$this->cache = $cache;
+	public function __construct($tss, CssToXpath $xPath, Value $valueParser, \Transphporm\FilePath $filePath, \Transphporm\SheetLoader $sheetLoader, $file = null) {
 		$this->xPath = $xPath;
 		$this->valueParser = $valueParser;
 		$this->filePath = $filePath;
-		if (is_file($tss)) {
-			$this->file = $tss;
-			$this->rules = $this->cache->load($tss);
-			$this->filePath->addPath(dirname(realpath($tss)));
-			if (empty($this->rules)) $tss = file_get_contents($tss);
-			else return;
-		}
+		$this->sheetLoader = $sheetLoader;
+		$this->file = $file;
 		$this->tss = (new Tokenizer($tss))->getTokens();
 	}
 
 	public function parse($indexStart = 0) {
 		if (!empty($this->rules)) return $this->rules['rules'];
 		$rules = $this->parseTokens($indexStart);
-		usort($rules, [$this, 'sortRules']);
 		$this->checkError($rules);
-		//var_dump($rules);
-		return $this->cache->write($this->file, $rules, $this->import);
+		return $rules;
 	}
 
 	private function parseTokens($indexStart) {
@@ -57,7 +47,6 @@ class Sheet {
 
 		$this->tss->skip(count($selector));
 		if (count($selector) === 0) return;
-
 		$newRules = $this->cssToRules($selector, count($this->rules)+$indexStart, $this->getProperties($this->tss->current()['value']), $token['line']);
 		$this->rules = $this->writeRule($this->rules, $newRules);
 	}
@@ -79,7 +68,6 @@ class Sheet {
 
 	private function writeRule($rules, $newRules) {
 		foreach ($newRules as $selector => $newRule) {
-
 			if (isset($rules[$selector])) {
 				$newRule->properties = array_merge($rules[$selector]->properties, $newRule->properties);
 				$newRule->index = $rules[$selector]->index;
@@ -104,24 +92,8 @@ class Sheet {
 
 	private function import($args, $indexStart) {
 		$fileName = $this->filePath->getFilePath($args[0]);
-		$this->import[] = $fileName;
-		$sheet = new Sheet($fileName, $this->xPath, $this->valueParser, $this->cache, $this->filePath);
-		return $sheet->parse($indexStart);
-	}
-
-	private function sortRules($a, $b) {
-		//If they have the same depth, compare on index
-		if ($a->query === $b->query) return $this->sortPseudo($a, $b);
-
-		if ($a->depth === $b->depth) $property = 'index';
-		else $property = 'depth';
-
-		return ($a->$property < $b->$property) ? -1 : 1;
-	}
-
-
-	private function sortPseudo($a, $b) {
-		return count($a->pseudo) < count($b->pseudo)  ? -1  :1;
+		$this->sheetLoader->addImport($fileName);
+		return $this->sheetLoader->getRules($fileName, $this->xPath, $this->valueParser);
 	}
 
 	private function getProperties($tokens) {

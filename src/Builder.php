@@ -10,7 +10,6 @@ class Builder {
 	private $template;
 	private $tss;
 	private $cache;
-	private $tssCache;
 	private $time;
 	private $modules = [];
 	private $config;
@@ -59,13 +58,13 @@ class Builder {
 		$cachedOutput = $this->loadTemplate();
 		//To be a valid XML document it must have a root element, automatically wrap it in <template> to ensure it does
 		$template = new Template($this->isValidDoc($cachedOutput['body']) ? str_ireplace('<!doctype', '<!DOCTYPE', $cachedOutput['body']) : '<template>' . $cachedOutput['body'] . '</template>' );
-		$this->tssCache = new TSSCache($this->cache, $template->getPrefix());
+		$tssCache = new SheetLoader($this->cache,  $this->filePath, $this->tss, $template->getPrefix(), $this->time);
 		$valueParser = new Parser\Value($functionSet);
 		$this->config = new Config($functionSet, $valueParser, $elementData, new Hook\Formatter(), new Parser\CssToXpath($functionSet, $template->getPrefix(), md5($this->tss)), $this->filePath, $headers);
 
 		foreach ($this->modules as $module) $module->load($this->config);
 
-		$this->processRules($template, $this->config);
+		$tssCache->processRules($template, $this->config);
 
 		$result = ['body' => $template->output($document), 'headers' => array_merge($cachedOutput['headers'], $headers)];
 		$this->cache->write($this->template, $result);
@@ -73,15 +72,6 @@ class Builder {
 		return (object) $result;
 	}
 
-	private function processRules($template, $config) {
-		$rules = $this->getRules($template, $config);
-
-		foreach ($rules as $rule) {
-			if ($rule->shouldRun($this->time)) $this->executeTssRule($rule, $template, $config);
-		}
-
-		if (is_file($this->tss)) $this->tssCache->write($this->tss, $rules);
-	}
 
 	//Add a postprocessing hook. This cleans up anything transphporm has added to the markup which needs to be removed
 	private function doPostProcessing($template) {
@@ -89,15 +79,6 @@ class Builder {
 		return $template;
 	}
 
-	//Process a TSS rule e.g. `ul li {content: "foo"; format: bar}
-	private function executeTssRule($rule, $template, $config) {
-		$rule->touch();
-
-		$pseudoMatcher = $config->createPseudoMatcher($rule->pseudo);
-		$hook = new Hook\PropertyHook($rule->properties, $config->getLine(), $rule->file, $rule->line, $pseudoMatcher, $config->getValueParser(), $config->getFunctionSet(), $config->getFilePath());
-		$config->loadProperties($hook);
-		$template->addHook($rule->query, $hook);
-	}
 
 	//Load a template, firstly check if it's a file or a valid string
 	private function loadTemplate() {
@@ -110,12 +91,6 @@ class Builder {
         $xml = $this->cache->load($this->template, filemtime($this->template));
         return $xml ? $xml : ['body' => file_get_contents($this->template) ?: "", 'headers' => []];
     }
-
-	//Load the TSS rules either from a file or as a string
-	//N.b. only files can be cached
-	private function getRules($template, $config) {
-		return (new Parser\Sheet($this->tss, $config->getCssToXpath(), $config->getValueParser(), $this->tssCache, $config->getFilePath()))->parse();
-	}
 
 	public function setCache(\ArrayAccess $cache) {
 		$this->cache = new Cache($cache);
