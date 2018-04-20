@@ -51,27 +51,38 @@ class Builder {
 
 	public function output($data = null, $document = false) {
 		$headers = [];
+		$result = $this->loadTemplate();
+		$tssCache = new SheetLoader($this->cache,  $this->filePath, $this->tss, $this->time);
 
+		//If an update is required, run any rules that need to be run. Otherwise, return the result from cache
+		//without creating any further objects, loading a DomDocument, etc
+		if ($tssCache->updateRequired($data) === true) {
+			$template = $this->createAndProcessTemplate($data, $result['cache'], $headers);
+			$tssCache->processRules($template, $this->config);
+
+			$result = ['cache' => $template->output($document),
+			   'headers' => array_merge($result['headers'], $headers),
+			   'body' => $this->doPostProcessing($template)->output($document)
+			];
+			$this->cache->write($this->template, $result);
+		}
+
+		unset($result['cache']);
+		return (object) $result;
+	}
+
+	private function createAndProcessTemplate($data, $body, &$headers) {
 		$elementData = new \Transphporm\Hook\ElementData(new \SplObjectStorage(), $data);
 		$functionSet = new FunctionSet($elementData);
-
-		$cachedOutput = $this->loadTemplate();
 		//To be a valid XML document it must have a root element, automatically wrap it in <template> to ensure it does
-		$template = new Template($this->isValidDoc($cachedOutput['body']) ? str_ireplace('<!doctype', '<!DOCTYPE', $cachedOutput['body']) : '<template>' . $cachedOutput['body'] . '</template>' );
-		$tssCache = new SheetLoader($this->cache,  $this->filePath, $this->tss, $template->getPrefix(), $this->time);
+		$template = new Template($this->isValidDoc($body) ? str_ireplace('<!doctype', '<!DOCTYPE', $body) : '<template>' . $body . '</template>' );
+
 		$valueParser = new Parser\Value($functionSet);
 		$this->config = new Config($functionSet, $valueParser, $elementData, new Hook\Formatter(), new Parser\CssToXpath($functionSet, $template->getPrefix(), md5($this->tss)), $this->filePath, $headers);
 
 		foreach ($this->modules as $module) $module->load($this->config);
-
-		$tssCache->processRules($template, $this->config);
-
-		$result = ['body' => $template->output($document), 'headers' => array_merge($cachedOutput['headers'], $headers)];
-		$this->cache->write($this->template, $result);
-		$result['body'] = $this->doPostProcessing($template)->output($document);
-		return (object) $result;
+		return $template;
 	}
-
 
 	//Add a postprocessing hook. This cleans up anything transphporm has added to the markup which needs to be removed
 	private function doPostProcessing($template) {
@@ -82,14 +93,14 @@ class Builder {
 
 	//Load a template, firstly check if it's a file or a valid string
 	private function loadTemplate() {
-        $result = ['body' => $this->template, 'headers' => []];
+        $result = ['cache' => $this->template, 'headers' => []];
 		if (strpos($this->template, "\n") === false && is_file($this->template)) $result = $this->loadTemplateFromFile($this->template);
 		return $result;
 	}
 
     private function loadTemplateFromFile($file) {
         $xml = $this->cache->load($this->template, filemtime($this->template));
-        return $xml ? $xml : ['body' => file_get_contents($this->template) ?: "", 'headers' => []];
+        return $xml ? $xml : ['cache' => file_get_contents($this->template) ?: "", 'headers' => []];
     }
 
 	public function setCache(\ArrayAccess $cache) {

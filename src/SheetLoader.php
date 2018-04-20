@@ -8,15 +8,13 @@ namespace Transphporm;
 //Separates out TSS file loading/caching from parsing
 class SheetLoader {
     private $cache;
-    private $prefix;
     private $sheet;
     private $time;
     private $import = [];
 
-    public function __construct(Cache $cache, FilePath $filePath, $tss, $prefix, $time) {
+    public function __construct(Cache $cache, FilePath $filePath, $tss, $time) {
         $this->cache = $cache;
         $this->filePath = $filePath;
-        $this->prefix = $prefix;
         $this->tss = $tss;
         $this->time = $time;
     }
@@ -35,13 +33,20 @@ class SheetLoader {
 		}
 		return $rules;
 	}
+	//Allows controlling whether any updates are required to the template
+	//e.g. return false
+	//	 1. If all update-frequencies  haven't expired
+	//   2. If the data hasn't changed since the last run
+	public function updateRequired($data) {
+		return true;
+	}
 
 	public function addImport($import) {
 		$this->import[] = $import;
 	}
 
 	private function getCacheKey($file) {
-		return $file . $this->prefix . dirname(realpath($file)) . DIRECTORY_SEPARATOR;
+		return $file . dirname(realpath($file)) . DIRECTORY_SEPARATOR;
 	}
 	//write the sheet to cache
     public function write($file, $rules, $imports = []) {
