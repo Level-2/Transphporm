@@ -16,7 +16,7 @@ class SheetLoader {
         $this->cache = $cache;
         $this->filePath = $filePath;
         $this->tss = $tss;
-        $this->time = $time;
+        $this->time = $time ?? time();
     }
 
 	private function getRulesFromCache($file) {
@@ -32,23 +32,22 @@ class SheetLoader {
 				if (filemtime($file) > $rules['ctime']) return false;
 			}
 		}
-
-
 		return $rules;
 	}
 	//Allows controlling whether any updates are required to the template
 	//e.g. return false
 	//	 1. If all update-frequencies  haven't expired
 	//   2. If the data hasn't changed since the last run
+	//If this function returns false, the rendered template is sent straight from the cache skipping 99% of transphporm's code
 	public function updateRequired($data) {
 		if (!is_file($this->tss)) return true;
 		$rules = $this->getRulesFromCache($this->tss);
 		//Nothing was cached or the TSS file has changed, update is required
 		if (empty($rules)) return true;
+		//Find the sheet's minimum update-frequency, if it hasn't passed then no updates are required
+		if ($rules['ctime']+$rules['minFreq'] <= $this->time) return true;
 
-		//TOD: use `getMinUpdateFreq' to determne whether the rules need to be executed again
-
-		return true;
+		return false;
 	}
 
 	//Gets the minimum update-frequency for a sheet's rules
