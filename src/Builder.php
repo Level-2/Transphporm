@@ -61,13 +61,14 @@ class Builder {
 			$tssCache->processRules($template, $this->config);
 
 			$result = ['cache' => $template->output($document),
+			   'renderTime' => time(),
 			   'headers' => array_merge($result['headers'], $headers),
 			   'body' => $this->doPostProcessing($template)->output($document)
 			];
 			$this->cache->write($this->template, $result);
 		}
 
-		unset($result['cache']);
+		unset($result['cache'], $result['renderTime']);
 		return (object) $result;
 	}
 
