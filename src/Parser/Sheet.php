@@ -36,7 +36,7 @@ class Sheet {
 			if ($processing = $this->processingInstructions($token, count($this->rules)+$indexStart)) {
 				$this->rules = array_merge($this->rules, $processing);
 			}
-			else if ($token['type'] !== Tokenizer::NEW_LINE) $this->addRules($token, $indexStart++);
+			else if (!in_array($token['type'], [Tokenizer::NEW_LINE, Tokenizer::AT_SIGN])) $this->addRules($token, $indexStart++);
 		}
 
 		return $this->rules;
@@ -82,18 +82,22 @@ class Sheet {
 		if ($token['type'] !== Tokenizer::AT_SIGN) return false;
 		$tokens = $this->tss->from(Tokenizer::AT_SIGN, false)->to(Tokenizer::SEMI_COLON, false);
 		$funcName = $tokens->from(Tokenizer::NAME, true)->read();
-		$args = $this->valueParser->parseTokens($tokens->from(Tokenizer::NAME));
-		$rules = $this->$funcName($args, $indexStart);
-
+		$funcToks = $tokens->from(Tokenizer::NAME);
+		$args = $this->valueParser->parseTokens($funcToks);
+		$rules = $this->$funcName($args, $indexStart, $funcToks);
 		$this->tss->skip(count($tokens)+2);
 
 		return $rules;
 	}
 
-	private function import($args, $indexStart) {
+	private function import($args, $indexStart, $tokens) {
 		$fileName = $this->filePath->getFilePath($args[0]);
 		$this->sheetLoader->addImport($fileName);
 		return $this->sheetLoader->getRules($fileName, $this->xPath, $this->valueParser);
+	}
+
+	private function cacheKey($args, $indexStart, $tokens) {
+		$this->sheetLoader->setCacheKey($tokens);
 	}
 
 	private function getProperties($tokens) {

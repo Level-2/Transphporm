@@ -14,6 +14,7 @@ class Builder {
 	private $modules = [];
 	private $config;
 	private $filePath;
+	private $cacheKey;
 	private $defaultModules = [
 		'\\Transphporm\\Module\\Basics',
 		'\\Transphporm\\Module\\Pseudo',
@@ -41,9 +42,9 @@ class Builder {
 	}
 
 	public function setLocale($locale) {
-                $format = new \Transphporm\Module\Format($locale);
-                $this->modules[get_class($format)] = $format;
-        }
+        $format = new \Transphporm\Module\Format($locale);
+        $this->modules[get_class($format)] = $format;
+    }
 
 	public function addPath($dir) {
 		$this->filePath->addPath($dir);
@@ -51,12 +52,14 @@ class Builder {
 
 	public function output($data = null, $document = false) {
 		$headers = [];
-		$result = $this->loadTemplate();
-		$tssCache = new SheetLoader($this->cache,  $this->filePath, $this->tss, $this->time);
 
+		$tssCache = new SheetLoader($this->cache, $this->filePath, $this->tss, $this->time);
+		$this->cacheKey = $tssCache->getCacheKey($data);
+		$result = $this->loadTemplate();
 		//If an update is required, run any rules that need to be run. Otherwise, return the result from cache
 		//without creating any further objects, loading a DomDocument, etc
-		if ($tssCache->updateRequired($data) === true) {
+
+		if (empty($result['renderTime']) || $tssCache->updateRequired($data) === true) {
 			$template = $this->createAndProcessTemplate($data, $result['cache'], $headers);
 			$tssCache->processRules($template, $this->config);
 
@@ -65,9 +68,9 @@ class Builder {
 			   'headers' => array_merge($result['headers'], $headers),
 			   'body' => $this->doPostProcessing($template)->output($document)
 			];
-			$this->cache->write($this->template, $result);
-		}
 
+			$this->cache->write($tssCache->getCacheKey($data) . $this->template, $result);
+		}
 		unset($result['cache'], $result['renderTime']);
 		return (object) $result;
 	}
@@ -100,7 +103,7 @@ class Builder {
 	}
 
     private function loadTemplateFromFile($file) {
-        $xml = $this->cache->load($this->template, filemtime($this->template));
+        $xml = $this->cache->load($this->cacheKey . $this->template, filemtime($this->template));
         return $xml ? $xml : ['cache' => file_get_contents($this->template) ?: "", 'headers' => []];
     }
 

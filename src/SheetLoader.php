@@ -11,20 +11,23 @@ class SheetLoader {
     private $sheet;
     private $time;
     private $import = [];
+    private $cacheKey;
+    private $rules;
+    private $cacheName;
 
     public function __construct(Cache $cache, FilePath $filePath, $tss, $time) {
-        $this->cache = $cache;
+    	$this->cache = $cache;
         $this->filePath = $filePath;
         $this->tss = $tss;
         $this->time = $time ?? time();
+        $this->cacheName = $tss;
     }
 
 	private function getRulesFromCache($file) {
-		$key = $file;
-
 		//Try to load the cached rules, if not set in the cache (or expired) parse the supplied sheet
-		$ftime = filemtime($file);
-		$rules = $this->cache->load($key, $ftime);
+		$rules = $this->cache->load($this->cacheName, filemtime($file));
+
+		$this->cacheKey = $this->cacheKey ?? $rules['cacheKey'] ?? null;
 
 		if ($rules) {
 			foreach ($rules['import'] as $file) {
@@ -32,6 +35,7 @@ class SheetLoader {
 				if (filemtime($file) > $rules['ctime']) return false;
 			}
 		}
+
 		return $rules;
 	}
 	//Allows controlling whether any updates are required to the template
@@ -41,9 +45,13 @@ class SheetLoader {
 	//If this function returns false, the rendered template is sent straight from the cache skipping 99% of transphporm's code
 	public function updateRequired($data) {
 		if (!is_file($this->tss)) return true;
-		$rules = $this->getRulesFromCache($this->tss);
+
+		$this->cacheName = $this->getCacheKey($data) . $this->tss;
+
+		$rules = $this->getRulesFromCache($this->tss, $data);
 		//Nothing was cached or the TSS file has changed, update is required
 		if (empty($rules)) return true;
+
 		//Find the sheet's minimum update-frequency, if it hasn't passed then no updates are required
 		if ($rules['ctime']+$rules['minFreq'] <= $this->time) return true;
 
@@ -66,17 +74,27 @@ class SheetLoader {
 		$this->import[] = $import;
 	}
 
-	private function getCacheKey($file) {
-		return dirname(realpath($file));
+	public function setCacheKey($tokens) {
+		$this->cacheKey = $tokens;
 	}
+
+	public function getCacheKey($data) {
+		if (is_file($this->tss)) $this->getRulesFromCache($this->tss);
+		if ($this->cacheKey) {
+			$parser = new Parser\Value($data);
+			$x= $parser->parseTokens($this->cacheKey)[0];
+			$this->cacheName = $x . $this->tss;
+			return $x;
+		}
+		else return '';
+	}
+
 	//write the sheet to cache
     public function write($file, $rules, $imports = []) {
-
 		if (is_file($file)) {
-			$key = $this->getCacheKey($file);
-			$existing = $this->cache->load($key, filemtime($file));
+			$existing = $this->cache->load($file, filemtime($file));
 			if (isset($existing['import']) && empty($imports)) $imports = $existing['import'];
-			$this->cache->write($file, ['rules' => $rules, 'import' => $imports, 'minFreq' => $this->getMinUpdateFreq($rules), 'ctime' => time()]);
+			$this->cache->write($this->cacheName, ['rules' => $rules, 'import' => $imports, 'minFreq' => $this->getMinUpdateFreq($rules), 'ctime' => $this->time, 'cacheKey' => $this->cacheKey]);
 		}
 		return $rules;
     }
@@ -85,7 +103,6 @@ class SheetLoader {
 		$rules = $this->getRules($this->tss, $config->getCssToXpath(), $config->getValueParser());
 
 		usort($rules, [$this, 'sortRules']);
-
 		foreach ($rules as $rule) {
 			if ($rule->shouldRun($this->time)) $this->executeTssRule($rule, $template, $config);
 		}
@@ -104,7 +121,6 @@ class SheetLoader {
     	}
 		return $tss == null ? [] : (new Parser\Sheet($tss, $cssToXpath, $valueParser, $this->filePath, $this))->parse();
 	}
-
 	//Process a TSS rule e.g. `ul li {content: "foo"; format: bar}
 	private function executeTssRule($rule, $template, $config) {
 		$rule->touch();
