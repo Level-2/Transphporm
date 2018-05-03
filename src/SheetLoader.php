@@ -102,7 +102,9 @@ class SheetLoader {
 	public function processRules($template, \Transphporm\Config $config) {
 		$rules = $this->getRules($this->tss, $config->getCssToXpath(), $config->getValueParser());
 
+
 		usort($rules, [$this, 'sortRules']);
+
 		foreach ($rules as $rule) {
 			if ($rule->shouldRun($this->time)) $this->executeTssRule($rule, $template, $config);
 		}
@@ -111,7 +113,7 @@ class SheetLoader {
 	}
 
 	//Load the TSS
-	public function getRules($tss, $cssToXpath, $valueParser) {
+	public function getRules($tss, $cssToXpath, $valueParser, $indexStart = 0) {
 		if (is_file($tss)) {
     		//$rules = $this->cache->load($tss);
     		$rules = $this->getRulesFromCache($tss)['rules'];
@@ -119,7 +121,7 @@ class SheetLoader {
 			if (empty($rules)) $tss = file_get_contents($tss);
 			else return $rules;
     	}
-		return $tss == null ? [] : (new Parser\Sheet($tss, $cssToXpath, $valueParser, $this->filePath, $this))->parse();
+		return $tss == null ? [] : (new Parser\Sheet($tss, $cssToXpath, $valueParser, $this->filePath, $this))->parse($indexStart);
 	}
 	//Process a TSS rule e.g. `ul li {content: "foo"; format: bar}
 	private function executeTssRule($rule, $template, $config) {
@@ -144,6 +146,6 @@ class SheetLoader {
 
 
 	private function sortPseudo($a, $b) {
-		return count($a->pseudo) < count($b->pseudo)  ? -1  :1;
+		return count($a->pseudo) > count($b->pseudo)  ? 1 : -1;
 	}
 }

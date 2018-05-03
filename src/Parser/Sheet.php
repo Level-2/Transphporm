@@ -93,7 +93,7 @@ class Sheet {
 	private function import($args, $indexStart, $tokens) {
 		$fileName = $this->filePath->getFilePath($args[0]);
 		$this->sheetLoader->addImport($fileName);
-		return $this->sheetLoader->getRules($fileName, $this->xPath, $this->valueParser);
+		return $this->sheetLoader->getRules($fileName, $this->xPath, $this->valueParser, $indexStart);
 	}
 
 	private function cacheKey($args, $indexStart, $tokens) {
