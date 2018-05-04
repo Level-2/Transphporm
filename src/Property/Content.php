@@ -22,7 +22,10 @@ class Content implements \Transphporm\Property {
 			//Remove the current contents
 			$this->removeAllChildren($element);
 			//Now make a text node
-			if ($this->getContentMode($rules) === 'replace') $this->replaceContent($element, $values);
+			if ($this->getContentMode($rules) === 'replace') {
+				$contentReplace = new ContentReplace($this);
+				$contentReplace->replaceContent($element, $values);
+			}
 			else $this->appendContent($element, $values);
 		}
 	}
@@ -78,42 +81,6 @@ class Content implements \Transphporm\Property {
 		return $new;
 	}
 
-
-	private function replaceContent($element, $content) {
-		if ($element->getAttribute('transphporm') == 'added') return;
-		//If this rule was cached, the elements that were added last time need to be removed prior to running the rule again.
-		if ($element->getAttribute('transphporm')) {
-			$this->replaceCachedContent($element);
-		}
-
-		foreach ($this->getNode($content, $element->ownerDocument) as $node) {
-			if ($node instanceof \DomElement && !$node->getAttribute('transphporm'))  $node->setAttribute('transphporm', 'added');
-			$element->parentNode->insertBefore($node, $element);
-		}
-
-		//Remove the original element from the final output
-		$element->setAttribute('transphporm', 'remove');
-	}
-
-	private function replaceCachedContent($element) {
-		$el = $element;
-		while ($el = $el->previousSibling) {
-			if ($el->nodeType == 1 && $el->getAttribute('transphporm') != 'remove') {
-				$el->parentNode->removeChild($el);
-			}
-		}
-		$this->fixPreserveWhitespaceRemoveChild($element);
-	}
-
-	// $doc->preserveWhiteSpace = false should fix this but it doesn't
-	// Remove extra whitespace created by removeChild to avoid the cache growing 1 byte every time it's reloaded
-	// This may need to be moved in future, anywhere elements are being removed and files are cached may need to apply this fix
-	// Also remove any comments to avoid the comment being re-added every time the cache is reloaded
-	private function fixPreserveWhitespaceRemoveChild($element) {
-		if ($element->previousSibling instanceof \DomComment || ($element->previousSibling instanceof \DomText && $element->previousSibling->isElementContentWhiteSpace())) {
-			$element->parentNode->removeChild($element->previousSibling);
-		}
-	}
 
 	private function appendContent($element, $content) {
 		foreach ($this->getNode($content, $element->ownerDocument) as $node) {
