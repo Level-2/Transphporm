@@ -110,7 +110,7 @@ class Content implements \Transphporm\Property {
 	// This may need to be moved in future, anywhere elements are being removed and files are cached may need to apply this fix
 	// Also remove any comments to avoid the comment being re-added every time the cache is reloaded
 	private function fixPreserveWhitespaceRemoveChild($element) {
-		if ($element->previousSibling instanceof \DomComment || ($element->previousSibling instanceof \DomText && trim($element->previousSibling->isElementContentWhiteSpace()))) {
+		if ($element->previousSibling instanceof \DomComment || ($element->previousSibling instanceof \DomText && $element->previousSibling->isElementContentWhiteSpace())) {
 			$element->parentNode->removeChild($element->previousSibling);
 		}
 	}
