@@ -19,16 +19,18 @@ class ContentReplace {
 			$this->replaceCachedContent($element);
 		}
 
-		foreach ($this->content->getNode($content, $element->ownerDocument) as $node) {
-			if ($node instanceof \DomElement && !$node->getAttribute('transphporm'))  $node->setAttribute('transphporm', 'added');
-			$element->parentNode->insertBefore($node, $element);
-		}
+		$this->insertNodes($element, $content);
 
 		//Remove the original element from the final output
 		$element->setAttribute('transphporm', 'remove');
 	}
 
-
+	private function insertNodes($element, $content) {
+		foreach ($this->content->getNode($content, $element->ownerDocument) as $node) {
+			if ($node instanceof \DomElement && !$node->getAttribute('transphporm'))  $node->setAttribute('transphporm', 'added');
+			$element->parentNode->insertBefore($node, $element);
+		}
+	}
 
 	private function replaceCachedContent($element) {
 		$el = $element;
