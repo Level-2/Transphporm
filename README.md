@@ -6,7 +6,7 @@
 [![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/TomBZombie/CDS?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 
-Transphporm is fresh look at templating in PHP. Let's face it, [Templating in PHP sucks](http://www.workingsoftware.com.au/page/Your_templating_engine_sucks_and_everything_you_have_ever_written_is_spaghetti_code_yes_you) because it involves code like this:
+Transphporm is a fresh look at templating in PHP. Let's face it, [templating in PHP sucks](http://www.workingsoftware.com.au/page/Your_templating_engine_sucks_and_everything_you_have_ever_written_is_spaghetti_code_yes_you) because it involves code like this:
 
 
 ```php
@@ -45,7 +45,7 @@ Why does this suck? It mixes the logic with the template. There are processing i
 
 Template systems like this still mix logic and markup, the one thing they're trying to avoid.
 
-This is equivalent to `<h1 style="font-weight:bold">Title</h1>`,  as it mixes two very different concerns. 
+This is equivalent to `<h1 style="font-weight:bold">Title</h1>`,  as it mixes two very different concerns.
 
 ## Transphporm is different
 
@@ -71,7 +71,7 @@ But where are the processing instructions? Transphporm follows CSS's lead.  All 
 
 At its most basic, Transphporm works by supplying a stylesheet and XML as strings.
 
-Transphporm allows you to insert content into any element on a page. Traditional template engines force you to place markers in the markup which will then be replaced (essentially using str_replace) within the content. 
+Transphporm allows you to insert content into any element on a page. Traditional template engines force you to place markers in the markup which will then be replaced (essentially using str_replace) within the content.
 
 Transphporm takes a different approach and allows you to insert content into any element on the page using a CSS-like syntax. You don't need to provide special markers in the template; the template is plain old HTML without any special syntax. The elements on the page can then be targeted using CSS style syntax.
 
@@ -137,7 +137,7 @@ Transphporm gives both designers and developers an unprecedented level of flexib
 The preferred method of installing Transphporm is via Composer. Transphorm is available from Packagist:
 
 	level-2/transphporm
-	
+
 However, if you don't want to use Composer you can manually install Transphporm:
 
 1. Download and extract Transphporm into your project
@@ -240,7 +240,7 @@ Output:
 <h1>Title: My Title!</h1>
 ```
 
-For more information on inserting content see the wiki pages [Basic usage: Inserting Content](https://github.com/Level-2/Transphporm/wiki/Basic-Usage:-Inserting-content) and [Basic Usage: External Data](https://github.com/Level-2/Transphporm/wiki/Basic-Usage:-Working-with-external-data) 
+For more information on inserting content see the wiki pages [Basic usage: Inserting Content](https://github.com/Level-2/Transphporm/wiki/Basic-Usage:-Inserting-content) and [Basic Usage: External Data](https://github.com/Level-2/Transphporm/wiki/Basic-Usage:-Working-with-external-data)
 
 ### Loops
 
@@ -270,7 +270,7 @@ Using Transphporm, the user list can be generated like this:
 ```php
 
 $xml = '<ul>
-	<li>Name</li>	
+	<li>Name</li>
 </ul>';
 
 
@@ -288,7 +288,7 @@ echo $template->output($data)->body;
 ```
 
 
-`repeat` tells Transphporm to repeat the selected element for each of the supplied array. 
+`repeat` tells Transphporm to repeat the selected element for each of the supplied array.
 
 `data(users)` reads `$data['users']` as supplied in PHP.
 
@@ -297,8 +297,8 @@ echo $template->output($data)->body;
 
 ```php
 <ul>
-	<li>Tom</li>	
-	<li>Scott</li>	
+	<li>Tom</li>
+	<li>Scott</li>
 </ul>
 ```
 
@@ -310,7 +310,7 @@ $xml = '<ul>
 	<li>
 		<h3>Name</h3>
 		<span>email</span>
-	</li>	
+	</li>
 </ul>';
 
 
@@ -359,7 +359,7 @@ $xml = '<ul>
 	<li>
 		<h3>Name</h3>
 		<span>email</span>
-	</li>	
+	</li>
 </ul>';
 
 
@@ -405,9 +405,9 @@ Transphporm supports the following CSS selectors:
 `#id`
 `.className`
 `tagName.className`
-`direct > descendant` 
+`direct > descendant`
 `[attribute]`
-`[attribute=value]` 
+`[attribute=value]`
 `[attribute!=value]`
 
 And any of these can be chained:
@@ -473,7 +473,7 @@ $xml = '
 	<li>
 		<h3>Name</h3>
 		<span>email</span>
-	</li>	
+	</li>
 </ul>';
 
 
@@ -502,11 +502,11 @@ Output:
 	<li>
 		<h3>Scott</h3>
 		<span>scott@example.org</span>
-	</li>	
+	</li>
 	<li>
 		<h3>Jo</h3>
 		<span>jo@example.org</span>
-	</li>	
+	</li>
 </ul>
 ```
 
@@ -545,7 +545,7 @@ $xml = '
 	<li>
 		<h3>Name</h3>
 		<a href="mailto:email">email</a>
-	</li>	
+	</li>
 </ul>';
 
 
@@ -580,7 +580,7 @@ Output:
 	<li>
 		<h3>Scott</h3>
 		<a href="mailto:scott@example.org">scott@example.org</span>
-	</li>	
+	</li>
 </ul>
 ```
 
@@ -644,12 +644,12 @@ Array (
 		Array (
 			[0] => 'location',
 			[1] => '/redirect-url'
-		) 
+		)
 
 
 
 	)
-	
+
 )
 ```
 
@@ -849,10 +849,10 @@ Prints:
 ```
 
 
-## Locales 
+## Locales
 
 
-For date, time and currency formatting, Transphporm supports Locales. Currently only enGB is supplied but you can write your own. 
+For date, time and currency formatting, Transphporm supports Locales. Currently only enGB is supplied but you can write your own.
 
 To set a locale, use the `builder::setLocale` method. This takes either a locale name, for a locale inside `Formatter/Locale/{name}.json` e.g.
 
@@ -949,7 +949,7 @@ The strings are specified in the locale.
 Like CSS, transphporm supports `@import` for importing other TSS files:
 
 
-`imported.tss` 
+`imported.tss`
 
 ```css
 h1 {content: "From imported tss"}
@@ -1035,7 +1035,7 @@ Most frameowrks do not pass models into views, however for those that do this al
 
 # Building a whole page
 
-Transphporm uses a top-down approach to construct pages. Most frameworks require writing a layout template and then pulling content into it. It becomes very difficult to make changes to the layout on a per-page basis. (At minimum you need to add some code to the layout HTML). Transphporm uses a top-down approach rather than the popular bottom-up approach where the child template is inserted into the layout at a specific point. 
+Transphporm uses a top-down approach to construct pages. Most frameworks require writing a layout template and then pulling content into it. It becomes very difficult to make changes to the layout on a per-page basis. (At minimum you need to add some code to the layout HTML). Transphporm uses a top-down approach rather than the popular bottom-up approach where the child template is inserted into the layout at a specific point.
 
 You still have two files, one for the layout and one for the content, but the TSS is applied to the *layout* which means the TSS can change anything in the layout you want (adding script tags, adding CSS, changing the page title and meta tags, etc).
 
@@ -1126,7 +1126,7 @@ echo $template->output()->body;
 
 ```
 
-There's a little repetition here which can be solved in two ways. 
+There's a little repetition here which can be solved in two ways.
 
 ### 1) Put the layout rules in their own file, e.g. base.tss:
 
