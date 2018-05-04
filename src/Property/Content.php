@@ -67,8 +67,6 @@ class Content implements \Transphporm\Property {
 	private function convertNode($node, $document) {
 		if ($node instanceof \DomElement || $node instanceof \DOMComment) {
 			$new = $document->importNode($node, true);
-			//Removing this might cause problems with caching...
-			//$new->setAttribute('transphporm', 'added');
 		}
 		else {
 			if ($node instanceof \DomText) $node = $node->nodeValue;
@@ -89,7 +87,7 @@ class Content implements \Transphporm\Property {
 		}
 
 		foreach ($this->getNode($content, $element->ownerDocument) as $node) {
-			if (!$node->getAttribute('transphporm'))  $node->setAttribute('transphporm', 'added');
+			if ($node instanceof \DomElement && !$node->getAttribute('transphporm'))  $node->setAttribute('transphporm', 'added');
 			$element->parentNode->insertBefore($node, $element);
 		}
 
@@ -104,14 +102,15 @@ class Content implements \Transphporm\Property {
 				$el->parentNode->removeChild($el);
 			}
 		}
-		$this->fixPreserveWhitespacRemoveChild($element);
+		$this->fixPreserveWhitespaceRemoveChild($element);
 	}
 
 	// $doc->preserveWhiteSpace = false should fix this but it doesn't
 	// Remove extra whitespace created by removeChild to avoid the cache growing 1 byte every time it's reloaded
 	// This may need to be moved in future, anywhere elements are being removed and files are cached may need to apply this fix
-	private function fixPreserveWhitespacRemoveChild($element) {
-		if ($element->previousSibling instanceof \DomText && trim($element->previousSibling->isElementContentWhiteSpace())) {
+	// Also remove any comments to avoid the comment being re-added every time the cache is reloaded
+	private function fixPreserveWhitespaceRemoveChild($element) {
+		if ($element->previousSibling instanceof \DomComment || ($element->previousSibling instanceof \DomText && trim($element->previousSibling->isElementContentWhiteSpace()))) {
 			$element->parentNode->removeChild($element->previousSibling);
 		}
 	}
