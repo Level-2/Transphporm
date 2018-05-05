@@ -14,7 +14,7 @@ class Sheet {
 	private $file;
 	private $rules;
 
-	public function __construct($tss, CssToXpath $xPath, Value $valueParser, \Transphporm\FilePath $filePath, \Transphporm\SheetLoader $sheetLoader, $file = null) {
+	public function __construct($tss, CssToXpath $xPath, Value $valueParser, \Transphporm\FilePath $filePath, \Transphporm\SheetLoader\SheetLoader $sheetLoader, $file = null) {
 		$this->xPath = $xPath;
 		$this->valueParser = $valueParser;
 		$this->filePath = $filePath;
@@ -93,12 +93,11 @@ class Sheet {
 	private function import($args, $indexStart, $tokens) {
 		$fileName = $this->filePath->getFilePath($args[0]);
 		$this->sheetLoader->addImport($fileName);
-		return $this->sheetLoader->getRules($fileName, $this->xPath, $this->valueParser, $indexStart);
+
+		$tssFile = new \Transphporm\SheetLoader\TSSString(file_get_contents($fileName), $this->filePath);
+		return $tssFile->getRules($this->xPath, $this->valueParser, $this->sheetLoader, $indexStart);
 	}
 
-	private function cacheKey($args, $indexStart, $tokens) {
-		$this->sheetLoader->setCacheKey($tokens);
-	}
 
 	private function getProperties($tokens) {
         $rules = $tokens->splitOnToken(Tokenizer::SEMI_COLON);

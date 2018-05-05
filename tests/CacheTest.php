@@ -40,6 +40,7 @@ class CacheTest extends PHPUnit_Framework_TestCase {
 		list($xml, $css) = $this->createFiles($frequency);
 
 		$template = new Builder($xml, $css);
+
 		if ($time) $template->setTime($time);
 		$template->setCache($cache);
 
@@ -65,7 +66,6 @@ class CacheTest extends PHPUnit_Framework_TestCase {
 
 
 	public function testCacheMinutes() {
-
 		$cache = new \ArrayObject;
 		$random = new RandomGenerator;
 
@@ -83,7 +83,6 @@ class CacheTest extends PHPUnit_Framework_TestCase {
 		//advance the clock 11 minutes so the cache is expired
 		$date = new \DateTime();
 		$date->modify('+11 minutes');
-
 
 		$o3 = $this->buildTemplate('10m', $cache, $date->format('U'))->output($random, false)->body;
 

@@ -50,15 +50,19 @@ class Builder {
 		$this->filePath->addPath($dir);
 	}
 
+	private function getSheetLoader() {
+		$tssRules = is_file($this->tss) ? new SheetLoader\TSSFile($this->tss, $this->filePath, $this->cache, $this->time) : new SheetLoader\TSSString($this->tss, $this->filePath);
+		return new SheetLoader\SheetLoader($this->cache, $this->filePath, $tssRules, $this->time);
+	}
+
 	public function output($data = null, $document = false) {
 		$headers = [];
 
-		$tssCache = new SheetLoader($this->cache, $this->filePath, $this->tss, $this->time);
+		$tssCache = $this->getSheetLoader();
 		$this->cacheKey = $tssCache->getCacheKey($data);
 		$result = $this->loadTemplate();
 		//If an update is required, run any rules that need to be run. Otherwise, return the result from cache
 		//without creating any further objects, loading a DomDocument, etc
-
 		if (empty($result['renderTime']) || $tssCache->updateRequired($data) === true) {
 			$template = $this->createAndProcessTemplate($data, $result['cache'], $headers);
 			$tssCache->processRules($template, $this->config);
@@ -68,7 +72,6 @@ class Builder {
 			   'headers' => array_merge($result['headers'], $headers),
 			   'body' => $this->doPostProcessing($template)->output($document)
 			];
-
 			$this->cache->write($tssCache->getCacheKey($data) . $this->template, $result);
 		}
 		unset($result['cache'], $result['renderTime']);
