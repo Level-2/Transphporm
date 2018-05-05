@@ -5,6 +5,7 @@
  * @license         http://www.opensource.org/licenses/bsd-license.php  BSD License *
  * @version         1.2                                                             */
 namespace Transphporm\SheetLoader;
+//Strings do not support caching because we cannot know when the containing PHP script has been modified
 class TSSString implements TSSRules {
 	private $str;
 	private $filePath;
@@ -26,6 +27,11 @@ class TSSString implements TSSRules {
 		return (new \Transphporm\Parser\Sheet($this->str, $cssToXpath, $valueParser, $this->filePath, $sheetLoader))->parse($indexStart);
 	}
 
-	public function write() {
+	public function write($rules, $imports = []) {
+		return;
+	}
+
+	public function setCacheKey($tokens) {
+		return;
 	}
 }

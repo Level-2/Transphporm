@@ -66,7 +66,10 @@ class Rule {
 		$frequency = isset($this->properties['update-frequency']) ? $this->properties['update-frequency']->read() : false;
 
 		if (empty($frequency)) return 0;
+		else return $this->calcUpdateFrequency($frequency);
+	}
 
+	private function calcUpdateFrequency($frequency) {
 		$num = (int) $frequency;
 		$unit = strtoupper(trim(str_replace($num, '', $frequency)));
 		if ($frequency == 'always') return 0;

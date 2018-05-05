@@ -75,7 +75,6 @@ class TSSFile implements TSSRules {
 
 	//write the sheet to cache
     public function write($rules, $imports = []) {
-
 		$existing = $this->cache->load($this->fileName, filemtime($this->fileName));
 		if (isset($existing['import']) && empty($imports)) $imports = $existing['import'];
 		$this->cache->write($this->cacheName, ['rules' => $rules, 'import' => $imports, 'minFreq' => $this->getMinUpdateFreq($rules), 'ctime' => $this->time, 'cacheKey' => $this->cacheKey]);
