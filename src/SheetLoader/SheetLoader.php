@@ -34,7 +34,16 @@ class SheetLoader {
 	}
 
 	public function setCacheKey($tokens) {
-		$this->tss->setCacheKey($tokens);
+		$newTokens = [];
+		foreach ($tokens as $token) {
+			if ($token['type'] == \Transphporm\Parser\Tokenizer::NAME && $token['value'] == 'data') {
+				$tokens->next();
+				$newTokens = array_merge($newTokens, iterator_to_array($tokens->current()['value']));
+			}
+			else $newTokens[] = $token;
+		}
+
+		$this->tss->setCacheKey(new \Transphporm\Parser\Tokens($newTokens));
 	}
 
 	public function getCacheKey($data) {
