@@ -98,6 +98,9 @@ class Sheet {
 		return $tssFile->getRules($this->xPath, $this->valueParser, $this->sheetLoader, $indexStart);
 	}
 
+	private function cacheKey($args, $indexStart, $tokens) {
+		$this->sheetLoader->setCacheKey($tokens);
+	}
 
 	private function getProperties($tokens) {
         $rules = $tokens->splitOnToken(Tokenizer::SEMI_COLON);

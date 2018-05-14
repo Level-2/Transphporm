@@ -57,9 +57,9 @@ class TSSFile implements TSSRules {
 		$this->getRulesFromCache($this->fileName);
 		if ($this->cacheKey) {
 			$parser = new \Transphporm\Parser\Value($data);
-			$x= $parser->parseTokens($this->cacheKey)[0];
-			$this->cacheName = $x . $this->tss;
-			return $x;
+			$cacheKey = $parser->parseTokens($this->cacheKey)[0];
+			$this->cacheName = $cacheKey . $this->fileName;
+			return $cacheKey;
 		}
 		else return '';
 	}
