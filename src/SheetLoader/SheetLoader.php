@@ -16,7 +16,7 @@ class SheetLoader {
     	$this->cache = $cache;
         $this->filePath = $filePath;
         $this->tss = $tss;
-        $this->time = $time ?? time();
+        $this->time = isset($time) ? $time : time();
     }
 
 	//Allows controlling whether any updates are required to the template
