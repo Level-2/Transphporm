@@ -7,6 +7,7 @@
 namespace Transphporm\SheetLoader;
 class TSSFile implements TSSRules {
 	private $fileName;
+	private $filePath;
 	private $cacheName;
 	private $cacheKey;
 	private $cache;
@@ -43,7 +44,7 @@ class TSSFile implements TSSRules {
 	public function updateRequired($data) {
 		$this->cacheName = $this->getCacheKey($data) . $this->fileName;
 
-		$rules = $this->getRulesFromCache($this->fileName, $data);
+		$rules = $this->getRulesFromCache($this->fileName);
 		//Nothing was cached or the TSS file has changed, update is required
 		if (empty($rules)) return true;
 

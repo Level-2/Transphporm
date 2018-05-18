@@ -90,10 +90,11 @@ class CssToXpath {
 	private function removeSpacesFromDirectDecend($css) {
 		$tokens = new Tokens;
 		$split = $css->splitOnToken(Tokenizer::GREATER_THAN);
+		$numSplits = count($split);
 
-		if (count($split) <= 1) return $css;
+		if ($numSplits <= 1) return $css;
 
-		for ($i = 0; $i < count($split); $i++) {
+		for ($i = 0; $i < $numSplits; $i++) {
 			$tokens->add($split[$i]->trim());
 			if (isset($split[$i+1])) $tokens->add(['type' => Tokenizer::GREATER_THAN]);
 		}

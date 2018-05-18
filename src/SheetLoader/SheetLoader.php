@@ -74,8 +74,9 @@ class SheetLoader {
 	private function executeTssRule($rule, $template, $config) {
 		$rule->touch();
 
+		$lineref = $config->getLine();
 		$pseudoMatcher = $config->createPseudoMatcher($rule->pseudo);
-		$hook = new \Transphporm\Hook\PropertyHook($rule->properties, $config->getLine(), $rule->file, $rule->line, $pseudoMatcher, $config->getValueParser(), $config->getFunctionSet(), $config->getFilePath());
+		$hook = new \Transphporm\Hook\PropertyHook($rule->properties, $lineref, $rule->file, $rule->line, $pseudoMatcher, $config->getValueParser(), $config->getFunctionSet(), $config->getFilePath());
 		$config->loadProperties($hook);
 		$template->addHook($rule->query, $hook);
 	}

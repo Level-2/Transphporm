@@ -46,7 +46,7 @@ class Rule {
 	private function timeFrequency($frequency, $time = null) {
 		if ($time === null) $time = time();
 
-		$offset = $this->getUpdateFrequency();
+		$offset = $this->getUpdateFrequency($frequency);
 
 		if ($time > $this->lastRun + $offset) return true;
 		else return false;
@@ -62,8 +62,10 @@ class Rule {
 		else return true;
 	}
 
-	public function getUpdateFrequency() {
-		$frequency = isset($this->properties['update-frequency']) ? $this->properties['update-frequency']->read() : false;
+	public function getUpdateFrequency($frequency = null) {
+		if ($frequency === null) {
+			$frequency = isset($this->properties['update-frequency']) ? $this->properties['update-frequency']->read() : false;
+		}
 
 		if (empty($frequency)) return 0;
 		else return $this->calcUpdateFrequency($frequency);
