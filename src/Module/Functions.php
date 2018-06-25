@@ -21,6 +21,7 @@ class Functions implements \Transphporm\Module {
 		$templateFunction = new \Transphporm\TSSFunction\Template($config->getElementData(), $config->getCssToXpath(), $baseDir);
 		$functionSet->addFunction('template', $templateFunction);
 		$functionSet->addFunction('json', new \Transphporm\TSSFunction\Json($baseDir));
+        $functionSet->addFunction('constant', new \Transphporm\TSSFunction\Constant());
 
 		// Register HTML formatter here because it uses the template function
 		$config->registerFormatter(new \Transphporm\Formatter\HTMLFormatter($templateFunction));
