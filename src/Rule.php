@@ -45,10 +45,8 @@ class Rule {
 
 	private function timeFrequency($frequency, $time = null) {
 		if ($time === null) $time = time();
-		$num = (int) $frequency;
-		$unit = strtoupper(trim(str_replace($num, '', $frequency)));
 
-		$offset = $num * constant(self::class . '::' . $unit);
+		$offset = $this->getUpdateFrequency();
 
 		if ($time > $this->lastRun + $offset) return true;
 		else return false;
@@ -62,5 +60,21 @@ class Rule {
 			else return $this->timeFrequency($frequency, $time);
 		}
 		else return true;
+	}
+
+	public function getUpdateFrequency() {
+		$frequency = isset($this->properties['update-frequency']) ? $this->properties['update-frequency']->read() : false;
+
+		if (empty($frequency)) return 0;
+		else return $this->calcUpdateFrequency($frequency);
+	}
+
+	private function calcUpdateFrequency($frequency) {
+		$num = (int) $frequency;
+		$unit = strtoupper(trim(str_replace($num, '', $frequency)));
+		if ($frequency == 'always') return 0;
+		else if ($frequency == 'never') return self::D*3650; //Not quite never, in 10 years will cause issues on 32 bit PHP builds re 2038 problem
+
+		return $num * constant(self::class . '::' . $unit);
 	}
 }

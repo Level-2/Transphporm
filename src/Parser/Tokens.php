@@ -39,7 +39,7 @@ class Tokens implements \Iterator, \Countable {
 	}
 
 	public function add($token) {
-		if ($token instanceof Tokens) $this->tokens = array_merge($token->tokens);
+		if ($token instanceof Tokens) $this->tokens = array_merge($this->tokens,  $token->tokens);
 		else $this->tokens[] = $token;
 	}
 

@@ -22,7 +22,10 @@ class Content implements \Transphporm\Property {
 			//Remove the current contents
 			$this->removeAllChildren($element);
 			//Now make a text node
-			if ($this->getContentMode($rules) === 'replace') $this->replaceContent($element, $values);
+			if ($this->getContentMode($rules) === 'replace') {
+				$contentReplace = new ContentReplace($this);
+				$contentReplace->replaceContent($element, $values);
+			}
 			else $this->appendContent($element, $values);
 		}
 	}
@@ -42,7 +45,7 @@ class Content implements \Transphporm\Property {
 	public function addContentPseudo($name, ContentPseudo $contentPseudo) {
 		$this->contentPseudo[$name] = $contentPseudo;
 	}
-	
+
 	private function processPseudo($value, $element, $pseudoMatcher) {
 		foreach ($this->contentPseudo as $pseudoName => $pseudoFunction) {
 			if ($pseudoMatcher->hasFunction($pseudoName)) {
@@ -67,8 +70,6 @@ class Content implements \Transphporm\Property {
 	private function convertNode($node, $document) {
 		if ($node instanceof \DomElement || $node instanceof \DOMComment) {
 			$new = $document->importNode($node, true);
-			//Removing this might cause problems with caching...
-			//$new->setAttribute('transphporm', 'added');
 		}
 		else {
 			if ($node instanceof \DomText) $node = $node->nodeValue;
@@ -80,13 +81,6 @@ class Content implements \Transphporm\Property {
 		return $new;
 	}
 
-	private function replaceContent($element, $content) {
-		//If this rule was cached, the elements that were added last time need to be removed prior to running the rule again.
-		foreach ($this->getNode($content, $element->ownerDocument) as $node) {
-			$element->parentNode->insertBefore($node, $element);
-		}
-		$element->setAttribute('transphporm', 'remove');
-	}
 
 	private function appendContent($element, $content) {
 		foreach ($this->getNode($content, $element->ownerDocument) as $node) {

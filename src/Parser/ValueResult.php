@@ -108,7 +108,6 @@ class ValueResult {
 
 	//Postprocessing - replace values with null where allowed, or override a value at position
 	public function postProcess(ValueData $data, $val, $overrideVal, $allowNull) {
-        if ($this->getMode() !== Tokenizer::ARG) return;
 		foreach ($this->getResult() as $i => $value) {
 			if (is_scalar($value)) {
 				$val = ($overrideVal == $val) ? $data->read($value) : $overrideVal;

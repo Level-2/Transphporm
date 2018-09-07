@@ -14,6 +14,7 @@ class Builder {
 	private $modules = [];
 	private $config;
 	private $filePath;
+	private $cacheKey;
 	private $defaultModules = [
 		'\\Transphporm\\Module\\Basics',
 		'\\Transphporm\\Module\\Pseudo',
@@ -39,44 +40,55 @@ class Builder {
 	public function loadModule(Module $module) {
 		$this->modules[get_class($module)] = $module;
 	}
-	
+
 	public function setLocale($locale) {
-                $format = new \Transphporm\Module\Format($locale);
-                $this->modules[get_class($format)] = $format;
-        }
+        $format = new \Transphporm\Module\Format($locale);
+        $this->modules[get_class($format)] = $format;
+    }
 
 	public function addPath($dir) {
 		$this->filePath->addPath($dir);
 	}
 
+	private function getSheetLoader() {
+		$tssRules = is_file($this->tss) ? new SheetLoader\TSSFile($this->tss, $this->filePath, $this->cache, $this->time) : new SheetLoader\TSSString($this->tss, $this->filePath);
+		return new SheetLoader\SheetLoader($this->cache, $this->filePath, $tssRules, $this->time);
+	}
+
 	public function output($data = null, $document = false) {
 		$headers = [];
 
+		$tssCache = $this->getSheetLoader();
+		$this->cacheKey = $tssCache->getCacheKey($data);
+		$result = $this->loadTemplate();
+		//If an update is required, run any rules that need to be run. Otherwise, return the result from cache
+		//without creating any further objects, loading a DomDocument, etc
+		if (empty($result['renderTime']) || $tssCache->updateRequired($data) === true) {
+			$template = $this->createAndProcessTemplate($data, $result['cache'], $headers);
+			$tssCache->processRules($template, $this->config);
+
+			$result = ['cache' => $template->output($document),
+			   'renderTime' => time(),
+			   'headers' => array_merge($result['headers'], $headers),
+			   'body' => $this->doPostProcessing($template)->output($document)
+			];
+			$this->cache->write($tssCache->getCacheKey($data) . $this->template, $result);
+		}
+		unset($result['cache'], $result['renderTime']);
+		return (object) $result;
+	}
+
+	private function createAndProcessTemplate($data, $body, &$headers) {
 		$elementData = new \Transphporm\Hook\ElementData(new \SplObjectStorage(), $data);
 		$functionSet = new FunctionSet($elementData);
-
-		$cachedOutput = $this->loadTemplate();
 		//To be a valid XML document it must have a root element, automatically wrap it in <template> to ensure it does
-		$template = new Template($this->isValidDoc($cachedOutput['body']) ? str_ireplace('<!doctype', '<!DOCTYPE', $cachedOutput['body']) : '<template>' . $cachedOutput['body'] . '</template>' );
+		$template = new Template($this->isValidDoc($body) ? str_ireplace('<!doctype', '<!DOCTYPE', $body) : '<template>' . $body . '</template>' );
+
 		$valueParser = new Parser\Value($functionSet);
 		$this->config = new Config($functionSet, $valueParser, $elementData, new Hook\Formatter(), new Parser\CssToXpath($functionSet, $template->getPrefix(), md5($this->tss)), $this->filePath, $headers);
 
 		foreach ($this->modules as $module) $module->load($this->config);
-
-		$this->processRules($template, $this->config);
-
-		$result = ['body' => $template->output($document), 'headers' => array_merge($cachedOutput['headers'], $headers)];
-		$this->cache->write($this->template, $result);
-		$result['body'] = $this->doPostProcessing($template)->output($document);
-		return (object) $result;
-	}
-
-	private function processRules($template, $config) {
-		$rules = $this->getRules($template, $config);
-
-		foreach ($rules as $rule) {
-			if ($rule->shouldRun($this->time)) $this->executeTssRule($rule, $template, $config);
-		}
+		return $template;
 	}
 
 	//Add a postprocessing hook. This cleans up anything transphporm has added to the markup which needs to be removed
@@ -85,34 +97,18 @@ class Builder {
 		return $template;
 	}
 
-	//Process a TSS rule e.g. `ul li {content: "foo"; format: bar}
-	private function executeTssRule($rule, $template, $config) {
-		$rule->touch();
-
-		$pseudoMatcher = $config->createPseudoMatcher($rule->pseudo);
-		$hook = new Hook\PropertyHook($rule->properties, $config->getLine(), $rule->file, $rule->line, $pseudoMatcher, $config->getValueParser(), $config->getFunctionSet(), $config->getFilePath());
-		$config->loadProperties($hook);
-		$template->addHook($rule->query, $hook);
-	}
 
 	//Load a template, firstly check if it's a file or a valid string
 	private function loadTemplate() {
-        $result = ['body' => $this->template, 'headers' => []];
-		if (file_exists($this->template)) $result = $this->loadTemplateFromFile($this->template);
+        $result = ['cache' => $this->template, 'headers' => []];
+		if (strpos($this->template, "\n") === false && is_file($this->template)) $result = $this->loadTemplateFromFile($this->template);
 		return $result;
 	}
 
     private function loadTemplateFromFile($file) {
-        $xml = $this->cache->load($this->template, filemtime($this->template));
-        return $xml ? $xml : ['body' => file_get_contents($this->template) ?: "", 'headers' => []];
+        $xml = $this->cache->load($this->cacheKey . $this->template, filemtime($this->template));
+        return $xml ? $xml : ['cache' => file_get_contents($this->template) ?: "", 'headers' => []];
     }
-
-	//Load the TSS rules either from a file or as a string
-	//N.b. only files can be cached
-	private function getRules($template, $config) {
-		$cache = new TSSCache($this->cache, $template->getPrefix());
-		return (new Parser\Sheet($this->tss, $config->getCssToXpath(), $config->getValueParser(), $cache, $config->getFilePath()))->parse();
-	}
 
 	public function setCache(\ArrayAccess $cache) {
 		$this->cache = new Cache($cache);
@@ -123,7 +119,7 @@ class Builder {
 	}
 
 	public function __destruct() {
-		//Required hack as DomXPath can only register static functions clear, the statically stored instance to avoid memory leaks
+		//Required hack as DomXPath can only register static functions clear the statically stored instance to avoid memory leaks
 		if (isset($this->config)) $this->config->getCssToXpath()->cleanup();
 	}
 }

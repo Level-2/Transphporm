@@ -16,7 +16,8 @@ class Template {
 	/** Takes an XML string and loads it into a DomDocument object */
 	public function __construct($doc) {
 		$this->document = new \DomDocument;
-
+		//This should remove whitespace left behind after ->removeChild but it doesn't
+		$this->document->preserveWhiteSpace = false;
 		$this->loadDocument($doc);
 
 		$this->xpath = new \DomXPath($this->document);
@@ -46,7 +47,7 @@ class Template {
 			//XML was loaded, save as XML.
 			$this->save = function($content = null) {
 				return $this->document->saveXml($content, LIBXML_NOEMPTYTAG);
-			};		
+			};
 		}
 
 

@@ -13,7 +13,7 @@ class Cache {
 	}
 
 	public function write($key, $content) {
-		$this->cache[md5($key)] = ['content' => $content, 'timestamp' => time()];		
+		$this->cache[md5($key)] = ['content' => $content, 'timestamp' => time()];
 		return $content;
 	}
 
