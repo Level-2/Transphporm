@@ -103,8 +103,10 @@ class CssToXpath {
 
 
 	public function getDepth($css) {
-		return count($this->split($css));
+		$parts = $css->splitOnToken(Tokenizer::COLON);
+		return count($this->split($parts[0]));
 	}
+
 
 	public function getPseudo($css) {
 		$parts = $css->splitOnToken(Tokenizer::COLON);
