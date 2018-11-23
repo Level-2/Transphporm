@@ -494,6 +494,34 @@ class TransphpormTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('<div class="classname">Test</div>', $template->output("class")->body);
 	}
 
+    public function testReadConstant() {
+        $template = '
+            <div>Test</div>
+        ';
+
+        $tss = 'div {content: constant(MY_CONSTANT); }';
+
+        define('MY_CONSTANT', 'constant value');
+        $template = new \Transphporm\Builder($template, $tss);
+
+        $this->assertEquals('<div class="MY_CONSTANT">constant value</div>', $template->output()->body);
+    }
+
+
+
+    public function testReadConstantFromAttribute() {
+        $template = '
+            <input name="foo" data-value="MY_ATTR_CONSTANT" />
+        ';
+
+        $tss = 'input:attr(value) {content: constant(attr(data-value)); }';
+
+        define('MY_ATTR_CONSTANT', 'attr constant value');
+        $template = new \Transphporm\Builder($template, $tss);
+
+        $this->assertEquals('<input name="foo" data-value="MY_ATTR_CONSTANT" value="attr constant value">', $template->output()->body);
+    }
+
 	public function testComments() {
 			$template = '
 			<div>Test</div>
