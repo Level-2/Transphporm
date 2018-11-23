@@ -8,7 +8,7 @@ namespace Transphporm\Parser\Tokenizer;
 use \Transphporm\Parser\Tokenizer;
 use \Transphporm\Parser\Tokens;
 
-class BasicChars implements \Transphporm\Parser\Tokenize {
+class BasicChars implements \Transphporm\Parser\Tokenizable {
 
 	public function tokenize(TokenizedString $str, Tokens $tokens) {
 		$this->newLine($str, $tokens);

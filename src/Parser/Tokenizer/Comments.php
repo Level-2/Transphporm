@@ -8,7 +8,7 @@ namespace Transphporm\Parser\Tokenizer;
 use \Transphporm\Parser\Tokenizer;
 use \Transphporm\Parser\Tokens;
 
-class Comments implements \Transphporm\Parser\Tokenize {
+class Comments implements \Transphporm\Parser\Tokenizable {
 	public function tokenize(TokenizedString $str, Tokens $tokens) {
 		$this->singleLineComments($str);
 		$this->multiLinecomments($str);

@@ -8,7 +8,7 @@ namespace Transphporm\Parser\Tokenizer;
 use \Transphporm\Parser\Tokenizer;
 use \Transphporm\Parser\Tokens;
 
-class Brackets implements \Transphporm\Parser\Tokenize {
+class Brackets implements \Transphporm\Parser\Tokenizable {
 
 	private $types =  [
 			Tokenizer::OPEN_BRACKET => ['(', ')'],

@@ -6,6 +6,6 @@
  * @version         1.2                                                             */
 namespace Transphporm\Parser;
 
-interface Tokenize {
+interface Tokenizable {
 	public function tokenize(Tokenizer\TokenizedString $str, Tokens $tokens);
 }

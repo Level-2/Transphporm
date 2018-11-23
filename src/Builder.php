@@ -5,7 +5,7 @@
  * @license         http://www.opensource.org/licenses/bsd-license.php  BSD License *
  * @version         1.2                                                             */
 namespace Transphporm;
-/** Builds a Transphorm instance from the 3 constituent parts. XML template string, TSS string and data */
+/** Builds a Transphporm instance from the 3 constituent parts. XML template string, TSS string and data */
 class Builder {
 	private $template;
 	private $tss;
@@ -106,8 +106,8 @@ class Builder {
 	}
 
     private function loadTemplateFromFile($file) {
-        $xml = $this->cache->load($this->cacheKey . $this->template, filemtime($this->template));
-        return $xml ? $xml : ['cache' => file_get_contents($this->template) ?: "", 'headers' => []];
+        $xml = $this->cache->load($this->cacheKey . $file, filemtime($file));
+        return $xml ? $xml : ['cache' => file_get_contents($file) ?: "", 'headers' => []];
     }
 
 	public function setCache(\ArrayAccess $cache) {

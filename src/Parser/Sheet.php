@@ -10,6 +10,7 @@ class Sheet {
 	private $tss;
 	private $xPath;
 	private $valueParser;
+	private $filePath;
 	private $sheetLoader;
 	private $file;
 	private $rules;
