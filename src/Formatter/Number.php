@@ -13,7 +13,8 @@ class Number {
 	}
 
 	public function decimal($num, $decimals) {
-		return number_format($num, $decimals, $this->locale['decimal_separator'], $this->locale['thousands_separator']);
+		if (!is_numeric($num)) return $num;
+		return number_format((float)$num, $decimals, $this->locale['decimal_separator'], $this->locale['thousands_separator']);
 	}
 
 	public function currency($num) {
