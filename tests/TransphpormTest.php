@@ -504,7 +504,7 @@ class TransphpormTest extends PHPUnit_Framework_TestCase {
         define('MY_CONSTANT', 'constant value');
         $template = new \Transphporm\Builder($template, $tss);
 
-        $this->assertEquals('<div class="MY_CONSTANT">constant value</div>', $template->output()->body);
+        $this->assertEquals('<div>constant value</div>', $template->output()->body);
     }
 
 
