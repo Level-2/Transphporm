@@ -65,11 +65,13 @@ class Template {
 	}
 
 	/** Loops through all assigned hooks, runs the Xpath query and calls the hook */
-	private function processHooks() {
+	private function processHooks($doc) {
 		foreach ($this->hooks as list($query, $hook)) {
-			foreach ($this->xpath->query($query) as $element) $hook->run($element);
+			foreach ($this->xpath->query($query) as $element) $doc = $hook->run($doc, $element);
 		}
 		$this->hooks = [];
+
+		return $doc;
 	}
 
 	/** Prints out the current DomDocument as HTML */
@@ -80,9 +82,9 @@ class Template {
 	}
 
 	/** Outputs the template's header/body. Returns an array containing both parts */
-	public function output($document = false) {
+	public function output(Document $doc, $document = false) {
 		//Process all hooks
-		 $this->processHooks();
+		 $doc = $this->processHooks($doc);
 
 		//Generate the document by taking only the childnodes of the template, ignoring the <template> and </template> tags
 		//TODO: Is there a faster way of doing this without string manipulation on the output or this loop through childnodes?

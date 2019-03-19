@@ -6,5 +6,5 @@
  * @version         1.2                                                             */
 namespace Transphporm;
 interface Hook {
-	public function run(\DomElement $element);
+	public function run(Document $document, \DomElement $element): Document;
 }

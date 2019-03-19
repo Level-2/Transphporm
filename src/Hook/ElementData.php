@@ -8,7 +8,7 @@ namespace Transphporm\Hook;
 /* Maps which data is applied to which element */
 class ElementData {
 	private $data;
-	private $elementMap;
+	public $elementMap;
 
 	public function __construct(\SplObjectStorage $elementMap, $data) {
 		$this->elementMap = $elementMap;

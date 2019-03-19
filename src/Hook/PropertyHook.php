@@ -29,19 +29,21 @@ class PropertyHook implements \Transphporm\Hook {
 		$this->functionSet = $functionSet;
 	}
 
-	public function run(\DomElement $element) {
+	public function run(\Transphporm\Document $document, \DomElement $element): \Transphporm\Document {
 		//Set the baseDir so that all files for this rule are relative to the file it came from
         if ($this->file !== null) $this->filePath->setBaseDir(dirname(realpath($this->file)));
 		$this->functionSet->setElement($element);
 		$this->configLine = $this->line;
 		try {
 			//Don't run if there's a pseudo element like nth-child() and this element doesn't match it
-			if (!$this->pseudoMatcher->matches($element)) return;
+			if (!$this->pseudoMatcher->matches($element)) return $document;
 			$this->callProperties($element);
 		}
 		catch (\Transphporm\RunException $e) {
 			throw new \Transphporm\Exception($e, $this->file, $this->line);
 		}
+
+		return $document;
 	}
 
 	// TODO: Have all rule values parsed before running them so that things like `content-append` are not expecting tokens

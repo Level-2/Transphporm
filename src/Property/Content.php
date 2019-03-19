@@ -14,6 +14,8 @@ class Content implements \Transphporm\Property {
 	}
 
 	public function run(array $values, \DomElement $element, array $rules, \Transphporm\Hook\PseudoMatcher $pseudoMatcher, array $properties = []) {
+
+
 		if (!$this->shouldRun($element)) return false;
 
 		$values = $this->formatter->format($values, $rules);

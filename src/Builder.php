@@ -67,10 +67,10 @@ class Builder {
 			$template = $this->createAndProcessTemplate($data, $result['cache'], $headers);
 			$tssCache->processRules($template, $this->config);
 
-			$result = ['cache' => $template->output($document),
+			$result = ['cache' => $template->output($this->document, $document),
 			   'renderTime' => time(),
 			   'headers' => array_merge($result['headers'], $headers),
-			   'body' => $this->doPostProcessing($template)->output($document)
+			   'body' => $this->doPostProcessing($template)->output($this->document, $document)
 			];
 			$this->cache->write($tssCache->getCacheKey($data) . $this->template, $result);
 		}
@@ -79,7 +79,10 @@ class Builder {
 	}
 
 	private function createAndProcessTemplate($data, $body, &$headers) {
-		$elementData = new \Transphporm\Hook\ElementData(new \SplObjectStorage(), $data);
+		$storage = new \SplObjectStorage();
+		$this->document = new Document($storage, new \DomDocument);
+
+		$elementData = new \Transphporm\Hook\ElementData($storage, $data);
 		$functionSet = new FunctionSet($elementData);
 		//To be a valid XML document it must have a root element, automatically wrap it in <template> to ensure it does
 		$template = new Template($this->isValidDoc($body) ? str_ireplace('<!doctype', '<!DOCTYPE', $body) : '<template>' . $body . '</template>' );

@@ -32,7 +32,7 @@ class Repeat implements \Transphporm\Property {
 			if ($count+1 > $max) break;
 			$clone = $this->cloneElement($element, $iteration, $key, $count++);
 			//Re-run the hook on the new element, but use the iterated data
-			$hook->run($clone);
+			$hook->run(new \Transphporm\Document($this->elementData->elementMap, new \DomDocument), $clone);
 		}
 		//Remove the original element
 		$element->parentNode->removeChild($element);
