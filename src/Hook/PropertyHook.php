@@ -52,7 +52,6 @@ class PropertyHook implements \Transphporm\Hook {
 	private function callProperties($document, $element) {
 		foreach ($this->rules as $name => $value) {
 			$result = $this->callProperty($document, $name, $element, $this->getArgs($value));
-			if ($result === false) break;
 		}
 	}
 	private function getArgs($value) {
