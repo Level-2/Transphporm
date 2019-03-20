@@ -31,9 +31,13 @@ class Document {
 		return $this;
 	}
 
-	public function removeElement($element) {
+	public function removeElement(\DomElement $element): self {
 		$element->parentNode->removeChild($element);
 		return clone $this;
 	}
 
+	public function removeAllChildren(\DomElement $element): self {
+		while ($element->hasChildNodes()) $element->removeChild($element->firstChild);
+		return clone $this;
+	}
 }

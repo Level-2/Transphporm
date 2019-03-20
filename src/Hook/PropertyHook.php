@@ -55,6 +55,7 @@ class PropertyHook implements \Transphporm\Hook {
 		}
 		return $document;
 	}
+
 	private function getArgs($value) {
 		return $this->valueParser->parseTokens($value);
 	}

@@ -17,8 +17,4 @@ class Bind implements \Transphporm\Property {
 		$document = $document->bind($element, $values[0]);
 		return $document;
 	}
-
-	public function runMultiple() {
-		return true;
-	}
 }

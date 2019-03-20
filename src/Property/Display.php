@@ -13,8 +13,4 @@ class Display implements \Transphporm\Property {
 
 		return $document;
 	}
-
-	public function runMultiple() {
-		return true;
-	}
 }

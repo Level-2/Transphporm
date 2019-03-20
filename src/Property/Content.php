@@ -13,10 +13,6 @@ class Content implements \Transphporm\Property {
 		$this->formatter = $formatter;
 	}
 
-	public function runMultiple() {
-		return true;
-	}
-
 	public function run(\Transphporm\Document $document, array $values, \DomElement $element, array $rules, \Transphporm\Hook\PseudoMatcher $pseudoMatcher, array $properties = []): \Transphporm\Document {
 
 		if (!$this->shouldRun($element)) return $document;
@@ -25,7 +21,7 @@ class Content implements \Transphporm\Property {
 
 		if (!$this->processPseudo($document, $values, $element, $pseudoMatcher)) {
 			//Remove the current contents
-			$this->removeAllChildren($element);
+			$document = $document->removeAllChildren($element);
 			//Now make a text node
 			if ($this->getContentMode($rules) === 'replace') {
 				$contentReplace = new ContentReplace($this);
@@ -101,7 +97,4 @@ class Content implements \Transphporm\Property {
 		}
 	}
 
-	private function removeAllChildren($element) {
-		while ($element->hasChildNodes()) $element->removeChild($element->firstChild);
-	}
 }
