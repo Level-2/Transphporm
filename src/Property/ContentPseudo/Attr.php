@@ -6,7 +6,7 @@
  * @version         1.2                                                             */
 namespace Transphporm\Property\ContentPseudo;
 class Attr implements \Transphporm\Property\ContentPseudo {
-	public function run($value, $pseudoArgs, $element, \Transphporm\Hook\PseudoMatcher $pseudoMatcher) {
+	public function run(\Transphporm\Document $document, $value, $pseudoArgs, $element, \Transphporm\Hook\PseudoMatcher $pseudoMatcher): \Transphporm\Document {
 		$implodedValue = implode('', $value);
 
 		if ($pseudoMatcher->hasFunction('before')) {
@@ -20,5 +20,7 @@ class Attr implements \Transphporm\Property\ContentPseudo {
 		}
 
 		$element->setAttribute($pseudoArgs, $attrValue);
+
+		return clone $document;
 	}
 }

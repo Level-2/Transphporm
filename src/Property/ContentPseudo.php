@@ -7,5 +7,5 @@
 namespace Transphporm\Property;
 
 interface ContentPseudo {
-    public function run($value, $pseudoArgs, $element, \Transphporm\Hook\PseudoMatcher $pseudoMatcher);
+	public function run(\Transphporm\Document $document, $value, $pseudoArgs, $element, \Transphporm\Hook\PseudoMatcher $pseudoMatcher): \Transphporm\Document;
 }

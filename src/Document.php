@@ -15,7 +15,7 @@ class Document {
 		$content = isset($this->elementMap[$element]) ? $this->elementMap[$element] : [];
 		$content[$type] = $data;
 		$this->elementMap[$element] = $content;
-		return $this;
+		return clone $this;
 	}
 
 	/** Returns the data that has been bound to $element, or, if no data is bound to $element climb the DOM tree to find the data bound to a parent node*/
@@ -29,6 +29,11 @@ class Document {
 
 	public function addHeader($header): self {
 		return $this;
+	}
+
+	public function removeElement($element) {
+		$element->parentNode->removeChild($element);
+		return clone $this;
 	}
 
 }

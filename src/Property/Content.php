@@ -13,14 +13,17 @@ class Content implements \Transphporm\Property {
 		$this->formatter = $formatter;
 	}
 
-	public function run(array $values, \DomElement $element, array $rules, \Transphporm\Hook\PseudoMatcher $pseudoMatcher, array $properties = []) {
+	public function runMultiple() {
+		return true;
+	}
 
+	public function run(\Transphporm\Document $document, array $values, \DomElement $element, array $rules, \Transphporm\Hook\PseudoMatcher $pseudoMatcher, array $properties = []): \Transphporm\Document {
 
-		if (!$this->shouldRun($element)) return false;
+		if (!$this->shouldRun($element)) return $document;
 
 		$values = $this->formatter->format($values, $rules);
 
-		if (!$this->processPseudo($values, $element, $pseudoMatcher)) {
+		if (!$this->processPseudo($document, $values, $element, $pseudoMatcher)) {
 			//Remove the current contents
 			$this->removeAllChildren($element);
 			//Now make a text node
@@ -30,6 +33,8 @@ class Content implements \Transphporm\Property {
 			}
 			else $this->appendContent($element, $values);
 		}
+
+		return $document;
 	}
 
 	private function shouldRun($element) {
@@ -48,17 +53,17 @@ class Content implements \Transphporm\Property {
 		$this->contentPseudo[$name] = $contentPseudo;
 	}
 
-	private function processPseudo($value, $element, $pseudoMatcher) {
+	private function processPseudo($document, $value, $element, $pseudoMatcher) {
 		foreach ($this->contentPseudo as $pseudoName => $pseudoFunction) {
 			if ($pseudoMatcher->hasFunction($pseudoName)) {
-				$pseudoFunction->run($value, $pseudoMatcher->getFuncArgs($pseudoName, $element)[0], $element, $pseudoMatcher);
+				$pseudoFunction->run($document, $value, $pseudoMatcher->getFuncArgs($pseudoName, $element)[0], $element, $pseudoMatcher);
 				return true;
 			}
 		}
 		return false;
 	}
 
-	public function getNode($node, $document) {
+	public function getNode(array $node, $document) {
 		foreach ($node as $n) {
 			if (is_array($n)) {
 				foreach ($this->getNode($n, $document) as $new) yield $new;
@@ -76,7 +81,13 @@ class Content implements \Transphporm\Property {
 		else {
 			if ($node instanceof \DomText) $node = $node->nodeValue;
 			$new = $document->createElement('text');
-
+			// If node isn't an string display nothing. May be better to have a strict mode which throws an exception?
+			try {
+				$node = strval($node);
+			}
+			catch (\Exception $e) {
+				$node = '';
+			}
 			$new->appendChild($document->createTextNode($node));
 			$new->setAttribute('transphporm', 'text');
 		}

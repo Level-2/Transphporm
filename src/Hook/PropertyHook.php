@@ -37,7 +37,7 @@ class PropertyHook implements \Transphporm\Hook {
 		try {
 			//Don't run if there's a pseudo element like nth-child() and this element doesn't match it
 			if (!$this->pseudoMatcher->matches($element)) return $document;
-			$this->callProperties($element);
+			$this->callProperties($document, $element);
 		}
 		catch (\Transphporm\RunException $e) {
 			throw new \Transphporm\Exception($e, $this->file, $this->line);
@@ -49,9 +49,9 @@ class PropertyHook implements \Transphporm\Hook {
 	// TODO: Have all rule values parsed before running them so that things like `content-append` are not expecting tokens
 	// problem with this is that anything in data changed by run properties is not shown
 	// TODO: Allow `update-frequency` to be parsed before it is accessed in rule (might need to switch location of rule check)
-	private function callProperties($element) {
+	private function callProperties($document, $element) {
 		foreach ($this->rules as $name => $value) {
-			$result = $this->callProperty($name, $element, $this->getArgs($value));
+			$result = $this->callProperty($document, $name, $element, $this->getArgs($value));
 			if ($result === false) break;
 		}
 	}
@@ -63,10 +63,10 @@ class PropertyHook implements \Transphporm\Hook {
 		$this->properties[$name] = $property;
 	}
 
-	private function callProperty($name, $element, $value) {
+	private function callProperty($document, $name, $element, $value) {
 		if (isset($this->properties[$name])) {
 			try {
-				return $this->properties[$name]->run($value, $element, $this->rules, $this->pseudoMatcher, $this->properties);
+				return $this->properties[$name]->run($document, $value, $element, $this->rules, $this->pseudoMatcher, $this->properties);
 			}
 			catch (\Exception $e) {
 				if ($e instanceof \Transphporm\RunException) throw $e;

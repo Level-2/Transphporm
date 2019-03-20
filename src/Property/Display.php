@@ -6,9 +6,15 @@
  * @version         1.2                                                             */
 namespace Transphporm\Property;
 class Display implements \Transphporm\Property {
-	public function run(array $values, \DomElement $element, array $rules, \Transphporm\Hook\PseudoMatcher $pseudoMatcher, array $properties = []) {
+	public function run(\Transphporm\Document $document, array $values, \DomElement $element, array $rules, \Transphporm\Hook\PseudoMatcher $pseudoMatcher, array $properties = []): \Transphporm\Document {
 		if ($pseudoMatcher->hasFunction('attr')) $element->removeAttribute($pseudoMatcher->getFuncArgs('attr')[0]);
 		else if (strtolower($values[0]) === 'none') $element->setAttribute('transphporm', 'remove');
 		else $element->setAttribute('transphporm', 'show');
+
+		return $document;
+	}
+
+	public function runMultiple() {
+		return true;
 	}
 }

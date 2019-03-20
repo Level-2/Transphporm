@@ -12,7 +12,9 @@ class Headers implements \Transphporm\Property\ContentPseudo {
 		$this->headers = &$headers;
 	}
 
-	public function run($value, $pseudoArgs, $element, \Transphporm\Hook\PseudoMatcher $pseudoMatcher) {
+	public function run(\Transphporm\Document $document, $value, $pseudoArgs, $element, \Transphporm\Hook\PseudoMatcher $pseudoMatcher): \Transphporm\Document {
 		$this->headers[] = [$pseudoArgs, implode('', $value)];
+		//TODO, all changes should be made in $document
+		return clone $document;
 	}
 }

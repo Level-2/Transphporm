@@ -14,15 +14,17 @@ class BeforeAfter implements \Transphporm\Property\ContentPseudo {
 		$this->content = $content;
 	}
 
-	public function run($value, $pseudoArgs, $element, \Transphporm\Hook\PseudoMatcher $pseudoMatcher) {
+	public function run(\Transphporm\Document $document, $value, $pseudoArgs, $element, \Transphporm\Hook\PseudoMatcher $pseudoMatcher): \Transphporm\Document {
 		$currentFirst = $element->firstChild;
 
 		foreach ($this->content->getNode($value, $element->ownerDocument) as $node) {
 			$this->{$this->insertLocation}($node, $element, $currentFirst);
 		}
+		//TODO, all changes should be made in $document
+		return clone $document;
 	}
 
-	private function before($node, $element, $currentFirst) {		
+	private function before($node, $element, $currentFirst) {
 		$element->insertBefore($node, $currentFirst);
 	}
 

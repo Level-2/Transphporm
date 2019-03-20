@@ -18,25 +18,25 @@ class Repeat implements \Transphporm\Property {
         $this->filePath = $filePath;
 	}
 
-	public function run(array $values, \DomElement $element, array $rules, \Transphporm\Hook\PseudoMatcher $pseudoMatcher, array $properties = []) {
+	public function run(\Transphporm\Document $document, array $values, \DomElement $element, array $rules, \Transphporm\Hook\PseudoMatcher $pseudoMatcher, array $properties = []): \Transphporm\Document {
 		$values = $this->fixEmpty($values);
-		if ($element->getAttribute('transphporm') === 'added') return $element->parentNode->removeChild($element);
+		if ($element->getAttribute('transphporm') === 'added') return $document->removeElement($element);
 		$max = $this->getMax($values);
 		$count = 0;
 		$repeat = $this->getRepeatValue($values, $max);
 		//Don't run repeat on the cloned element or it will loop forever
 		unset($rules['repeat']);
 		$hook = $this->createHook($rules, $pseudoMatcher, $properties);
-		$document = new \Transphporm\Document($this->elementData->elementMap, new \DomDocument);
+
 		foreach ($repeat as $key => $iteration) {
 			if ($count+1 > $max) break;
 			$clone = $this->cloneElement($document, $element, $iteration, $key, $count++);
 			//Re-run the hook on the new element, but use the iterated data
-			$hook->run($document, $clone);
+			$document = $hook->run($document, $clone);
 		}
 		//Remove the original element
 		$element->parentNode->removeChild($element);
-		return false;
+		return $document;
 	}
 
 	private function getRepeatValue($values, &$max) {
