@@ -27,12 +27,12 @@ class Repeat implements \Transphporm\Property {
 		//Don't run repeat on the cloned element or it will loop forever
 		unset($rules['repeat']);
 		$hook = $this->createHook($rules, $pseudoMatcher, $properties);
-
+		$document = new \Transphporm\Document($this->elementData->elementMap, new \DomDocument);
 		foreach ($repeat as $key => $iteration) {
 			if ($count+1 > $max) break;
-			$clone = $this->cloneElement($element, $iteration, $key, $count++);
+			$clone = $this->cloneElement($document, $element, $iteration, $key, $count++);
 			//Re-run the hook on the new element, but use the iterated data
-			$hook->run(new \Transphporm\Document($this->elementData->elementMap, new \DomDocument), $clone);
+			$hook->run($document, $clone);
 		}
 		//Remove the original element
 		$element->parentNode->removeChild($element);
@@ -59,12 +59,12 @@ class Repeat implements \Transphporm\Property {
 		return $value;
 	}
 
-	private function cloneElement($element, $iteration, $key, $count) {
+	private function cloneElement($document, $element, $iteration, $key, $count) {
 		$clone = $element->cloneNode(true);
 		$this->tagElement($clone, $count);
 
-		$this->elementData->bind($clone, $iteration, 'iteration');
-		$this->elementData->bind($clone, $key, 'key');
+		$document = $document->bind($clone, $iteration, 'iteration');
+		$document = $document->bind($clone, $key, 'key');
 		$element->parentNode->insertBefore($clone, $element);
 		return $clone;
 	}
