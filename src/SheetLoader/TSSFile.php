@@ -44,7 +44,7 @@ class TSSFile implements TSSRules {
 	}
 
 	public function updateRequired($data) {
-		$this->cacheName = $this->getCacheKey($data) . $this->fileName;
+		$this->cacheName = $this->getCacheKey($data);
 
 		$rules = $this->getRulesFromCache($this->fileName);
 		//Nothing was cached or the TSS file has changed, update is required
