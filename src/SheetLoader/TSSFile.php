@@ -64,7 +64,7 @@ class TSSFile implements TSSRules {
 			$this->cacheName = $cacheKey . $this->fileName;
 			return $cacheKey;
 		}
-		else return '';
+		else return $this->fileName;
 	}
 
 	public function getRules($cssToXpath, $valueParser, $sheetLoader, $indexStart) {
