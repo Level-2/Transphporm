@@ -18,18 +18,12 @@ class Repeat implements \Transphporm\Property {
         $this->filePath = $filePath;
 	}
 
+
+
 	public function run(array $values, \DomElement $element, array $rules, \Transphporm\Hook\PseudoMatcher $pseudoMatcher, array $properties = []) {
 		$values = $this->fixEmpty($values);
 		if ($element->getAttribute('transphporm') === 'added') return $element->parentNode->removeChild($element);
-
-		$contentMode = (isset($rules['content-mode'])) ? $rules['content-mode']->read() : 'replace';
-
-		if ($contentMode == 'append') {
-			$clone = $element->cloneNode(true);
-			$clone->setAttribute('transphporm', 'immutable');
-			$element->parentNode->insertBefore($clone, $element);
-		}
-
+		$this->handleContentModeAppend($element, $rules);
 		$max = $this->getMax($values);
 		$count = 0;
 		$repeat = $this->getRepeatValue($values, $max);
@@ -46,6 +40,16 @@ class Repeat implements \Transphporm\Property {
 		//Remove the original element
 		$element->parentNode->removeChild($element);
 		return false;
+	}
+
+	private function handleContentModeAppend(\DomElement $element, array $rules) {
+		$contentMode = (isset($rules['content-mode'])) ? $rules['content-mode']->read() : 'replace';
+
+		if ($contentMode == 'append') {
+			$clone = $element->cloneNode(true);
+			$clone->setAttribute('transphporm', 'immutable');
+			$element->parentNode->insertBefore($clone, $element);
+		}
 	}
 
 	private function getRepeatValue($values, &$max) {
