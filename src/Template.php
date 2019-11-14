@@ -67,7 +67,11 @@ class Template {
 	/** Loops through all assigned hooks, runs the Xpath query and calls the hook */
 	private function processHooks() {
 		foreach ($this->hooks as list($query, $hook)) {
-			foreach ($this->xpath->query($query) as $element) $hook->run($element);
+			foreach ($this->xpath->query($query) as $element) {
+				if ($element->getAttribute('transphporm') !== 'immutable' || $hook->runOnImmutableElements()) {
+					$hook->run($element);
+				}
+			}
 		}
 		$this->hooks = [];
 	}

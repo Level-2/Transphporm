@@ -21,6 +21,15 @@ class Repeat implements \Transphporm\Property {
 	public function run(array $values, \DomElement $element, array $rules, \Transphporm\Hook\PseudoMatcher $pseudoMatcher, array $properties = []) {
 		$values = $this->fixEmpty($values);
 		if ($element->getAttribute('transphporm') === 'added') return $element->parentNode->removeChild($element);
+
+		$contentMode = (isset($rules['content-mode'])) ? $rules['content-mode']->read() : 'replace';
+
+		if ($contentMode == 'append') {
+			$clone = $element->cloneNode(true);
+			$clone->setAttribute('transphporm', 'immutable');
+			$element->parentNode->insertBefore($clone, $element);
+		}
+
 		$max = $this->getMax($values);
 		$count = 0;
 		$repeat = $this->getRepeatValue($values, $max);

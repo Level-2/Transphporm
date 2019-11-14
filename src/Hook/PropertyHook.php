@@ -29,6 +29,10 @@ class PropertyHook implements \Transphporm\Hook {
 		$this->functionSet = $functionSet;
 	}
 
+	public function runOnImmutableElements(): bool {
+		return false;
+	}
+
 	public function run(\DomElement $element) {
 		//Set the baseDir so that all files for this rule are relative to the file it came from
         if ($this->file !== null) $this->filePath->setBaseDir(dirname(realpath($this->file)));

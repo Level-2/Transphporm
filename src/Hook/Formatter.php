@@ -33,6 +33,10 @@ class Formatter {
 		}
 	}
 
+	public function runOnImmutableElements(): bool {
+		return false;
+	}
+
 	//TODO: Abstract all error reporting externally with a method for turning it on/off
 	private function assert($condition, $error) {
 		if (!$condition) throw new \Exception($error);

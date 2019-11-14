@@ -1974,6 +1974,38 @@ ul li span {
 
 	}
 
+	public function testContentModeAppendWithRepeat() {
+		$xml = <<<XML
+		<select class="status">
+		<option value="0">Default option</option>
+		</select>
+		XML;
+
+		$tss = <<<TSS
+		.status option {
+		    repeat: data(status);
+		    content-mode: append;
+		    content: key(), " - ", iteration();
+		}
+		.status option:attr(value) {
+		    content: key();
+		}
+		TSS;
+
+		$data['status'] = [
+		    1 => "Good",
+		    2 => "Bad",
+		    3 => "Ugly",
+		];
+
+		$template = new Transphporm\Builder($xml, $tss);
+		$output = $template->output($data)->body;
+
+		$this->assertEquals($this->stripTabs('<select class="status">
+<option value="0">Default option</option><option value="1">1 - Good</option><option value="2">2 - Bad</option><option value="3">3 - Ugly</option>
+</select>'), $this->stripTabs($output));
+	}
+
 }
 
 

@@ -14,4 +14,7 @@ class PostProcess implements \Transphporm\Hook {
 		else $element->removeAttribute('transphporm');
 	}
 
+	public function runOnImmutableElements(): bool {
+		return true;
+	}
 }
