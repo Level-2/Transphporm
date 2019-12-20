@@ -97,7 +97,7 @@ class Tokens implements \Iterator, \Countable {
 		$tokens = $this->tokens;
 		$tokensToTrim = [Tokenizer::WHITESPACE, Tokenizer::NEW_LINE];
 		// Remove end whitespace
-		while (in_array(end($tokens)['type'], $tokensToTrim)) {
+		while ($tokens && in_array(end($tokens)['type'], $tokensToTrim)) {
 			array_pop($tokens);
 		}
 		// Remove begining whitespace

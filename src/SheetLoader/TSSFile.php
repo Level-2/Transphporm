@@ -68,10 +68,10 @@ class TSSFile implements TSSRules {
 	}
 
 	public function getRules($cssToXpath, $valueParser, $sheetLoader, $indexStart) {
-		$rules = $this->getRulesFromCache($this->fileName)['rules'];
+		$rules = $this->getRulesFromCache($this->fileName);
 		$this->filePath->addPath(dirname(realpath($this->fileName)));
 		if (empty($rules)) $tss = file_get_contents($this->fileName);
-		else return $rules;
+		else return $rules['rules'];
 
 		return $tss == null ? [] : (new \Transphporm\Parser\Sheet($tss, $cssToXpath, $valueParser, $this->filePath, $sheetLoader))->parse($indexStart);
 	}

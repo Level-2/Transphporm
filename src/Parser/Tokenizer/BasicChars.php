@@ -21,7 +21,7 @@ class BasicChars implements \Transphporm\Parser\Tokenizable {
 		$char = $str->identifyChar();
 		if ($char === Tokenizer::WHITESPACE) {
 			$last = $tokens->end();
-			if ($last['type'] !== Tokenizer::WHITESPACE) {
+			if ($last && $last['type'] !== Tokenizer::WHITESPACE) {
 				$tokens->add(['type' => $char]);
 			}
 		}
