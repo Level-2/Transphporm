@@ -54,14 +54,17 @@ class Value {
 	}
 
 	public function parseTokens($tokens, $data = null) {
+		if (count($tokens) === 0) return [$data];
+
 		$this->result = new ValueResult();
 		$this->data = new ValueData($data ? $data : $this->baseData);
 		$this->last = new Last($this->data, $this->result, $this->autoLookup);
 		$this->traversing = false;
 
-		if (count($tokens) <= 0) return [$data];
 
-		foreach (new TokenFilterIterator($tokens, [Tokenizer::WHITESPACE, Tokenizer::NEW_LINE]) as $name => $token) {
+
+		foreach ($tokens as $name => $token) {
+			if ($token['type'] == 'WHITESPACE' || $token['type'] == 'NEWLINE') continue;
 			$this->{$this->tokenFuncs[$token['type']]}($token);
 		}
 
