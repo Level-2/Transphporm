@@ -109,7 +109,8 @@ class Sheet {
         $return = [];
         foreach ($rules as $rule) {
             $name = $rule->from(Tokenizer::NAME, true)->to(Tokenizer::COLON)->read();
-            $return[$name] = $rule->from(Tokenizer::COLON)->trim();
+            $tokens = $rule->from(Tokenizer::COLON)->trim();
+            if (count($tokens) > 0) $return[$name] = $rule->from(Tokenizer::COLON)->trim();
         }
 
         return $return;

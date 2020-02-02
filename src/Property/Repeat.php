@@ -28,15 +28,20 @@ class Repeat implements \Transphporm\Property {
 		$count = 0;
 		$repeat = $this->getRepeatValue($values, $max);
 		//Don't run repeat on the cloned element or it will loop forever
+
 		unset($rules['repeat']);
+
+
 		$hook = $this->createHook($rules, $pseudoMatcher, $properties);
+
 
 		foreach ($repeat as $key => $iteration) {
 			if ($count+1 > $max) break;
 			$clone = $this->cloneElement($element, $iteration, $key, $count++);
 			//Re-run the hook on the new element, but use the iterated data
-			$hook->run($clone);
+			if ($hook) $hook->run($clone);
 		}
+
 		//Remove the original element
 		$element->parentNode->removeChild($element);
 		return false;
@@ -92,6 +97,9 @@ class Repeat implements \Transphporm\Property {
 	}
 
 	private function createHook($newRules, $pseudoMatcher, $properties) {
+		if (empty($newRules) || (count($newRules) == 1 && isset($newRules[0]) && $newRules[0]->count() == 0)) {
+			return false;
+		}
 		$hook = new \Transphporm\Hook\PropertyHook($newRules, $this->line, null, $this->line, $pseudoMatcher, new \Transphporm\Parser\Value($this->functionSet), $this->functionSet, $this->filePath);
 		foreach ($properties as $name => $property) $hook->registerProperty($name, $property);
 		return $hook;
