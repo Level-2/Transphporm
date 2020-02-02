@@ -18,17 +18,19 @@ class PseudoMatcher {
 		$this->valueParser = $valueParser;
 	}
 
-	public function registerFunction(\Transphporm\Pseudo $pseudo) {
-		$this->functions[] = $pseudo;
+	public function registerFunction($name, \Transphporm\Pseudo $pseudo) {
+		$this->functions[$name] = $pseudo;
 	}
 
 	public function matches($element) {
 		foreach ($this->pseudo as $i => $tokens) {
 			$parts = $this->getFuncParts($i, $tokens);
-			foreach ($this->functions as $function) {
-				$matches = $this->match($parts, $function, $element);
-				if ($matches === false) return false;
+			if ($parts['name'] === null) $parts['name'] = 'data';
+			if (!isset($this->functions[$parts['name']])) return true;
+			if ($this->match($parts, $this->functions[$parts['name']], $element) === false) {
+				return false;
 			}
+
 		}
 		return true;
 	}

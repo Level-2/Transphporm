@@ -72,8 +72,8 @@ class Config {
         if (isset($this->properties['content'])) $this->properties['content']->addContentPseudo($name, $pseudo);
     }
 
-	public function registerPseudo(Pseudo $pseudo) {
-		$this->pseudo[] = $pseudo;
+	public function registerPseudo($name, Pseudo $pseudo) {
+		$this->pseudo[$name] = $pseudo;
 	}
 
 	public function loadProperties(Hook\PropertyHook $hook) {
@@ -82,7 +82,7 @@ class Config {
 
 	public function createPseudoMatcher($pseudo) {
 		$pseudoMatcher = new Hook\PseudoMatcher($pseudo, $this->valueParser);
-		foreach ($this->pseudo as $pseudoFunction) $pseudoMatcher->registerFunction(clone $pseudoFunction);
+		foreach ($this->pseudo as $name => $pseudoFunction) $pseudoMatcher->registerFunction($name, clone $pseudoFunction);
 		return $pseudoMatcher;
 	}
 

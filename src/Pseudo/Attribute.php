@@ -7,7 +7,7 @@
 namespace Transphporm\Pseudo;
 class Attribute implements \Transphporm\Pseudo {
 	public function match($name, $args, \DomElement $element) {
-		if (!($name === null || in_array($name, ['data', 'iteration', 'root'])))  return true;
+		if ($name === null) return true;
 		return $args[0];
 	}
 }
