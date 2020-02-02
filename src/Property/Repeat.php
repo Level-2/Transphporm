@@ -97,9 +97,12 @@ class Repeat implements \Transphporm\Property {
 	}
 
 	private function createHook($newRules, $pseudoMatcher, $properties) {
-		if (empty($newRules) || (count($newRules) == 1 && isset($newRules[0]) && $newRules[0]->count() == 0)) {
-			return false;
-		}
+		// Only create a hook if there are remaining properties to process
+		// for this rule e.g. repeat: data(); content: "foo"
+		// The content property still needs to be used
+		// But for rules that are just { repeat: data(); } this can be skipped.
+		if (empty($newRules)) return false;
+
 		$hook = new \Transphporm\Hook\PropertyHook($newRules, $this->line, null, $this->line, $pseudoMatcher, new \Transphporm\Parser\Value($this->functionSet), $this->functionSet, $this->filePath);
 		foreach ($properties as $name => $property) $hook->registerProperty($name, $property);
 		return $hook;
