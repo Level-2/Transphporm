@@ -11,6 +11,7 @@ class PseudoMatcher {
 	private $pseudo;
 	private $valueParser;
 	private $functions = [];
+	private $funcParts = [];
 
 	public function __construct($pseudo, \Transphporm\Parser\Value $valueParser) {
 		$this->pseudo = $pseudo;
@@ -22,18 +23,18 @@ class PseudoMatcher {
 	}
 
 	public function matches($element) {
-		foreach ($this->pseudo as $tokens) {
+		foreach ($this->pseudo as $i => $tokens) {
+			$parts = $this->getFuncParts($i, $tokens);
 			foreach ($this->functions as $function) {
-				$matches = $this->match($tokens, $function, $element);
+				$matches = $this->match($parts, $function, $element);
 				if ($matches === false) return false;
 			}
 		}
 		return true;
 	}
 
-	private function match($tokens, $function, $element) {
+	private function match($parts, $function, $element) {
 		try {
-			$parts = $this->getFuncParts($tokens);
 			$matches = $function->match($parts['name'], $parts['args'], $element);
 			if ($matches === false) return false;
 		}
@@ -41,10 +42,14 @@ class PseudoMatcher {
 			throw new \Transphporm\RunException(\Transphporm\Exception::PSEUDO, $parts['name'], $e);
 		}
 	}
-	private function getFuncParts($tokens) {
+	private function getFuncParts($i, $tokens) {
+		if (isset($this->funcParts[$i])) return $this->funcParts[$i];
 		$parts = [];
+		$canCache = true;
 		$parts['name'] = $this->getFuncName($tokens);
 		if ($parts['name'] === null || in_array($parts['name'], ['data', 'iteration', 'root'])) {
+			//If the args are dynamic, it can't be cached as it may change between calls
+			$canCache = false;
 			$parts['args'] = $this->valueParser->parseTokens($tokens);
 		}
 		else if (count($tokens) > 1) {
@@ -53,6 +58,7 @@ class PseudoMatcher {
 			$parts['args'] = $this->valueParser->parseTokens($tokens->current()['value']);
 		}
 		else $parts['args'] = [['']];
+		if ($canCache) $this->funcParts[$i] = $parts;
 		return $parts;
 	}
 
@@ -68,8 +74,8 @@ class PseudoMatcher {
 	}
 
 	public function getFuncArgs($name) {
-		foreach ($this->pseudo as $tokens) {
-			$parts = $this->getFuncParts($tokens);
+		foreach ($this->pseudo as $i => $tokens) {
+			$parts = $this->getFuncParts($i, $tokens);
 			if ($name === $parts['name']) return $parts['args'];
 		}
 	}
