@@ -57,11 +57,16 @@ class PseudoMatcher {
 		else if (count($tokens) > 1) {
 			$tokens->rewind();
 			$tokens->next();
+			$this->skipWhitespace($tokens);
 			$parts['args'] = $this->valueParser->parseTokens($tokens->current()['value']);
 		}
 		else $parts['args'] = [['']];
 		if ($canCache) $this->funcParts[$i] = $parts;
 		return $parts;
+	}
+
+	private function skipWhitespace($tokens) {
+		while ($tokens->current()['type'] === 'WHITESPACE' || $tokens->current()['type'] == 'NEWLINE') $tokens->next();
 	}
 
 	private function getFuncName($tokens) {
