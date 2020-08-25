@@ -1,5 +1,5 @@
 {
-    "name": "level-2/transphporm",
+    "name": "cxj/transphporm",
     "description": "A new approach at templating",
     "license": "BSD-2-Clause",
     "homepage": "https://github.com/Level-2/Transphporm",
@@ -8,7 +8,11 @@
     	{
     		"name": "Tom Butler",
     		"email": "tom@r.je"
-    	}
+    	},
+        {
+            "name": "Chris Johnson",
+            "email": "cxjohnson@gmail.com"
+        }
     ],
     "require": {
         "php": ">=7.0.0"
