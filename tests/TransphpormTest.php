@@ -1436,6 +1436,27 @@ ul li span {
 		unlink($file);
 	}
 
+    public function testFile() {
+        $data = <<<JS
+let j = 0;
+if (j < 4) {
+    console.log('j' + " is less than 4");
+}
+JS;
+
+        $file = __DIR__ . 'data.file';
+        file_put_contents($file, $data);
+
+        $xml = "<script></script>";
+        $tss = 'script { content: file("' . $file . '"); }';
+
+        $template = new \Transphporm\Builder($xml, $tss);
+
+		$this->assertEquals($this->stripTabs("<script>$data</script>"), $this->stripTabs($template->output($data)->body));
+
+		unlink($file);
+    }
+
 	public function testRoot() {
 		$xml = "
 		<div></div>
