@@ -120,7 +120,7 @@ class DateFormatTest extends PHPUnit_Framework_TestCase {
 	}
 
 	public function testWeeksin() {
-		$this->assertEquals('in 2 weeks', $this->relative('+2 weeks'));
+		$this->assertEquals('in 3 weeks', $this->relative('+3 weeks'));
 	}
 
 	public function testMonthsAgo() {

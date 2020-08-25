@@ -28,11 +28,25 @@ class Literals implements \Transphporm\Parser\Tokenizable {
 		}
 	}
 
+	private function isRealSubtract($n, $str) {
+		$n--;
+		// allow foo(2-5)
+		//but not data(foo2-5)
+		while (is_numeric($str->read($n))) {
+			$n--;
+		}
+
+		if ($n == 0) return false;
+		if (in_array($str->read($n), ['(', "\n", ' ', '['])) return true;
+
+		return false;
+	}
+
 	private function isLiteral($n, $str) {
 		//Is it a normal literal character
 		return ($str->has($n) && ($str->identifyChar($n, $str) === Tokenizer::NAME
 		//but a subtract can be part of a class name or a mathematical operation
-				|| $str->identifyChar($n) == Tokenizer::SUBTRACT && !is_numeric($str->read($n-1)))
+				|| $str->identifyChar($n) == Tokenizer::SUBTRACT && !$this->isRealSubtract($n, $str))
 			);
 	}
 
