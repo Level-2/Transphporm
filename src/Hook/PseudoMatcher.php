@@ -26,7 +26,7 @@ class PseudoMatcher {
 		foreach ($this->pseudo as $i => $tokens) {
 			$parts = $this->getFuncParts($i, $tokens);
 			if ($parts['name'] === null) $parts['name'] = 'data';
-			if (!isset($this->functions[$parts['name']])) return true;
+			if (!isset($this->functions[$parts['name']])) continue;
 			if ($this->match($parts, $this->functions[$parts['name']], $element) === false) {
 				return false;
 			}

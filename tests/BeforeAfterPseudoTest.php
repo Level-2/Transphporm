@@ -30,6 +30,30 @@ class BeforeAfterPseudoTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals($this->stripTabs('<div>TestAFTER</div>'), $this->stripTabs($template->output()->body));
 	}
 
+    public function testConditionalAfterFalse() {
+        $template =  '
+		<div>Test</div>
+		';
+
+        $tss = 'div:[data()="test"]:after {content: "AFTER";}';
+
+        $template = new \Transphporm\Builder($template, $tss);
+
+        $this->assertEquals($this->stripTabs('<div>Test</div>'), $this->stripTabs($template->output("test1")->body));
+    }
+
+    public function testConditionalAfterFalseCondition2nd() {
+        $template =  '
+		<div>Test</div>
+		';
+
+        $tss = 'div:after:[data()="test"] {content: "AFTER";}';
+
+        $template = new \Transphporm\Builder($template, $tss);
+
+        $this->assertEquals($this->stripTabs('<div>Test</div>'), $this->stripTabs($template->output("test1")->body));
+    }
+
     public function testOverrideAfter() {
 			$xml = '<div>
 			<span>Test</span>

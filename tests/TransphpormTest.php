@@ -1979,7 +1979,7 @@ ul li span {
 		<select class="status">
 		<option value="0">Default option</option>
 		</select>
-		XML;
+XML;
 
 		$tss = <<<TSS
 		.status option {
@@ -1990,7 +1990,7 @@ ul li span {
 		.status option:attr(value) {
 		    content: key();
 		}
-		TSS;
+TSS;
 
 		$data['status'] = [
 		    1 => "Good",
