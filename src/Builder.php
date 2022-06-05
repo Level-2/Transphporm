@@ -51,7 +51,7 @@ class Builder {
 	}
 
 	private function getSheetLoader() {
-		$tssRules = is_file($this->tss) ? new SheetLoader\TSSFile($this->tss, $this->filePath, $this->cache, $this->time) : new SheetLoader\TSSString($this->tss, $this->filePath);
+		$tssRules = is_file((string)$this->tss) ? new SheetLoader\TSSFile($this->tss, $this->filePath, $this->cache, $this->time) : new SheetLoader\TSSString($this->tss, $this->filePath);
 		return new SheetLoader\SheetLoader($this->cache, $this->filePath, $tssRules, $this->time);
 	}
 
@@ -85,7 +85,7 @@ class Builder {
 		$template = new Template($this->isValidDoc($body) ? str_ireplace('<!doctype', '<!DOCTYPE', $body) : '<template>' . $body . '</template>' );
 
 		$valueParser = new Parser\Value($functionSet);
-		$this->config = new Config($functionSet, $valueParser, $elementData, new Hook\Formatter(), new Parser\CssToXpath($functionSet, $template->getPrefix(), md5($this->tss)), $this->filePath, $headers);
+		$this->config = new Config($functionSet, $valueParser, $elementData, new Hook\Formatter(), new Parser\CssToXpath($functionSet, $template->getPrefix(), md5((string)$this->tss)), $this->filePath, $headers);
 
 		foreach ($this->modules as $module) $module->load($this->config);
 		return $template;
