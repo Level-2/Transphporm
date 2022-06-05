@@ -52,7 +52,12 @@ class ValueData {
 	}
 
 	public function methodExists($name) {
-		return method_exists($this->data, $name);
+		// PHP 8+ will throw a type error if not an object or string
+		try {
+			return method_exists($this->data, $name);
+		} catch (\TypeError $e) {
+			return false;
+		}
 	}
 
 	public function parseNested($parser, $token, $funcName) {
