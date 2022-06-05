@@ -18,11 +18,11 @@ class Tokens implements \Iterator, \Countable {
 	}
 
 	// Iterator Functions
-	public function current(): mixed {
+	public function current(): array {
 		return $this->tokens[$this->iterator];
 	}
 
-	public function key(): mixed {
+	public function key(): int {
 		return $this->iterator;
 	}
 

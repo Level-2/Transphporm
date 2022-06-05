@@ -14,11 +14,11 @@ class TokenFilterIterator implements \Iterator {
         $this->tokens = $tokens;
     }
 
-    public function current(): mixed {
+    public function current(): array {
         return $this->tokens->current();
     }
 
-    public function key(): mixed {
+    public function key(): int {
         return $this->tokens->key();
     }
 
