@@ -132,6 +132,10 @@ This allows an unprecedented level of flexibility. Rather than having to conside
 
 Transphporm gives both designers and developers an unprecedented level of flexibility that just isn't possible with traditional template engines.
 
+# Requirements
+
+Transphporm requires at least PHP 7.3 to run and is fully supported up to PHP 8.1.
+
 # Installation
 
 The preferred method of installing Transphporm is via Composer. Transphporm is available from Packagist as:
@@ -1179,6 +1183,7 @@ This allows a top down approach. Most frameworks work on a bottom up approach wh
 
 # Credits
 
-Transphporm was originally developed by Tom Butler ( @TomBZombie ) with additional feature implementation, bugfixes and suggestions by Richard Sollee ( @solleer )
+Transphporm was originally developed by Tom Butler ( @TomBZombie ). Additional features, bugfixes and suggestions by:
 
-
+- Richard Sollee ( @solleer )
+- Nathan Bishop ( @nbish11 )

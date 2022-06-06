@@ -52,7 +52,7 @@ class TokenizedString {
 
 	public function next() {
 		$this->pos++;
-		return $this->pos < strlen($this->str);
+		return $this->pos < strlen((string)$this->str);
 	}
 
 	public function reset() {

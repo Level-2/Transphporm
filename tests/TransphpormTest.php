@@ -1835,7 +1835,7 @@ ul li span {
 
 		$output = $template->output(['foo' => 'bar'])->body;
 
-		$this->assertRegexp('/string\(3\) \"bar\"/', $output);
+		$this->assertMatchesRegularExpression('/string\(3\) \"bar\"/', $output);
 	}
 
 	public function testGreater() {

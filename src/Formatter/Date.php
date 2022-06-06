@@ -16,7 +16,7 @@ class Date {
 	/** Converts $val into a \DateTime object if it's not already */
 	private function getDate($val) {
 		$tz = new \DateTimeZone($this->locale['timezone']);
-		$date =  $val instanceof \DateTimeInterface ? $val : new \DateTime($val, $tz);
+		$date =  $val instanceof \DateTimeInterface ? $val : new \DateTime((string)$val, $tz);
 		$date->setTimeZone($tz);
 		return $date;
 	}
@@ -44,9 +44,11 @@ class Date {
 		$now = $this->getDate(null);
 		$date = $this->getDate($val);
 
+		// round microseconds to nearest second
+		$secondsToAdd = round($now->diff($date)->f, 0);
+		$date->add(new \DateInterval("PT${secondsToAdd}S"));
+
 		$diff = $now->diff($date);
-
-
 		$diffDays = $diff->invert === 1 ? $diff->days : 0- $diff->days;
 
 		if ($diffDays !== 0) return $this->dayOffset($diffDays);

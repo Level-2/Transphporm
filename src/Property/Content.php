@@ -75,7 +75,7 @@ class Content implements \Transphporm\Property {
 			if ($node instanceof \DomText) $node = $node->nodeValue;
 			$new = $document->createElement('text');
 
-			$new->appendChild($document->createTextNode($node));
+			$new->appendChild($document->createTextNode($node !== null ? $node : ''));
 			$new->setAttribute('transphporm', 'text');
 		}
 		return $new;

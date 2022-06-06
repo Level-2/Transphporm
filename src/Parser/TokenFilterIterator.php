@@ -14,26 +14,26 @@ class TokenFilterIterator implements \Iterator {
         $this->tokens = $tokens;
     }
 
-    public function current() {
+    public function current(): array {
         return $this->tokens->current();
     }
 
-    public function key() {
+    public function key(): int {
         return $this->tokens->key();
     }
 
-    public function valid() {
+    public function valid(): bool {
         return $this->tokens->valid();
     }
 
-    public function next() {
+    public function next(): void {
         do {
             $this->tokens->next();
         }
         while ($this->shouldContinue());
     }
 
-    public function rewind() {
+    public function rewind(): void {
         $this->tokens->rewind();
         while ($this->shouldContinue()) $this->tokens->next();
     }

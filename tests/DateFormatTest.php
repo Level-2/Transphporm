@@ -45,28 +45,8 @@ class DateFormatTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('28 seconds ago', $this->relative('-28 seconds'));
 	}
 
-	private function hasMicroseconds() {
-		$d1 = new \DateTime();
-		$d2 = new \DateTime();
-		$diff = $d1->diff($d2);
-		return isset($diff->f);
-	}
-
 	public function testSecondsin() {
-		//As of PHP 7.2 tests start to fail +33 seconds causes a 32s diff
-		//due to microseconds.
-		//What was previously a 33 second diff is now a
-		//32 second + 0.99999 microsecond diff
-		//Doesn't cause any real world problems but breaks the unit tests
-		//For now, just adjust the tests
-
-		if ($this->hasMicroseconds()) {
-			$this->assertEquals('in 32 seconds', $this->relative('+33 seconds'));
-		}
-		else {
-			$this->assertEquals('in 33 seconds', $this->relative('+33 seconds'));
-		}
-
+		$this->assertEquals('in 33 seconds', $this->relative('+33 seconds'));
 	}
 
 	public function testMinutesAgo() {
@@ -74,18 +54,7 @@ class DateFormatTest extends PHPUnit_Framework_TestCase {
 	}
 
 	public function testMinutesin() {
-		//As of PHP 7.2 tests start to fail +33 seconds causes a 32s diff
-		//due to microseconds.
-		//What was previously a 33 second diff is now a
-		//32 second + 0.99999 microsecond diff
-		//Doesn't cause any real world problems but breaks the unit tests
-		//For now, just adjust the tests
-		if ($this->hasMicroseconds()) {
-			$this->assertEquals('in 39 minutes', $this->relative('+40 minutes'));
-		}
-		else {
-			$this->assertEquals('in 40 minutes', $this->relative('+40 minutes'));
-		}
+		$this->assertEquals('in 40 minutes', $this->relative('+40 minutes'));
 	}
 
 	public function testHoursAgo() {
@@ -93,18 +62,7 @@ class DateFormatTest extends PHPUnit_Framework_TestCase {
 	}
 
 	public function testHoursin() {
-		//As of PHP 7.2 tests start to fail +33 seconds causes a 32s diff
-		//due to microseconds.
-		//What was previously a 33 second diff is now a
-		//32 second + 0.99999 microsecond diff
-		//Doesn't cause any real world problems but breaks the unit tests
-		//For now, just adjust the tests
-		if ($this->hasMicroseconds()) {
-			$this->assertEquals('in 2 hours', $this->relative('+3 hours'));
-		}
-		else {
-			$this->assertEquals('in 3 hours', $this->relative('+3 hours'));
-		}
+		$this->assertEquals('in 3 hours', $this->relative('+3 hours'));
 	}
 
 	public function testDaysAgo() {

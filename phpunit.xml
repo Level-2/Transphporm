@@ -1,16 +1,16 @@
 <?xml version="1.0"?>
-<phpunit bootstrap="tests/bootstrap.php">
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" bootstrap="tests/bootstrap.php" xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/9.3/phpunit.xsd">
+  <coverage processUncoveredFiles="true">
+    <include>
+      <directory suffix=".php">src</directory>
+      <directory suffix=".php">src/Formatter</directory>
+      <directory suffix=".php">src/Formatter/Locale</directory>
+      <directory suffix=".php">src/Hook</directory>
+    </include>
+  </coverage>
   <testsuites>
     <testsuite name="tests">
       <directory>tests</directory>
     </testsuite>
   </testsuites>
-  <filter>
-  <whitelist processUncoveredFilesFromWhitelist="true">
-    <directory suffix=".php">src</directory>
-    <directory suffix=".php">src/Formatter</directory>
-    <directory suffix=".php">src/Formatter/Locale</directory>
-    <directory suffix=".php">src/Hook</directory>
-  </whitelist>
-</filter>
 </phpunit>
